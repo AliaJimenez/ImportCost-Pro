@@ -12,10 +12,10 @@ Sistema de gestión de importaciones y cálculo automatizado de **Landed Cost** 
 ---
 
 ## 🛠️ Tecnologías y Herramientas
-*   **Framework principal:** .NET 9 (ASP.NET Core MVC)[cite: 2]
-*   **Persistencia de datos:** Entity Framework Core (Enfoque Code-First)[cite: 2]
-*   **Motor de Base de Datos:** SQL Server[cite: 2]
-*   **Diseño Visual:** Bootstrap CSS[cite: 2]
+*   **Framework principal:** .NET 9 (ASP.NET Core MVC)
+*   **Persistencia de datos:** Entity Framework Core (Enfoque Code-First)
+*   **Motor de Base de Datos:** SQL Server
+*   **Diseño Visual:** Bootstrap CSS
 
 ---
 
