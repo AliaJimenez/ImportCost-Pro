@@ -1,6 +1,6 @@
 # ImportCost Pro
 
-Sistema de gestión de importaciones y cálculo automatizado de **Landed Cost** (costo real final de mercancías puestas en almacén local)[cite: 2]. Proyecto académico diseñado bajo los requerimientos y la rúbrica de evaluación de 960 puntos[cite: 1].
+Sistema de gestión de importaciones y cálculo automatizado de **Landed Cost** (costo real final de mercancías puestas en almacén local)[cite: 2]. Proyecto académico diseñado bajo los requerimientos y la rúbrica de evaluación de 960 puntos.
 
 ---
 
@@ -20,13 +20,13 @@ Sistema de gestión de importaciones y cálculo automatizado de **Landed Cost** 
 ---
 
 ## 🏗️ Reglas de Arquitectura
-El proyecto se divide estrictamente en **3 capas independientes**[cite: 2]. Está totalmente penalizado por la rúbrica mezclar responsabilidades[cite: 2]:
+El proyecto se divide estrictamente en **3 capas independientes**[cite: 2]. Está totalmente penalizado por la rúbrica mezclar responsabilidades:
 
-1.  **`ImportCostPro.Web` (Presentación):** Controladores MVC y vistas[cite: 2]. *Regla de oro:* Los controladores solo reciben peticiones y devuelven vistas; **no hacen cálculos ni validaciones complejas de negocio**[cite: 2].
-2.  **`ImportCostPro.Core` (Lógica de Negocio):** Clases de servicio puros, DTOs y lógica matemática (prorrateos, tasas e impuestos)[cite: 2].
-3.  **`ImportCostPro.Data` (Acceso a Datos):** El `DbContext`, las entidades de la base de datos y las migraciones de EF Core[cite: 2].
+1.  **`ImportCostPro.Web` (Presentación):** Controladores MVC y vistas[cite: 2]. *Regla de oro:* Los controladores solo reciben peticiones y devuelven vistas; **no hacen cálculos ni validaciones complejas de negocio**.
+2.  **`ImportCostPro.Core` (Lógica de Negocio):** Clases de servicio puros, DTOs y lógica matemática (prorrateos, tasas e impuestos).
+3.  **`ImportCostPro.Data` (Acceso a Datos):** El `DbContext`, las entidades de la base de datos y las migraciones de EF Core.
 
-> ⚠️ **Nota Crítica:** Todos los valores monetarios, porcentajes y cálculos financieros deben utilizar obligatoriamente el tipo de dato `decimal`. Queda prohibido el uso de `float` o `double`[cite: 2].
+> ⚠️ **Nota Crítica:** Todos los valores monetarios, porcentajes y cálculos financieros deben utilizar obligatoriamente el tipo de dato `decimal`. Queda prohibido el uso de `float` o `double`.
 
 ---
 
