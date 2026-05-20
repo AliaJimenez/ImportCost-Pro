@@ -36,7 +36,7 @@ Sigue estos pasos en tu terminal para clonar y ejecutar el proyecto localmente:
 
 ```bash
 # 1. Clonar el repositorio privado
-git clone [[https://github.com/tu-usuario/ImportCost-Pro](https://github.com/AliaJimenez/ImportCost-Pro).git]
+git clone https://github.com/AliaJimenez/ImportCost-Pro.git
 cd ImportCost-Pro
 
 # 2. Restaurar los paquetes Nuget de la solución
