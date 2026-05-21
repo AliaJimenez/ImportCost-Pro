@@ -1,4 +1,15 @@
+using ImportCostPro.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// 1. Configurar la cadena de conexión y el DbContext
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<ImportCostDbContext>(options =>
+    options.UseSqlServer(connectionString));
+
+// 2. Inyección de Dependencias (Servicios de Aplicación)
+// Aquí iremos añadiendo los servicios según avancen
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -15,15 +26,11 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
 app.UseAuthorization();
-
-app.MapStaticAssets();
+app.UseStaticFiles(); 
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
