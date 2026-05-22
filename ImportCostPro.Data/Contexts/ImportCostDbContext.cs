@@ -1,6 +1,7 @@
+using ImportCostPro.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace ImportCostPro.Data
+namespace ImportCostPro.Data.Contexts
 {
     public class ImportCostDbContext : DbContext
     {
@@ -10,5 +11,8 @@ namespace ImportCostPro.Data
         }
 
         // Aquí Waldin, Yailyn y tú irán agregando sus DbSets (DbSet<Pais>, DbSet<Moneda>, etc.)
+
+        public DbSet<CategoriaArancelaria> CategoriasArancelaria { get; set; }
+        public DbSet<Producto> Productos { get; set; }
     }
 }
