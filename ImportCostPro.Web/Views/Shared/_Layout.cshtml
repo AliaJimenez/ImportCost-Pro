@@ -1,50 +1,89 @@
-﻿<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
-    <div class="container-fluid">
-        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ImportCost Pro</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-            <ul class="navbar-nav flex-grow-1">
-                <li class="nav-item">
-                    <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-                </li>
-                
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarConfig" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Configuración Base
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarConfig">
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Paises" asp-action="Index">Países</a></li>
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Monedas" asp-action="Index">Monedas</a></li>
-                        <li><a class="dropdown-item" asp-area="" asp-controller="TasasCambio" asp-action="Index">Tasas de Cambio</a></li>
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Impuestos" asp-action="Index">Configuración de Impuestos</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" asp-area="" asp-controller="CategoriasArancelarias" asp-action="Index">Categorías Arancelarias</a></li>
-                    </ul>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarCatalogos" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Catálogos
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarCatalogos">
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Importadores" asp-action="Index">Importadores</a></li>
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Proveedores" asp-action="Index">Proveedores</a></li>
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Productos" asp-action="Index">Productos</a></li>
-                    </ul>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarOperaciones" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Operaciones
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarOperaciones">
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Ordenes" asp-action="Index">Órdenes de Importación</a></li>
-                    </ul>
-                </li>
-            </ul>
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ImportCost Pro</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-calculator"></i> ImportCost Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
+                    </li>
+                    <!-- GEOGRAFÍA -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="geografiaDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-map"></i> Geografía
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="geografiaDropdown">
+                            <li><a class="dropdown-item" asp-controller="Pais" asp-action="Index">Países</a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- FINANZAS -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="financesDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-coins"></i> Finanzas
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="financesDropdown">
+                            <li><a class="dropdown-item" asp-controller="Moneda" asp-action="Index">Monedas</a></li>
+                            <li><a class="dropdown-item" asp-controller="TasaCambio" asp-action="Index">Tasas de Cambio</a></li>
+                            <li><a class="dropdown-item" asp-controller="ConfiguracionImpuesto" asp-action="Edit">Impuestos</a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- ACTORES -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="actoresDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-users"></i> Actores
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="actoresDropdown">
+                            <li><a class="dropdown-item" asp-controller="Importador" asp-action="Index">Importadores</a></li>
+                            <li><a class="dropdown-item" asp-controller="Proveedor" asp-action="Index">Proveedores</a></li>
+                        </ul>
+                    </li>
+                    
+                    <!-- CATÁLOGO -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="catalogoDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-box"></i> Catálogo
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="catalogoDropdown">
+                            <li><a class="dropdown-item" asp-controller="CategoriaArancelaria" asp-action="Index">Categorías</a></li>
+                            <li><a class="dropdown-item" asp-controller="Producto" asp-action="Index">Productos</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
+
+    <!-- Main Content -->
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top footer text-muted bg-light mt-5">
+        <div class="container text-center">
+            <small>&copy; 2026 ImportCost Pro - Sistema de Cálculo de Costo de Importación</small>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

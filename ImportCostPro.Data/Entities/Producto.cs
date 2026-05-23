@@ -6,7 +6,7 @@ namespace ImportCostPro.Data.Entities
 {
     public class Producto
     {
-        public int Id { get; set; }
+        /*public int Id { get; set; }
 
         [MaxLength(150)]
         public required string Nombre { get; set; }
@@ -37,7 +37,7 @@ namespace ImportCostPro.Data.Entities
         //navigation properties
         //cuando se agregue el DbSet<Pais> tengo q descomentar 
         //public Pais PaisOrigen { get; set; }
-        public CategoriaArancelaria CategoriaArancelaria { get; set; } 
+        public CategoriaArancelaria CategoriaArancelaria { get; set; } */
 
 
     }

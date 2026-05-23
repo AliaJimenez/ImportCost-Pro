@@ -1,0 +1,1 @@
+//Restricción rangos 0-100
