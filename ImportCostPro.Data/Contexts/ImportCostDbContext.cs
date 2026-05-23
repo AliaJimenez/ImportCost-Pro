@@ -14,5 +14,9 @@ namespace ImportCostPro.Data.Contexts
 
         public DbSet<CategoriaArancelaria> CategoriasArancelaria { get; set; }
         public DbSet<Producto> Productos { get; set; }
+        public DbSet<Pais> Paises { get; set; } 
+        public DbSet<Proveedor> Proveedores { get; set; }
+        public DbSet <Importador> importadores { get; set; }    
+      
     }
 }
