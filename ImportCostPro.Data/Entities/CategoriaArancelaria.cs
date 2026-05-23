@@ -22,7 +22,7 @@ namespace ImportCostPro.Data.Entities
         public required bool Activo { get; set; }= true;
 
         //navigation properties
-        public ICollection<Producto> Productos { get; set; } = new List<Producto>();*/
+        public ICollection<Producto> Productos { get; set; } = new List<Producto>();
 
     }
 }
