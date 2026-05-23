@@ -1,0 +1,54 @@
+﻿@model ImportCostPro.Core.Dtos.ProductoDto
+
+@{
+    ViewData["Title"] = "Eliminar producto";
+}
+
+<div class="container">
+    <h2 class="mb-4">Eliminar producto</h2>
+
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle"></i>
+        ¿Está seguro que desea eliminar este producto?
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Código o referencia</dt>
+                <dd class="col-sm-8">@Model.CodigoReferencia</dd>
+
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">@Model.Nombre</dd>
+
+                <dt class="col-sm-4">Categoría arancelaria</dt>
+                <dd class="col-sm-8">@Model.NombreCategoria</dd>
+
+                <dt class="col-sm-4">Peso unitario</dt>
+                <dd class="col-sm-8">@Model.PesoUnitario kg</dd>
+
+                <dt class="col-sm-4">Unidad de medida</dt>
+                <dd class="col-sm-8">@Model.UnidadMedida</dd>
+
+                <dt class="col-sm-4">Estado</dt>
+                <dd class="col-sm-8">
+                    @(Model.Activo ? "Activo" : "Inactivo")
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Aceptar
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
