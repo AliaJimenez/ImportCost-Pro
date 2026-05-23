@@ -1,5 +1,6 @@
 using ImportCostPro.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace ImportCostPro.Data.Contexts
 {
@@ -12,7 +13,16 @@ namespace ImportCostPro.Data.Contexts
 
         // Aquí Waldin, Yailyn y tú irán agregando sus DbSets (DbSet<Pais>, DbSet<Moneda>, etc.)
 
-        public DbSet<CategoriaArancelaria> CategoriasArancelaria { get; set; }
+        public DbSet<CategoriaArancelaria> CategoriasArancelarias { get; set; }
         public DbSet<Producto> Productos { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder); //principio liskov
+
+            //trae todas las configuraciones de entidades 
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+           
+        }
     }
 }

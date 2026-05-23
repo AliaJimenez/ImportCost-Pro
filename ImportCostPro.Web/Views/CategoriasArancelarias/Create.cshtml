@@ -1,0 +1,115 @@
+﻿@model ImportCostPro.Core.ViewModels.CategoriaArancelariaViewModel
+
+@{
+    ViewData["Title"] = "Crear categoría arancelaria";
+}
+
+<div class="container">
+    <h2 class="mb-4">Crear categoría arancelaria</h2>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="CodigoArancelario" class="form-label"></label>
+                <input asp-for="CodigoArancelario" class="form-control"
+                       placeholder="Ej: 8471.30" />
+                <span asp-validation-for="CodigoArancelario"
+                      class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-8 mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control"
+                       placeholder="Ej: Computadoras portátiles" />
+                <span asp-validation-for="Nombre"
+                      class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="PorcentajeArancel" class="form-label"></label>
+                <div class="input-group">
+                    <input asp-for="PorcentajeArancel"
+                           class="form-control" placeholder="0" />
+                    <span class="input-group-text">%</span>
+                </div>
+                <span asp-validation-for="PorcentajeArancel"
+                      class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="form-check form-switch mt-4">
+                    <input asp-for="AplicaItbis"
+                           class="form-check-input" type="checkbox" />
+                    <label asp-for="AplicaItbis"
+                           class="form-check-label"></label>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="form-check form-switch mt-4">
+                    <input asp-for="AplicaImpuestoSelectivo"
+                           class="form-check-input" type="checkbox"
+                           id="chkSelectivo"
+                           onchange="toggleSelectivo(this)" />
+                    <label asp-for="AplicaImpuestoSelectivo"
+                           class="form-check-label"></label>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3" id="divSelectivo"
+                 style="display:none">
+                <label asp-for="PorcentajeImpuestoSelectivo"
+                       class="form-label"></label>
+                <div class="input-group">
+                    <input asp-for="PorcentajeImpuestoSelectivo"
+                           class="form-control" placeholder="0" />
+                    <span class="input-group-text">%</span>
+                </div>
+                <span asp-validation-for="PorcentajeImpuestoSelectivo"
+                      class="text-danger small"></span>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check form-switch">
+                <input asp-for="Activo" class="form-check-input"
+                       type="checkbox" checked />
+                <label asp-for="Activo" class="form-check-label"></label>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-floppy"></i> Crear categoría arancelaria
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver atrás
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function toggleSelectivo(checkbox) {
+            const div = document.getElementById('divSelectivo');
+            div.style.display = checkbox.checked ? 'block' : 'none';
+        }
+
+        window.onload = function () {
+            const chk = document.getElementById('chkSelectivo');
+            if (chk && chk.checked) {
+                document.getElementById('divSelectivo').style.display = 'block';
+            }
+        }
+    </script>
+}
