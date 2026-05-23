@@ -2,7 +2,7 @@
 {
     public class CategoriaArancelaria
     {
-        /*public int Id { get; set; }
+        public int Id { get; set; }
 
         public required string CodigoArancelario { get; set; }
 
@@ -17,7 +17,7 @@
         public required bool Activo { get; set; }= true;
 
         //navigation properties
-        public ICollection<Producto> Productos { get; set; } = new List<Producto>();*/
+        public ICollection<Producto> Productos { get; set; } = new List<Producto>();
 
     }
 }
