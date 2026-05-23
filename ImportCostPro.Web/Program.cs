@@ -1,3 +1,5 @@
+using ImportCostPro.Core.Interfaces;
+using ImportCostPro.Core.Services;
 using ImportCostPro.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using ImportCostPro.Core.Interfaces;
@@ -12,7 +14,8 @@ builder.Services.AddDbContext<ImportCostDbContext>(options =>
 
 // 2. Inyección de Dependencias (Servicios de Aplicación)
 // Aquí iremos añadiendo los servicios según avancen
-
+builder.Services.AddScoped<ICategoriaArancelariaService, CategoriaArancelariaService>();
+builder.Services.AddScoped<IProductoService, ProductoService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

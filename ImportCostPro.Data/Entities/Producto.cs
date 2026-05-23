@@ -2,10 +2,7 @@
 {
     public class Producto
     {
-
         public int Id { get; set; }
-
-
         public required string Nombre { get; set; }
         public required string CodigoReferencia { get; set; }
         public required decimal PesoUnitario { get; set; }
@@ -28,10 +25,8 @@
         //navigation properties
         //cuando se agregue el DbSet<Pais> tengo q descomentar 
         //public Pais PaisOrigen { get; set; }
+        public CategoriaArancelaria CategoriaArancelaria { get; set; } 
 
-       // public CategoriaArancelaria CategoriaArancelaria { get; set; } 
-
-       // public CategoriaArancelaria CategoriaArancelaria { get; set; } 
 
     }
 }

@@ -1,0 +1,54 @@
+﻿@model ImportCostPro.Core.Dtos.CategoriaArancelariaDto
+
+@{
+    ViewData["Title"] = "Eliminar categoría arancelaria";
+}
+
+<div class="container">
+    <h2 class="mb-4">Eliminar categoría arancelaria</h2>
+
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle"></i>
+        ¿Está seguro que desea eliminar esta categoría arancelaria?
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Código arancelario</dt>
+                <dd class="col-sm-8">@Model.CodigoArancelario</dd>
+
+                <dt class="col-sm-4">Nombre</dt>
+                <dd class="col-sm-8">@Model.Nombre</dd>
+
+                <dt class="col-sm-4">% Arancel</dt>
+                <dd class="col-sm-8">@Model.PorcentajeArancel %</dd>
+
+                <dt class="col-sm-4">Aplica ITBIS</dt>
+                <dd class="col-sm-8">@(Model.AplicaItbis ? "Sí" : "No")</dd>
+
+                <dt class="col-sm-4">Aplica impuesto selectivo</dt>
+                <dd class="col-sm-8">
+                    @(Model.AplicaImpuestoSelectivo ? "Sí" : "No")
+                </dd>
+
+                <dt class="col-sm-4">Estado</dt>
+                <dd class="col-sm-8">@(Model.Activo ? "Activo" : "Inactivo")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Aceptar
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
