@@ -427,3 +427,7 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/ImportCostPro.Core/ViewModels/Proveedor/ProveedorEditViewModel.cs
+/ImportCostPro.Data/Contexts/ImportCostDbContext.cs
+/ImportCostPro.Data/Entities/CategoriaArancelaria.cs
+/ImportCostPro.Data/Entities/Pais.cs

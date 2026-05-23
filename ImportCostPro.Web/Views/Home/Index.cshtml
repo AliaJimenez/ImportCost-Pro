@@ -1,8 +1,46 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard - ImportCost Pro";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <div class="jumbotron bg-light p-5 rounded">
+        <h1 class="display-4">
+            <i class="fas fa-calculator"></i> ImportCost Pro
+        </h1>
+        <p class="lead">Sistema integral para el cálculo del costo de importación (Landed Cost)</p>
+        <hr class="my-4">
+        <p>Selecciona una opción del menú para comenzar.</p>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-map"></i> Geografía</h5>
+                    <p class="card-text">Gestión de países.</p>
+                    <a asp-controller="Pais" asp-action="Index" class="btn btn-primary">Ir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-coins"></i> Finanzas</h5>
+                    <p class="card-text">Monedas, tasas y configuración de impuestos.</p>
+                    <a asp-controller="Moneda" asp-action="Index" class="btn btn-primary">Ir</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-users"></i> Actores</h5>
+                    <p class="card-text">Importadores y proveedores.</p>
+                    <a asp-controller="Importador" asp-action="Index" class="btn btn-primary">Ir</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
