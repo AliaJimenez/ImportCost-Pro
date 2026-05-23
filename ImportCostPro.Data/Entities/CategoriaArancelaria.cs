@@ -6,7 +6,7 @@ namespace ImportCostPro.Data.Entities
 {
     public class CategoriaArancelaria
     {
-        /*public int Id { get; set; }
+        public int Id { get; set; }
 
         [MaxLength(20)]
         public required string CodigoArancelario { get; set; }
