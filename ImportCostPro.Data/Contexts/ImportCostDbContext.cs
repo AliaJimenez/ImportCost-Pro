@@ -11,10 +11,13 @@ namespace ImportCostPro.Data.Contexts
         {
         }
 
-        // Aquí Waldin, Yailyn y tú irán agregando sus DbSets (DbSet<Pais>, DbSet<Moneda>, etc.)
+        // Aqui iremos agregando sus DbSets (DbSet<Pais>, DbSet<Moneda>, etc.)
 
         public DbSet<CategoriaArancelaria> CategoriasArancelarias { get; set; }
         public DbSet<Producto> Productos { get; set; }
+        public DbSet<Moneda> Monedas { get; set; }
+        public DbSet<TasaCambio> TasasCambio { get; set; }
+        public DbSet<ConfiguracionImpuesto> ConfiguracionesImpuestos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -22,7 +25,7 @@ namespace ImportCostPro.Data.Contexts
 
             //trae todas las configuraciones de entidades 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-           
+        
         }
     }
 }

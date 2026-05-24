@@ -12,8 +12,12 @@ builder.Services.AddDbContext<ImportCostDbContext>(options =>
 
 // 2. Inyección de Dependencias (Servicios de Aplicación)
 // Aquí iremos añadiendo los servicios según avancen
-builder.Services.AddScoped<ICategoriaArancelariaService, CategoriaArancelariaService>();
+// Asegúrate de tener esto en tu Program.cs
+builder.Services.AddScoped<IMonedaService, MonedaService>();
+builder.Services.AddScoped<ITasaCambioService, TasaCambioService>();
+builder.Services.AddScoped<IConfiguracionImpuestoService, ConfiguracionImpuestoService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
+builder.Services.AddScoped<ICategoriaArancelariaService, CategoriaArancelariaService>(); 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

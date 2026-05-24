@@ -12,7 +12,6 @@ namespace ImportCostPro.Data.Entities
         // Porcentaje Tasa de Servicio Aduanal (0-100)
         public decimal PorcentajeTasaServicioAduanal { get; set; }
         
-        // Auditoría
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
     }
 }

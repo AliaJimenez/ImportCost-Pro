@@ -8,11 +8,11 @@ namespace ImportCostPro.Data.Entities
         
         // Moneda origen
         public int MonedaOrigenId { get; set; }
-        public Moneda MonedaOrigen { get; set; }
+        public Moneda ? MonedaOrigen { get; set; }
         
         // Moneda destino
         public int MonedaDestinoId { get; set; }
-        public Moneda MonedaDestino { get; set; }
+        public Moneda ? MonedaDestino { get; set; }
         
         // Tasa (factor de conversión - decimal con 6 decimales)
         public decimal Tasa { get; set; }

@@ -1,0 +1,80 @@
+@model IEnumerable<ImportCostPro.Core.Dtos.TasaCambioDto>
+
+@{
+    ViewData["Title"] = "Tasas de Cambio";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2><i class="bi bi-currency-exchange"></i> Histórico de Tasas de Cambio</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Registrar Tasa
+        </a>
+    </div>
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @TempData["Mensaje"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-3">Fecha Vigencia</th>
+                            <th>Origen -> Destino</th>
+                            <th class="text-end">Tasa de Conversión</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center pe-3">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr><td colspan="5" class="text-center py-4 text-muted">No hay tasas registradas.</td></tr>
+                        }
+                        else
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="fw-bold ps-3">@item.FechaVigencia.ToShortDateString()</td>
+                                    <td>
+                                        <span class="badge bg-secondary">@item.NombreMonedaOrigen</span> 
+                                        <i class="bi bi-arrow-right"></i> 
+                                        <span class="badge bg-primary">@item.NombreMonedaDestino</span>
+                                    </td>
+                                    <td class="text-end text-monospace fw-bold">@item.Tasa.ToString("N6")</td>
+                                    <td class="text-center">
+                                        @if (item.Activo) { <span class="badge bg-success">Vigente</span> }
+                                        else { <span class="badge bg-danger">Inactiva</span> }
+                                    </td>
+                                    <td class="text-center pe-3">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

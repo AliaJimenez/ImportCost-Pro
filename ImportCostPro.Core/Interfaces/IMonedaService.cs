@@ -1,22 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using ImportCostPro.Core.Dtos;
 
 namespace ImportCostPro.Core.Interfaces
 {
     public interface IMonedaService
     {
-        Task<IEnumerable<MonedaDto>> GetAllAsync();
-        Task<IEnumerable<MonedaDto>> GetActivasAsync();
-        Task<MonedaDto> GetByIdAsync(int id);
-        Task<MonedaDto> CreateAsync(MonedaDto monedaDto);
-        Task<MonedaDto> UpdateAsync(MonedaDto monedaDto);
-        Task<bool> DeleteAsync(int id);
-        Task<bool> ExistsByCodigoISOAsync(string codigoISO, int? excludeId = null);
-        Task<int?> GetMonedaLocalActivaAsync();
-        Task<bool> IsMonedaLocalAsync(int monedaId);
-        Task<bool> CanDeleteAsync(int monedaId);
-        Task<string> GetDeleteErrorMessageAsync(int monedaId);
+        Task<List<MonedaDto>> ObtenerTodasAsync();
+        Task<List<MonedaDto>> ObtenerActivasAsync();
+        Task<MonedaDto?> ObtenerPorIdAsync(int id);
+        Task<(bool exito, string mensaje)> CrearAsync(MonedaDto dto);
+        Task<(bool exito, string mensaje)> EditarAsync(MonedaDto dto);
+        Task<(bool exito, string mensaje)> EliminarAsync(int id);
     }
 }

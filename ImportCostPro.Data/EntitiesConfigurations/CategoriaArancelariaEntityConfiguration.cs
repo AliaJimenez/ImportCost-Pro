@@ -24,9 +24,9 @@ namespace ImportCostPro.Data.EntityConfigurations
 
             #region Relationship Configuration
             builder.HasMany<Producto>(c => c.Productos)
-                   .WithOne(p => p.CategoriaArancelaria)
-                   .HasForeignKey(p => p.CategoriaArancelariaId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                .WithOne(p => p.CategoriaArancelaria)
+                .HasForeignKey(p => p.CategoriaArancelariaId)
+                .OnDelete(DeleteBehavior.Restrict);
             #endregion
         }
     }

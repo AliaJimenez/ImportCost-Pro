@@ -1,0 +1,65 @@
+@model ImportCostPro.Core.ViewModels.TasaCambioViewModel
+
+@{
+    ViewData["Title"] = "Nueva Tasa de Cambio";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Registrar Tasa de Cambio</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 fw-bold"></div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="MonedaOrigenId" class="form-label fw-bold"></label>
+                                <select asp-for="MonedaOrigenId" class="form-select" asp-items="ViewBag.MonedasOrigen">
+                                    <option value="">-- Seleccione Origen --</option>
+                                </select>
+                                <span asp-validation-for="MonedaOrigenId" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="MonedaDestinoId" class="form-label fw-bold"></label>
+                                <select asp-for="MonedaDestinoId" class="form-select" asp-items="ViewBag.MonedasDestino">
+                                    <option value="">-- Seleccione Destino --</option>
+                                </select>
+                                <span asp-validation-for="MonedaDestinoId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Tasa" class="form-label fw-bold"></label>
+                                <input asp-for="Tasa" class="form-control text-end" type="number" step="0.000001" placeholder="Ej. 58.500000" />
+                                <span asp-validation-for="Tasa" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="FechaVigencia" class="form-label fw-bold"></label>
+                                <input asp-for="FechaVigencia" class="form-control" type="date" />
+                                <span asp-validation-for="FechaVigencia" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 form-check form-switch">
+                            <input asp-for="Activo" class="form-check-input" type="checkbox" role="switch">
+                            <label asp-for="Activo" class="form-check-label fw-bold"></label>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Cancelar</a>
+                            <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Guardar Tasa</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

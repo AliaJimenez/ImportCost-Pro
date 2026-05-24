@@ -1,6 +1,6 @@
+using ImportCostPro.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ImportCostPro.Data.Entities;
 
 namespace ImportCostPro.Data.EntitiesConfigurations
 {
@@ -8,17 +8,27 @@ namespace ImportCostPro.Data.EntitiesConfigurations
     {
         public void Configure(EntityTypeBuilder<ConfiguracionImpuesto> builder)
         {
+            #region Basic Configuration
+            builder.ToTable("ConfiguracionesImpuestos");
             builder.HasKey(c => c.Id);
-            
-            // ITBIS decimal(5,2) - entre 0 y 100
+            #endregion
+
+            #region Property Configuration
             builder.Property(c => c.PorcentajeITBIS)
-                .HasPrecision(5, 2)
-                .IsRequired();
-            
-            // Tasa Servicio Aduanal decimal(5,2) - entre 0 y 100
+                .IsRequired()
+                .HasColumnType("decimal(5,2)");
+
             builder.Property(c => c.PorcentajeTasaServicioAduanal)
-                .HasPrecision(5, 2)
-                .IsRequired();
+                .IsRequired()
+                .HasColumnType("decimal(5,2)");
+
+            builder.Property(c => c.FechaModificacion)
+                .HasDefaultValueSql("GETDATE()");
+            #endregion
+
+            #region Relationship Configuration
+            // Esta entidad no tiene relaciones foráneas según la estructura actual
+            #endregion
         }
     }
 }

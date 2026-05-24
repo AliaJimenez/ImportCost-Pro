@@ -1,6 +1,6 @@
+using ImportCostPro.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ImportCostPro.Data.Entities;
 
 namespace ImportCostPro.Data.EntitiesConfigurations
 {
@@ -8,36 +8,56 @@ namespace ImportCostPro.Data.EntitiesConfigurations
     {
         public void Configure(EntityTypeBuilder<Moneda> builder)
         {
+            #region Basic Configuration
+            builder.ToTable("Monedas");
             builder.HasKey(m => m.Id);
-            
-            // Código ISO único y requerido
+            #endregion
+
+            #region Property Configuration
             builder.Property(m => m.CodigoISO)
                 .IsRequired()
-                .HasMaxLength(3);
-            
-            builder.HasIndex(m => m.CodigoISO)
-                .IsUnique();
-            
-            // Nombre requerido
+                .HasMaxLength(3)
+                .IsFixedLength(); // El ISO siempre tiene exactamente 3 caracteres
+
             builder.Property(m => m.Nombre)
                 .IsRequired()
-                .HasMaxLength(100);
-            
-            // Símbolo
+                .HasMaxLength(150);
+
             builder.Property(m => m.Simbolo)
+                .IsRequired()
                 .HasMaxLength(5);
-            
-            // EsMonedaLocal por defecto false
+
             builder.Property(m => m.EsMonedaLocal)
                 .HasDefaultValue(false);
-            
-            // Activo por defecto
+
             builder.Property(m => m.Activo)
                 .HasDefaultValue(true);
-            
-            // Fechas
+
             builder.Property(m => m.FechaCreacion)
                 .HasDefaultValueSql("GETDATE()");
+
+            builder.Property(m => m.FechaModificacion)
+                .HasDefaultValueSql("GETDATE()");
+            #endregion
+
+            #region Index Configuration
+            builder.HasIndex(m => m.CodigoISO)
+                .IsUnique();
+            #endregion
+
+            #region Relationship Configuration
+            // Relación 1 a Muchos: Una Moneda puede ser el Origen de muchas Tasas de Cambio
+            builder.HasMany(m => m.TasasCambioOrigen)
+                .WithOne(t => t.MonedaOrigen)
+                .HasForeignKey(t => t.MonedaOrigenId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Relación 1 a Muchos: Una Moneda puede ser el Destino de muchas Tasas de Cambio
+            builder.HasMany(m => m.TasasCambioDestino)
+                .WithOne(t => t.MonedaDestino)
+                .HasForeignKey(t => t.MonedaDestinoId)
+                .OnDelete(DeleteBehavior.Restrict);
+            #endregion
         }
     }
 }

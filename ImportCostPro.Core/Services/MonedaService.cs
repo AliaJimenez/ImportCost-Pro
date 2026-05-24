@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using ImportCostPro.Data.Entities;
 using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Data.Contexts;
+using ImportCostPro.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Core.Services
 {
@@ -15,182 +15,141 @@ namespace ImportCostPro.Core.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<MonedaDto>> GetAllAsync()
+        public async Task<List<MonedaDto>> ObtenerTodasAsync()
         {
-            var monedas = await _context.Monedas
+            return await _context.Monedas
                 .OrderBy(m => m.Nombre)
+                .Select(m => new MonedaDto
+                {
+                    Id = m.Id,
+                    CodigoISO = m.CodigoISO,
+                    Nombre = m.Nombre,
+                    Simbolo = m.Simbolo,
+                    EsMonedaLocal = m.EsMonedaLocal,
+                    Activo = m.Activo
+                })
                 .ToListAsync();
-            
-            return MapToDto(monedas);
         }
 
-        public async Task<IEnumerable<MonedaDto>> GetActivasAsync()
+        public async Task<List<MonedaDto>> ObtenerActivasAsync()
         {
-            var monedas = await _context.Monedas
+            return await _context.Monedas
                 .Where(m => m.Activo)
                 .OrderBy(m => m.Nombre)
+                .Select(m => new MonedaDto
+                {
+                    Id = m.Id,
+                    CodigoISO = m.CodigoISO,
+                    Nombre = m.Nombre,
+                    Simbolo = m.Simbolo,
+                    EsMonedaLocal = m.EsMonedaLocal,
+                    Activo = m.Activo
+                })
                 .ToListAsync();
-            
-            return MapToDto(monedas);
         }
 
-        public async Task<MonedaDto> GetByIdAsync(int id)
+        public async Task<MonedaDto?> ObtenerPorIdAsync(int id)
         {
-            var moneda = await _context.Monedas.FindAsync(id);
-            return moneda == null ? null : MapToDto(moneda);
-        }
+            var entidad = await _context.Monedas.FirstOrDefaultAsync(m => m.Id == id);
+            if (entidad == null) return null;
 
-        public async Task<MonedaDto> CreateAsync(MonedaDto monedaDto)
-        {
-            // Validar que no exista el código ISO
-            if (await ExistsByCodigoISOAsync(monedaDto.CodigoISO))
-                throw new Exception("El código ISO ya existe");
-            
-            // Si es moneda local, verificar que no haya otra activa
-            if (monedaDto.EsMonedaLocal)
+            return new MonedaDto
             {
-                var otraLocal = await _context.Monedas
-                    .FirstOrDefaultAsync(m => m.EsMonedaLocal && m.Activo);
+                Id = entidad.Id,
+                CodigoISO = entidad.CodigoISO,
+                Nombre = entidad.Nombre,
+                Simbolo = entidad.Simbolo,
+                EsMonedaLocal = entidad.EsMonedaLocal,
+                Activo = entidad.Activo
+            };
+        }
+
+        public async Task<(bool exito, string mensaje)> CrearAsync(MonedaDto dto)
+        {
+            // Validación ISO Único
+            var isoExiste = await _context.Monedas
+                .AnyAsync(m => m.CodigoISO.ToUpper() == dto.CodigoISO.Trim().ToUpper());
+
+            if (isoExiste)
+                return (false, "Ya existe una moneda con este código ISO.");
+
+            // Validación de Moneda Local Única Activa
+            if (dto.EsMonedaLocal && dto.Activo)
+            {
+                var otraLocalActiva = await _context.Monedas
+                    .AnyAsync(m => m.EsMonedaLocal && m.Activo);
                 
-                if (otraLocal != null)
-                    throw new Exception("Solo puede haber una moneda local activa");
+                if (otraLocalActiva)
+                    return (false, "Ya existe una moneda local activa. Solo puede haber una en el sistema.");
             }
-            
-            var moneda = new Moneda
+
+            var entidad = new Moneda
             {
-                CodigoISO = monedaDto.CodigoISO,
-                Nombre = monedaDto.Nombre,
-                Simbolo = monedaDto.Simbolo,
-                EsMonedaLocal = monedaDto.EsMonedaLocal,
-                Activo = monedaDto.Activo,
+                CodigoISO = dto.CodigoISO.Trim().ToUpper(),
+                Nombre = dto.Nombre.Trim(),
+                Simbolo = dto.Simbolo.Trim(),
+                EsMonedaLocal = dto.EsMonedaLocal,
+                Activo = dto.Activo,
                 FechaCreacion = DateTime.Now,
                 FechaModificacion = DateTime.Now
             };
-            
-            _context.Monedas.Add(moneda);
+
+            _context.Monedas.Add(entidad);
             await _context.SaveChangesAsync();
-            
-            return MapToDto(moneda);
+
+            return (true, "Moneda creada correctamente.");
         }
 
-        public async Task<MonedaDto> UpdateAsync(MonedaDto monedaDto)
+        public async Task<(bool exito, string mensaje)> EditarAsync(MonedaDto dto)
         {
-            var moneda = await _context.Monedas.FindAsync(monedaDto.Id);
-            if (moneda == null)
-                throw new Exception("Moneda no encontrada");
-            
-            // Validar código ISO único
-            if (await ExistsByCodigoISOAsync(monedaDto.CodigoISO, monedaDto.Id))
-                throw new Exception("El código ISO ya existe");
-            
-            // Si es moneda local, validar
-            if (monedaDto.EsMonedaLocal && !moneda.EsMonedaLocal)
+            var entidad = await _context.Monedas.FirstOrDefaultAsync(m => m.Id == dto.Id);
+            if (entidad == null)
+                return (false, "Moneda no encontrada.");
+
+            // Validación ISO Único 
+            var isoExiste = await _context.Monedas
+                .AnyAsync(m => m.CodigoISO.ToUpper() == dto.CodigoISO.Trim().ToUpper() && m.Id != dto.Id);
+
+            if (isoExiste)
+                return (false, "Ya existe otra moneda con este código ISO.");
+
+            // Validación de Moneda Local Única Activa
+            if (dto.EsMonedaLocal && dto.Activo)
             {
-                var otraLocal = await _context.Monedas
-                    .FirstOrDefaultAsync(m => m.EsMonedaLocal && m.Activo && m.Id != monedaDto.Id);
+                var otraLocalActiva = await _context.Monedas
+                    .AnyAsync(m => m.EsMonedaLocal && m.Activo && m.Id != dto.Id);
                 
-                if (otraLocal != null)
-                    throw new Exception("Solo puede haber una moneda local activa");
+                if (otraLocalActiva)
+                    return (false, "Ya existe otra moneda local activa. Solo puede haber una en el sistema.");
             }
-            
-            moneda.CodigoISO = monedaDto.CodigoISO;
-            moneda.Nombre = monedaDto.Nombre;
-            moneda.Simbolo = monedaDto.Simbolo;
-            moneda.EsMonedaLocal = monedaDto.EsMonedaLocal;
-            moneda.Activo = monedaDto.Activo;
-            moneda.FechaModificacion = DateTime.Now;
-            
-            _context.Monedas.Update(moneda);
+
+            entidad.CodigoISO = dto.CodigoISO.Trim().ToUpper();
+            entidad.Nombre = dto.Nombre.Trim();
+            entidad.Simbolo = dto.Simbolo.Trim();
+            entidad.EsMonedaLocal = dto.EsMonedaLocal;
+            entidad.Activo = dto.Activo;
+            entidad.FechaModificacion = DateTime.Now;
+
             await _context.SaveChangesAsync();
-            
-            return MapToDto(moneda);
+            return (true, "Moneda actualizada correctamente.");
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<(bool exito, string mensaje)> EliminarAsync(int id)
         {
-            var moneda = await _context.Monedas.FindAsync(id);
-            if (moneda == null)
-                return false;
-            
-            _context.Monedas.Remove(moneda);
+            var entidad = await _context.Monedas.FirstOrDefaultAsync(m => m.Id == id);
+            if (entidad == null)
+                return (false, "Moneda no encontrada.");
+
+            var usadaEnTasas = await _context.TasasCambio
+                .AnyAsync(t => t.MonedaOrigenId == id || t.MonedaDestinoId == id);
+
+            if (usadaEnTasas)
+                return (false, "No se puede eliminar esta moneda porque está siendo utilizada en Tasas de Cambio.");
+
+            _context.Monedas.Remove(entidad);
             await _context.SaveChangesAsync();
-            
-            return true;
-        }
 
-        public async Task<bool> ExistsByCodigoISOAsync(string codigoISO, int? excludeId = null)
-        {
-            var query = _context.Monedas
-                .Where(m => m.CodigoISO == codigoISO);
-            
-            if (excludeId.HasValue)
-                query = query.Where(m => m.Id != excludeId);
-            
-            return await query.AnyAsync();
-        }
-
-        public async Task<int?> GetMonedaLocalActivaAsync()
-        {
-            var monedaLocal = await _context.Monedas
-                .FirstOrDefaultAsync(m => m.EsMonedaLocal && m.Activo);
-            
-            return monedaLocal?.Id;
-        }
-
-        public async Task<bool> IsMonedaLocalAsync(int monedaId)
-        {
-            var moneda = await _context.Monedas.FindAsync(monedaId);
-            return moneda?.EsMonedaLocal ?? false;
-        }
-
-        public async Task<bool> CanDeleteAsync(int monedaId)
-        {
-            // Verificar si está en tasas de cambio
-            bool enTasas = await _context.TasasCambio
-                .AnyAsync(t => (t.MonedaOrigenId == monedaId || t.MonedaDestinoId == monedaId) && t.Activo);
-            
-            return !enTasas;
-        }
-
-        public async Task<string> GetDeleteErrorMessageAsync(int monedaId)
-        {
-            if (await _context.TasasCambio
-                .AnyAsync(t => (t.MonedaOrigenId == monedaId || t.MonedaDestinoId == monedaId)))
-            {
-                return "Esta moneda está usada en tasas de cambio y no puede ser eliminada.";
-            }
-            
-            return "No se puede eliminar esta moneda.";
-        }
-
-        private IEnumerable<MonedaDto> MapToDto(IEnumerable<Moneda> monedas)
-        {
-            return monedas.Select(m => new MonedaDto
-            {
-                Id = m.Id,
-                CodigoISO = m.CodigoISO,
-                Nombre = m.Nombre,
-                Simbolo = m.Simbolo,
-                EsMonedaLocal = m.EsMonedaLocal,
-                Activo = m.Activo,
-                FechaCreacion = m.FechaCreacion,
-                FechaModificacion = m.FechaModificacion
-            });
-        }
-
-        private MonedaDto MapToDto(Moneda moneda)
-        {
-            return new MonedaDto
-            {
-                Id = moneda.Id,
-                CodigoISO = moneda.CodigoISO,
-                Nombre = moneda.Nombre,
-                Simbolo = moneda.Simbolo,
-                EsMonedaLocal = moneda.EsMonedaLocal,
-                Activo = moneda.Activo,
-                FechaCreacion = moneda.FechaCreacion,
-                FechaModificacion = moneda.FechaModificacion
-            };
+            return (true, "Moneda eliminada correctamente.");
         }
     }
 }

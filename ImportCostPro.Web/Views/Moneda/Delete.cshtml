@@ -1,0 +1,40 @@
+@model ImportCostPro.Core.Dtos.MonedaDto
+
+@{
+    ViewData["Title"] = "Eliminar Moneda";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> ¿Confirmar Eliminación?</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="fs-5">¿Estás seguro de que deseas eliminar permanentemente esta moneda?</p>
+                    
+                    <div class="alert alert-warning text-start">
+                        <strong>Moneda:</strong> @Model.Nombre (@Model.CodigoISO)<br />
+                        <strong>Símbolo:</strong> @Model.Simbolo<br />
+                        <strong>Nota:</strong> Esta acción no se puede deshacer y fallará si la moneda está amarrada a tasas de cambio vigentes.
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left-circle"></i> No, Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash-fill"></i> Sí, Eliminar Moneda
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

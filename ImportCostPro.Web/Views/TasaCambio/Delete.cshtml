@@ -1,0 +1,36 @@
+@model ImportCostPro.Core.Dtos.TasaCambioDto
+
+@{
+    ViewData["Title"] = "Eliminar Tasa de Cambio";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> ¿Confirmar Eliminación?</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p class="fs-5">¿Estás seguro de que deseas eliminar esta tasa de cambio?</p>
+                    
+                    <div class="alert alert-warning text-start">
+                        <strong>Fecha Vigencia:</strong> @Model.FechaVigencia.ToShortDateString()<br />
+                        <strong>Conversión:</strong> @Model.NombreMonedaOrigen -> @Model.NombreMonedaDestino<br />
+                        <strong>Tasa:</strong> @Model.Tasa.ToString("N6")<br />
+                    </div>
+
+                    <form asp-action="Delete" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Cancelar</a>
+                            <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Sí, Eliminar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

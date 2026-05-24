@@ -8,13 +8,13 @@ namespace ImportCostPro.Data.Entities
         public int Id { get; set; }
         
         // Código ISO de 3 caracteres (USD, EUR, DOP, etc.)
-        public string CodigoISO { get; set; }
+        public string ? CodigoISO { get; set; }
         
         // Nombre de la moneda
-        public string Nombre { get; set; }
+        public string ? Nombre { get; set; }
         
         // Símbolo ($, €, etc.)
-        public string Simbolo { get; set; }
+        public string ? Simbolo { get; set; }
         
         // Una única moneda local activa en el sistema
         public bool EsMonedaLocal { get; set; } = false;
@@ -22,7 +22,6 @@ namespace ImportCostPro.Data.Entities
         // Estado
         public bool Activo { get; set; } = true;
         
-        // Auditoría
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
         

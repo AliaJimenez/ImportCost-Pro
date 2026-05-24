@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using ImportCostPro.Data.Contexts;
-using ImportCostPro.Data.Entities;
 using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
+using ImportCostPro.Data.Contexts;
+using ImportCostPro.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Core.Services
 {
@@ -19,171 +15,117 @@ namespace ImportCostPro.Core.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<TasaCambioDto>> GetAllAsync()
+        public async Task<List<TasaCambioDto>> ObtenerTodasAsync()
         {
-            var tasas = await _context.TasasCambio
+            return await _context.TasasCambio
                 .Include(t => t.MonedaOrigen)
                 .Include(t => t.MonedaDestino)
                 .OrderByDescending(t => t.FechaVigencia)
+                .Select(t => new TasaCambioDto
+                {
+                    Id = t.Id,
+                    MonedaOrigenId = t.MonedaOrigenId,
+                    NombreMonedaOrigen = $"{t.MonedaOrigen.Nombre} ({t.MonedaOrigen.CodigoISO})",
+                    MonedaDestinoId = t.MonedaDestinoId,
+                    NombreMonedaDestino = $"{t.MonedaDestino.Nombre} ({t.MonedaDestino.CodigoISO})",
+                    Tasa = t.Tasa,
+                    FechaVigencia = t.FechaVigencia,
+                    Activo = t.Activo,
+                    FechaCreacion = t.FechaCreacion
+                })
                 .ToListAsync();
-            
-            return MapToDto(tasas);
         }
 
-        public async Task<IEnumerable<TasaCambioDto>> GetActivasAsync()
+        public async Task<TasaCambioDto?> ObtenerPorIdAsync(int id)
         {
-            var tasas = await _context.TasasCambio
-                .Where(t => t.Activo)
-                .Include(t => t.MonedaOrigen)
-                .Include(t => t.MonedaDestino)
-                .OrderByDescending(t => t.FechaVigencia)
-                .ToListAsync();
-            
-            return MapToDto(tasas);
-        }
-
-        public async Task<TasaCambioDto> GetByIdAsync(int id)
-        {
-            var tasa = await _context.TasasCambio
+            var entidad = await _context.TasasCambio
                 .Include(t => t.MonedaOrigen)
                 .Include(t => t.MonedaDestino)
                 .FirstOrDefaultAsync(t => t.Id == id);
-            
-            return tasa == null ? null : MapToDto(tasa);
+                
+            if (entidad == null) return null;
+
+            return new TasaCambioDto
+            {
+                Id = entidad.Id,
+                MonedaOrigenId = entidad.MonedaOrigenId,
+                NombreMonedaOrigen = entidad.MonedaOrigen.Nombre,
+                MonedaDestinoId = entidad.MonedaDestinoId,
+                NombreMonedaDestino = entidad.MonedaDestino.Nombre,
+                Tasa = entidad.Tasa,
+                FechaVigencia = entidad.FechaVigencia,
+                Activo = entidad.Activo,
+                FechaCreacion = entidad.FechaCreacion
+            };
         }
 
-        public async Task<TasaCambioDto> CreateAsync(TasaCambioDto tasaDto)
+        public async Task<(bool exito, string mensaje)> CrearAsync(TasaCambioDto dto)
         {
-            var tasa = new TasaCambio
+            if (dto.MonedaOrigenId == dto.MonedaDestinoId)
+                return (false, "La moneda de origen y la de destino no pueden ser la misma.");
+
+            // Valida que no se dupliquen tasas el mismo día para el mismo par de monedas
+            var duplicado = await _context.TasasCambio.AnyAsync(t => 
+                t.MonedaOrigenId == dto.MonedaOrigenId && 
+                t.MonedaDestinoId == dto.MonedaDestinoId && 
+                t.FechaVigencia.Date == dto.FechaVigencia.Date);
+
+            if (duplicado)
+                return (false, "Ya existe una tasa de cambio registrada para estas monedas en la fecha seleccionada.");
+
+            var entidad = new TasaCambio
             {
-                MonedaOrigenId = tasaDto.MonedaOrigenId,
-                MonedaDestinoId = tasaDto.MonedaDestinoId,
-                Tasa = tasaDto.Tasa,
-                FechaVigencia = tasaDto.FechaVigencia,
-                Activo = tasaDto.Activo,
+                MonedaOrigenId = dto.MonedaOrigenId,
+                MonedaDestinoId = dto.MonedaDestinoId,
+                Tasa = dto.Tasa,
+                FechaVigencia = dto.FechaVigencia,
+                Activo = dto.Activo,
                 FechaCreacion = DateTime.Now,
                 FechaModificacion = DateTime.Now
             };
-            
-            _context.TasasCambio.Add(tasa);
+
+            _context.TasasCambio.Add(entidad);
             await _context.SaveChangesAsync();
-            
-            tasa = await _context.TasasCambio
-                .Include(t => t.MonedaOrigen)
-                .Include(t => t.MonedaDestino)
-                .FirstAsync(t => t.Id == tasa.Id);
-            
-            return MapToDto(tasa);
+
+            return (true, "Tasa de cambio creada exitosamente.");
         }
 
-        public async Task<TasaCambioDto> UpdateAsync(TasaCambioDto tasaDto)
+        public async Task<(bool exito, string mensaje)> EditarAsync(TasaCambioDto dto)
         {
-            var tasa = await _context.TasasCambio.FindAsync(tasaDto.Id);
-            if (tasa == null)
-                throw new Exception("Tasa de cambio no encontrada");
-            
-            tasa.MonedaOrigenId = tasaDto.MonedaOrigenId;
-            tasa.MonedaDestinoId = tasaDto.MonedaDestinoId;
-            tasa.Tasa = tasaDto.Tasa;
-            tasa.FechaVigencia = tasaDto.FechaVigencia;
-            tasa.Activo = tasaDto.Activo;
-            tasa.FechaModificacion = DateTime.Now;
-            
-            _context.TasasCambio.Update(tasa);
+            var entidad = await _context.TasasCambio.FindAsync(dto.Id);
+            if (entidad == null) return (false, "Tasa de cambio no encontrada.");
+
+            if (dto.MonedaOrigenId == dto.MonedaDestinoId)
+                return (false, "La moneda de origen y la de destino no pueden ser la misma.");
+
+            // TO DO: Descomentar esto en el Sprint 2 cuando esté creada la tabla 'Ordenes'.
+            // var usada = await _context.Ordenes.AnyAsync(o => o.TasaCambioId == dto.Id);
+            // if (usada) return (false, "No se puede editar: esta tasa ya se usó en cálculos transaccionales.");
+
+            entidad.MonedaOrigenId = dto.MonedaOrigenId;
+            entidad.MonedaDestinoId = dto.MonedaDestinoId;
+            entidad.Tasa = dto.Tasa;
+            entidad.FechaVigencia = dto.FechaVigencia;
+            entidad.Activo = dto.Activo;
+            entidad.FechaModificacion = DateTime.Now;
+
             await _context.SaveChangesAsync();
-            
-            tasa = await _context.TasasCambio
-                .Include(t => t.MonedaOrigen)
-                .Include(t => t.MonedaDestino)
-                .FirstAsync(t => t.Id == tasa.Id);
-            
-            return MapToDto(tasa);
+            return (true, "Tasa de cambio actualizada exitosamente.");
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<(bool exito, string mensaje)> EliminarAsync(int id)
         {
-            var tasa = await _context.TasasCambio.FindAsync(id);
-            if (tasa == null)
-                return false;
-            
-            _context.TasasCambio.Remove(tasa);
+            var entidad = await _context.TasasCambio.FindAsync(id);
+            if (entidad == null) return (false, "Tasa de cambio no encontrada.");
+
+            // TO DO: Descomentar en el Sprint 2 cuando esté la tabla 'Ordenes'.
+            // var usada = await _context.Ordenes.AnyAsync(o => o.TasaCambioId == id);
+            // if (usada) return (false, "No se puede eliminar: esta tasa ya se usó en cálculos transaccionales.");
+
+            _context.TasasCambio.Remove(entidad);
             await _context.SaveChangesAsync();
-            
-            return true;
-        }
 
-        public async Task<decimal> GetTasaVigenteAsync(int monedaOrigenId, int monedaDestinoId, DateTime fecha)
-        {
-            var tasa = await _context.TasasCambio
-                .Where(t => t.MonedaOrigenId == monedaOrigenId
-                    && t.MonedaDestinoId == monedaDestinoId
-                    && t.FechaVigencia <= fecha
-                    && t.Activo)
-                .OrderByDescending(t => t.FechaVigencia)
-                .FirstOrDefaultAsync();
-            
-            if (tasa == null)
-                throw new Exception($"No hay tasa vigente para {monedaOrigenId} a {monedaDestinoId} en {fecha:dd/MM/yyyy}");
-            
-            return tasa.Tasa;
-        }
-
-        public async Task<TasaCambioDto> GetTasaVigenteDtoAsync(int monedaOrigenId, int monedaDestinoId, DateTime fecha)
-        {
-            var tasa = await _context.TasasCambio
-                .Where(t => t.MonedaOrigenId == monedaOrigenId
-                    && t.MonedaDestinoId == monedaDestinoId
-                    && t.FechaVigencia <= fecha
-                    && t.Activo)
-                .Include(t => t.MonedaOrigen)
-                .Include(t => t.MonedaDestino)
-                .OrderByDescending(t => t.FechaVigencia)
-                .FirstOrDefaultAsync();
-            
-            return tasa == null ? null : MapToDto(tasa);
-        }
-
-        public async Task<bool> CanDeleteAsync(int tasaId)
-        {
-            // Por ahora retorna true (para futuro: verificar si está en órdenes)
-            return true;
-        }
-
-        public async Task<string> GetDeleteErrorMessageAsync(int tasaId)
-        {
-            return "No se puede eliminar esta tasa de cambio.";
-        }
-
-        private IEnumerable<TasaCambioDto> MapToDto(IEnumerable<TasaCambio> tasas)
-        {
-            return tasas.Select(t => new TasaCambioDto
-            {
-                Id = t.Id,
-                MonedaOrigenId = t.MonedaOrigenId,
-                NombreMonedaOrigen = $"{t.MonedaOrigen.Nombre} ({t.MonedaOrigen.CodigoISO})",
-                MonedaDestinoId = t.MonedaDestinoId,
-                NombreMonedaDestino = $"{t.MonedaDestino.Nombre} ({t.MonedaDestino.CodigoISO})",
-                Tasa = t.Tasa,
-                FechaVigencia = t.FechaVigencia,
-                Activo = t.Activo,
-                FechaCreacion = t.FechaCreacion
-            });
-        }
-
-        private TasaCambioDto MapToDto(TasaCambio tasa)
-        {
-            return new TasaCambioDto
-            {
-                Id = tasa.Id,
-                MonedaOrigenId = tasa.MonedaOrigenId,
-                NombreMonedaOrigen = $"{tasa.MonedaOrigen.Nombre} ({tasa.MonedaOrigen.CodigoISO})",
-                MonedaDestinoId = tasa.MonedaDestinoId,
-                NombreMonedaDestino = $"{tasa.MonedaDestino.Nombre} ({tasa.MonedaDestino.CodigoISO})",
-                Tasa = tasa.Tasa,
-                FechaVigencia = tasa.FechaVigencia,
-                Activo = tasa.Activo,
-                FechaCreacion = tasa.FechaCreacion
-            };
+            return (true, "Tasa de cambio eliminada exitosamente.");
         }
     }
 }
