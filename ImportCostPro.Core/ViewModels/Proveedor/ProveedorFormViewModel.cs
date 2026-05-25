@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace ImportCostPro.Core.ViewModels.Proveedor
 {
-    internal class ProveedorFormViewModel
+    public class ProveedorFormViewModel
     {
         public int Id { get; set; }
 
@@ -15,14 +16,13 @@ namespace ImportCostPro.Core.ViewModels.Proveedor
         [StringLength(150, ErrorMessage = "Máximo 150 caracteres")]
         public string Nombre { get; set; }
 
-        [Required(ErrorMessage = "El RNC es obligatorio")]
-        [StringLength(20, ErrorMessage = "Maximo 20 caracteres")]
-        public string Rnc { get; set; }
+        [Required(ErrorMessage = "El país es obligatorio")]
+        public int PaisOrigenId { get; set; }
 
-        [StringLength(300, ErrorMessage = "Maximo 300 caracteres")]
-        public string Direccion { get; set; }
+        [Required(ErrorMessage = "La moneda es obligatoria")]
+        public int MonedaPrincipalId { get; set; }
 
-        [StringLength(100, ErrorMessage = "Maximo 100 caracteres")]
+        [StringLength(100, ErrorMessage = "Máximo 100 caracteres")]
         public string Contacto { get; set; }
 
         [EmailAddress(ErrorMessage = "Email no válido")]
@@ -33,6 +33,13 @@ namespace ImportCostPro.Core.ViewModels.Proveedor
         [StringLength(20)]
         public string Telefono { get; set; }
 
+        [StringLength(300, ErrorMessage = "Máximo 300 caracteres")]
+        public string Direccion { get; set; }
+
         public bool Activo { get; set; } = true;
+
+      
+        public List<SelectListItem> Paises { get; set; } = new();
+        public List<SelectListItem> Monedas { get; set; } = new();
     }
 }

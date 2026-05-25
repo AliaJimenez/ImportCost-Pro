@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace ImportCostPro.Core.ViewModels.Importador
 {
-    internal class ImportadorIndexViewModel
+    public class ImportadorIndexViewModel
     {
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public   string Rnc { get; set; }
+        public  string Email { get; set; }
+        public  string Telefono { get; set; }
+        public bool Activo { get; set; }
+        public DateTime FechaCreacion { get; set; }
     }
 }

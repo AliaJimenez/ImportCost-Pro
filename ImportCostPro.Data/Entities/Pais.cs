@@ -6,10 +6,9 @@ namespace ImportCostPro.Data.Entities
     {
         public int Id { get; set; }
 
-        [MaxLength(100)]
+    
         public required string Nombre { get; set; }
 
-        [MaxLength(3)] 
         public required string CodigoISO 
         {
             get => _codigoISO;

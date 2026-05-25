@@ -15,6 +15,12 @@ namespace ImportCostPro.Data.Contexts
 
         public DbSet<CategoriaArancelaria> CategoriasArancelarias { get; set; }
         public DbSet<Producto> Productos { get; set; }
+        public DbSet<Moneda> Monedas { get; set; }
+        public DbSet<TasaCambio> TasasCambio { get; set; }
+        public DbSet<ConfiguracionImpuesto> ConfiguracionesImpuesto { get; set; }
+        public DbSet<Pais> Paises { get; set; }
+        public DbSet<Importador> Importadores { get; set; }
+        public DbSet <Proveedor> Proveedores { get; set; }  
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
