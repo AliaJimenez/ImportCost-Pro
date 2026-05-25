@@ -16,7 +16,7 @@
 
         public required int PaisOrigenId { get; set; }
         public required int CategoriaArancelariaId { get; set; }
-        public Pais PaisOrigen { get; set; }
+        public Pais? PaisOrigen { get; set; }
         public CategoriaArancelaria CategoriaArancelaria { get; set; } 
 
         //public required int PaisOrigenId { get; set; }//fk
@@ -25,7 +25,7 @@
         //navigation properties
         //cuando se agregue el DbSet<Pais> tengo q descomentar 
         //public Pais PaisOrigen { get; set; }
-        public CategoriaArancelaria CategoriaArancelaria { get; set; } 
+      
 
 
     }

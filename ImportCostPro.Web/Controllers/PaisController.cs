@@ -1,83 +1,171 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ImportCostPro.Core.Dtos;
+using ImportCostPro.Core.Interfaces;
+using ImportCostPro.Core.ViewModels.Pais;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ImportCostPro.Web.Controllers
 {
     public class PaisController : Controller
     {
-        // GET: PaisController
-        public ActionResult Index()
+        private readonly IPaisService _paisService;
+
+        public PaisController(IPaisService paisService)
         {
-            return View();
+            _paisService = paisService;
         }
 
-        // GET: PaisController/Details/5
-        public ActionResult Details(int id)
+        // GET: Pais
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var paises = await _paisService.GetAllAsync();
+            var viewModel = MapToIndexViewModel(paises);
+            return View(viewModel);
         }
 
-        // GET: PaisController/Create
-        public ActionResult Create()
+        // GET: Pais/Create
+        public IActionResult Create()
         {
-            return View();
+            return View(new PaisFormViewModel());
         }
 
-        // POST: PaisController/Create
+        // POST: Pais/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(PaisFormViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                var paisDto = new PaisDto
+                {
+                    Nombre = model.Nombre,
+                    CodigoISO = model.CodigoISO,
+                    Activo = model.Activo
+                };
+
+                await _paisService.CreateAsync(paisDto);
+                TempData["Success"] = "País creado correctamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(model);
+            }
+        }
+
+        // GET: Pais/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var pais = await _paisService.GetByIdAsync(id.Value);
+            if (pais == null)
+                return NotFound();
+
+            var viewModel = new PaisFormViewModel
+            {
+                Id = pais.Id,
+                Nombre = pais.Nombre,
+                CodigoISO = pais.CodigoISO,
+                Activo = pais.Activo
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Pais/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, PaisFormViewModel model)
+        {
+            if (id != model.Id)
+                return NotFound();
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            try
+            {
+                var paisDto = new PaisDto
+                {
+                    Id = model.Id,
+                    Nombre = model.Nombre,
+                    CodigoISO = model.CodigoISO,
+                    Activo = model.Activo
+                };
+
+                await _paisService.UpdateAsync(paisDto);
+                TempData["Success"] = "País actualizado correctamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(model);
+            }
+        }
+
+        // GET: Pais/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var pais = await _paisService.GetByIdAsync(id.Value);
+            if (pais == null)
+                return NotFound();
+
+            if (!await _paisService.CanDeleteAsync(id.Value))
+            {
+                TempData["Error"] = await _paisService.GetDeleteErrorMessageAsync(id.Value);
+                return RedirectToAction(nameof(Index));
+            }
+
+            var viewModel = new PaisFormViewModel
+            {
+                Id = pais.Id,
+                Nombre = pais.Nombre,
+                CodigoISO = pais.CodigoISO,
+                Activo = pais.Activo
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Pais/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
+                await _paisService.DeleteAsync(id);
+                TempData["Success"] = "País eliminado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
-            }
-        }
-
-        // GET: PaisController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: PaisController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
+                TempData["Error"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
         }
 
-        // GET: PaisController/Delete/5
-        public ActionResult Delete(int id)
+        private IEnumerable<PaisIndexViewModel> MapToIndexViewModel(IEnumerable<PaisDto> paises)
         {
-            return View();
-        }
-
-        // POST: PaisController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            return paises.Select(p => new PaisIndexViewModel
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+                Id = p.Id,
+                Nombre = p.Nombre,
+                CodigoISO = p.CodigoISO,
+                Activo = p.Activo,
+                FechaCreacion = p.FechaCreacion
+            });
         }
     }
 }
