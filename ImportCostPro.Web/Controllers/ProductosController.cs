@@ -1,6 +1,6 @@
 ﻿using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
-using ImportCostPro.Core.ViewModels;
+using ImportCostPro.Core.ViewModels.Producto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 

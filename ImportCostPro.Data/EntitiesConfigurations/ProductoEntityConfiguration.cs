@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ImportCostPro.Data.Entities;
 
-namespace ImportCostPro.Data.EntityConfigurations
+namespace ImportCostPro.Data.EntitiesConfigurations
 {
     public class ProductoEntityConfiguration : IEntityTypeConfiguration<Producto>
     {
