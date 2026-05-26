@@ -1,87 +1,100 @@
-﻿@model IEnumerable<ImportCostPro.Core.ViewModels.Proveedor.ProveedorIndexViewModel>
+@model IEnumerable<ImportCostPro.Core.ViewModels.Proveedor.ProveedorIndexViewModel>
 
 @{
     ViewData["Title"] = "Proveedores";
 }
 
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <h1><i class="fas fa-truck"></i> Proveedores</h1>
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <div class="icp-page-icon" style="background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.2);">
+            <i class="bi bi-truck" style="color: var(--accent-purple);"></i>
         </div>
-        <div class="col-md-6 text-end">
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Nuevo Proveedor
-            </a>
+        <div>
+            <h1 class="icp-page-title">Proveedores</h1>
+            <p class="icp-page-subtitle">Suplidores internacionales registrados</p>
         </div>
     </div>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    @if (Model.Any())
-    {
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>País Origen</th>
-                        <th>Moneda</th>
-                        <th>Email</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Nombre</td>
-                            <td>@item.NombrePais</td>
-                            <td><span class="badge bg-info">@item.NombreMoneda</span></td>
-                            <td>@item.Email</td>
-                            <td>
-                                @if (item.Activo)
-                                {
-                                    <span class="badge bg-success">Activo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Inactivo</span>
-                                }
-                            </td>
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i> Editar
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Eliminar
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-info">
-            No hay proveedores registrados. <a asp-action="Create">Crear uno.</a>
-        </div>
-    }
+    <a asp-action="Create" class="btn-icp-primary">
+        <i class="bi bi-plus-lg"></i> Nuevo Proveedor
+    </a>
 </div>
+
+<div class="icp-toolbar">
+    <div class="icp-toolbar-left">
+        <div class="icp-search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchProv" placeholder="Buscar proveedor, país, moneda..." />
+        </div>
+    </div>
+    <div class="icp-toolbar-right">
+        <span class="icp-count-label" id="countProv">@Model.Count() registros</span>
+    </div>
+</div>
+
+<div class="icp-table-wrapper">
+    <table class="icp-table">
+        <thead>
+            <tr>
+                <th style="width:35%;">Nombre del Suplidor</th>
+                <th style="width:25%;">País Origen</th>
+                <th style="width:20%;">Moneda</th>
+                <th style="width:20%;" class="text-end">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="4" class="text-center py-5" style="color: var(--text-muted);">
+                        <i class="bi bi-globe-americas display-5 d-block mb-3" style="opacity: .25;"></i>
+                        No hay proveedores internacionales registrados.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    <tr class="prov-row">
+                        <td class="fw-600" style="color: var(--text-primary);">
+                            <i class="bi bi-truck me-2" style="color: var(--accent-purple); font-size: 0.75rem;"></i>
+                            @item.Nombre
+                        </td>
+                        <td>
+                            <span style="color: var(--text-secondary);">
+                                <i class="bi bi-geo-alt me-1" style="color: var(--accent-cyan); font-size: 0.75rem;"></i>@item.NombrePais
+                            </span>
+                        </td>
+                        <td>
+                            <span class="icp-code-badge" style="color: var(--accent-orange);">@item.NombreMoneda</span>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn-icp-edit">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn-icp-delete">
+                                    <i class="bi bi-trash3"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+    document.getElementById('searchProv')?.addEventListener('input', function () {
+        var q = this.value.toLowerCase(); var vis = 0;
+        document.querySelectorAll('.prov-row').forEach(function (r) {
+            var show = r.textContent.toLowerCase().includes(q);
+            r.style.display = show ? '' : 'none';
+            if (show) vis++;
+        });
+        document.getElementById('countProv').textContent = vis + ' registros';
+    });
+</script>
+}

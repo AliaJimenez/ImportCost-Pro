@@ -1,54 +1,56 @@
-﻿@model ImportCostPro.Core.Dtos.CategoriaArancelariaDto
+@model ImportCostPro.Core.ViewModels.CategoriaArancelariaViewModel
 
 @{
-    ViewData["Title"] = "Eliminar categoría arancelaria";
+    ViewData["Title"] = "Eliminar Categoría Arancelaria";
 }
 
-<div class="container">
-    <h2 class="mb-4">Eliminar categoría arancelaria</h2>
-
-    <div class="alert alert-danger">
-        <i class="bi bi-exclamation-triangle"></i>
-        ¿Está seguro que desea eliminar esta categoría arancelaria?
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-4">Código arancelario</dt>
-                <dd class="col-sm-8">@Model.CodigoArancelario</dd>
-
-                <dt class="col-sm-4">Nombre</dt>
-                <dd class="col-sm-8">@Model.Nombre</dd>
-
-                <dt class="col-sm-4">% Arancel</dt>
-                <dd class="col-sm-8">@Model.PorcentajeArancel %</dd>
-
-                <dt class="col-sm-4">Aplica ITBIS</dt>
-                <dd class="col-sm-8">@(Model.AplicaItbis ? "Sí" : "No")</dd>
-
-                <dt class="col-sm-4">Aplica impuesto selectivo</dt>
-                <dd class="col-sm-8">
-                    @(Model.AplicaImpuestoSelectivo ? "Sí" : "No")
-                </dd>
-
-                <dt class="col-sm-4">Estado</dt>
-                <dd class="col-sm-8">@(Model.Activo ? "Activo" : "Inactivo")</dd>
-            </dl>
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-2">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2);">
+            <i class="bi bi-exclamation-octagon-fill" style="color: var(--accent-red);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Eliminar Categoría Arancelaria</h1>
+            <p class="icp-page-subtitle">Esta acción desvinculará la tasa de aduana</p>
         </div>
     </div>
+</div>
 
-    <form asp-action="Delete" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="id" value="@Model.Id" />
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="icp-card" style="border-color: rgba(239,68,68,0.25);">
+            <div class="icp-alert-danger mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Asegúrese de que no existan productos o auditorías vinculadas a esta categoría.
+            </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-danger">
-                <i class="bi bi-trash"></i> Aceptar
-            </button>
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-x-circle"></i> Cancelar
-            </a>
+            <div class="icp-delete-preview mb-4">
+                <div class="preview-row">
+                    <span class="preview-label">Partida</span>
+                    <span class="preview-value"><span class="icp-code-badge">@Model.CodigoArancelario</span></span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Descripción</span>
+                    <span class="preview-value fw-600">@Model.Nombre</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Arancel Base</span>
+                    <span class="preview-value"><span class="icp-rate-orange">@Model.PorcentajeArancel%</span></span>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn-cancel">Cancelar</a>
+                    <button type="submit" class="btn btn-danger fw-semibold px-4">
+                        <i class="bi bi-trash3-fill me-1"></i> Eliminar Definitivamente
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
