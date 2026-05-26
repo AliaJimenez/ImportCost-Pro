@@ -1,82 +1,163 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="ImportCost Pro — Sistema de Liquidación y Cálculo de Landed Cost para importaciones internacionales." />
     <title>@ViewData["Title"] - ImportCost Pro</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ImportCost Pro</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-                        </li>
-                        
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-light" href="#" id="navbarGeografia" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Contactos y Geografía
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarGeografia">
-                                <li><a class="dropdown-item" asp-controller="Pais" asp-action="Index">Países</a></li>
-                                <li><a class="dropdown-item" asp-controller="Importador" asp-action="Index">Importadores</a></li>
-                                <li><a class="dropdown-item" asp-controller="Proveedor" asp-action="Index">Proveedores</a></li>
-                            </ul>
-                        </li>
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-light" href="#" id="navbarCatalogo" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Catálogo
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarCatalogo">
-                                <li><a class="dropdown-item" asp-controller="Productos" asp-action="Index">Productos</a></li>
-                                <li><a class="dropdown-item" asp-controller="CategoriasArancelarias" asp-action="Index">Categorías Arancelarias</a></li>
-                            </ul>
-                        </li>
+    @{
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        var currentAction     = ViewContext.RouteData.Values["action"]?.ToString()     ?? "";
+        var pageTitle         = ViewData["Title"]?.ToString() ?? "Dashboard";
+    }
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-light" href="#" id="navbarFinanzas" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Finanzas
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarFinanzas">
-                                <li><a class="dropdown-item" asp-controller="Moneda" asp-action="Index">Monedas</a></li>
-                                <li><a class="dropdown-item" asp-controller="TasaCambio" asp-action="Index">Tasas de Cambio</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" asp-controller="ConfiguracionImpuesto" asp-action="Index">Configuración de Impuestos</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+    <!-- ══ OVERLAY (mobile) ════════════════════════════════════ -->
+    <div class="icp-overlay" id="sidebarOverlay"></div>
+
+    <!-- ══ SIDEBAR ══════════════════════════════════════════════ -->
+    <aside class="icp-sidebar" id="icpSidebar">
+
+        <!-- Logo -->
+        <a class="icp-sidebar-brand" asp-controller="Home" asp-action="Index">
+            <div class="brand-icon">IC</div>
+            <div class="brand-text">
+                <span class="brand-name">ImportCost Pro</span>
+                <span class="brand-sub">Landed Cost</span>
             </div>
+        </a>
+
+        <!-- MÓDULO PRINCIPAL -->
+        <nav class="icp-nav-group">
+            <span class="icp-nav-group-label">Principal</span>
+            <a class="icp-nav-item @(currentController == "Home" ? "active" : "")"
+               asp-controller="Home" asp-action="Index">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
+            <a class="icp-nav-item @(currentController == "CalculoLandedCost" ? "active" : "")"
+               asp-controller="CalculoLandedCost" asp-action="Index">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Órdenes</span>
+            </a>
         </nav>
+
+        <!-- CONFIGURACIÓN -->
+        <nav class="icp-nav-group">
+            <span class="icp-nav-group-label">Configuración</span>
+            <a class="icp-nav-item @(currentController == "ConfiguracionImpuesto" ? "active" : "")"
+               asp-controller="ConfiguracionImpuesto" asp-action="Index">
+                <i class="bi bi-sliders"></i>
+                <span>Config. Impuestos</span>
+            </a>
+            <a class="icp-nav-item @(currentController == "TasaCambio" ? "active" : "")"
+               asp-controller="TasaCambio" asp-action="Index">
+                <i class="bi bi-arrow-left-right"></i>
+                <span>Tasas de Cambio</span>
+            </a>
+        </nav>
+
+        <!-- MANTENIMIENTOS -->
+        <nav class="icp-nav-group">
+            <span class="icp-nav-group-label">Mantenimientos</span>
+            <a class="icp-nav-item @(currentController == "Pais" ? "active" : "")"
+               asp-controller="Pais" asp-action="Index">
+                <i class="bi bi-globe-americas"></i>
+                <span>Países</span>
+            </a>
+            <a class="icp-nav-item @(currentController == "Moneda" ? "active" : "")"
+               asp-controller="Moneda" asp-action="Index">
+                <i class="bi bi-currency-dollar"></i>
+                <span>Monedas</span>
+            </a>
+            <a class="icp-nav-item @(currentController == "Importador" ? "active" : "")"
+               asp-controller="Importador" asp-action="Index">
+                <i class="bi bi-person-badge"></i>
+                <span>Importadores</span>
+            </a>
+            <a class="icp-nav-item @(currentController == "Proveedor" ? "active" : "")"
+               asp-controller="Proveedor" asp-action="Index">
+                <i class="bi bi-truck"></i>
+                <span>Proveedores</span>
+            </a>
+            <a class="icp-nav-item @(currentController == "Productos" ? "active" : "")"
+               asp-controller="Productos" asp-action="Index">
+                <i class="bi bi-tags"></i>
+                <span>Productos</span>
+            </a>
+            <a class="icp-nav-item @(currentController == "CategoriasArancelarias" ? "active" : "")"
+               asp-controller="CategoriasArancelarias" asp-action="Index">
+                <i class="bi bi-percent"></i>
+                <span>Cat. Arancelarias</span>
+            </a>
+        </nav>
+
+        <!-- Footer usuario -->
+        <div class="icp-sidebar-footer">
+            <div class="avatar">A</div>
+            <div>
+                <div class="user-name">Admin</div>
+                <div class="user-role">Administrador</div>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ══ TOPBAR ═══════════════════════════════════════════════ -->
+    <header class="icp-topbar">
+        <div class="d-flex align-items-center gap-3">
+            <button class="icp-hamburger" id="hamburgerBtn" aria-label="Menú">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="icp-topbar-breadcrumb">
+                <a asp-controller="Home" asp-action="Index" class="home-link">
+                    <i class="bi bi-grid-1x2-fill me-1"></i>Dashboard
+                </a>
+                @if (currentController != "Home")
+                {
+                    <span class="sep">/</span>
+                    <span class="current">@pageTitle</span>
+                }
+            </div>
+        </div>
+        <div class="icp-topbar-right">
+            <span class="icp-topbar-badge">
+                <i class="bi bi-shield-check"></i> Logístico
+            </span>
+        </div>
     </header>
 
-    <div class="container-fluid">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ImportCost Pro
+    <!-- ══ ÁREA PRINCIPAL ════════════════════════════════════════ -->
+    <div class="icp-main">
+        <div class="icp-content">
+            <main role="main">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
+    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Mobile sidebar toggle
+        const hamburger = document.getElementById('hamburgerBtn');
+        const sidebar   = document.getElementById('icpSidebar');
+        const overlay   = document.getElementById('sidebarOverlay');
+
+        function openSidebar()  { sidebar.classList.add('open'); overlay.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('active'); document.body.style.overflow = ''; }
+
+        hamburger?.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+        overlay?.addEventListener('click', closeSidebar);
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

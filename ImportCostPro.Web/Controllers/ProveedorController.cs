@@ -54,7 +54,7 @@ namespace ImportCostPro.Web.Controllers
             try
             {
                 var paisDto = await _paisService.GetByIdAsync(model.PaisOrigenId);
-                var monedaDto = await _monedaService.GetByIdAsync(model.MonedaPrincipalId);
+                var monedaDto = await _monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
 
                 var proveedorDto = new ProveedorDto
                 {
@@ -134,7 +134,7 @@ namespace ImportCostPro.Web.Controllers
             try
             {
                 var paisDto = await _paisService.GetByIdAsync(model.PaisOrigenId);
-                var monedaDto = await _monedaService.GetByIdAsync(model.MonedaPrincipalId);
+                var monedaDto = await _monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
 
                 var proveedorDto = new ProveedorDto
                 {
@@ -225,7 +225,7 @@ namespace ImportCostPro.Web.Controllers
 
         private async Task<List<SelectListItem>> GetMonedasSelectList()
         {
-            var monedas = await _monedaService.GetActivasAsync();
+            var monedas = await _monedaService.ObtenerActivasAsync();
             return monedas.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),

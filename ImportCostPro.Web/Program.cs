@@ -17,6 +17,9 @@ builder.Services.AddScoped<ITasaCambioService, TasaCambioService>();
 builder.Services.AddScoped<IConfiguracionImpuestoService, ConfiguracionImpuestoService>();
 builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<ICategoriaArancelariaService, CategoriaArancelariaService>(); 
+builder.Services.AddScoped<IPaisService, PaisService>();
+builder.Services.AddScoped<IProveedorService, ProveedorService>();
+builder.Services.AddScoped<IImportadorService, ImportadorService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

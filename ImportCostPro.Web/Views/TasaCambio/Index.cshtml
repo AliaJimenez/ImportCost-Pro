@@ -4,77 +4,73 @@
     ViewData["Title"] = "Tasas de Cambio";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2><i class="bi bi-currency-exchange"></i> Histórico de Tasas de Cambio</h2>
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Registrar Tasa
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <div class="icp-page-icon" style="background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.2);">
+            <i class="bi bi-arrow-left-right" style="color: var(--accent-purple);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Tasas de Cambio</h1>
+            <p class="icp-page-subtitle">Gestiona las tasas de conversión a peso dominicano (DOP)</p>
+        </div>
+    </div>
+    <a asp-action="Create" class="btn-icp-primary">
+        <i class="bi bi-plus-lg"></i> Nueva Tasa
+    </a>
+</div>
+
+<div class="icp-alert-info mb-4">
+    <i class="bi bi-graph-up-arrow me-2"></i>
+    <strong>Moneda base: Peso Dominicano (DOP)</strong> — Las tasas representan cuántos DOP equivalen a 1 unidad de cada moneda extranjera.
+</div>
+
+@if (!Model.Any())
+{
+    <div class="icp-card text-center py-5">
+        <i class="bi bi-currency-exchange display-4 mb-3 d-block" style="color: var(--text-muted); opacity: 0.4;"></i>
+        <p class="mb-3" style="color: var(--text-muted);">No hay tasas de cambio registradas.</p>
+        <a asp-action="Create" class="btn-icp-primary">
+            <i class="bi bi-plus-lg me-1"></i> Registrar Primera Tasa
         </a>
     </div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var item in Model)
+        {
+            var initials = item.NombreMonedaOrigen?.Length >= 2
+                ? item.NombreMonedaOrigen.Substring(0, 2).ToUpper()
+                : (item.NombreMonedaOrigen ?? "??").ToUpper();
+            <div class="col-sm-6 col-lg-4 col-xl-3">
+                <div class="icp-currency-card">
+                    <div class="currency-header">
+                        <div class="currency-avatar">@initials</div>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn-icp-edit">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+                    </div>
 
-    @if (TempData["Mensaje"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill"></i> @TempData["Mensaje"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
+                    <div class="currency-code mt-2">@item.NombreMonedaOrigen</div>
+                    <div class="currency-name mb-2">→ @item.NombreMonedaDestino</div>
 
-    <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover table-striped mb-0 align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th class="ps-3">Fecha Vigencia</th>
-                            <th>Origen -> Destino</th>
-                            <th class="text-end">Tasa de Conversión</th>
-                            <th class="text-center">Estado</th>
-                            <th class="text-center pe-3">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Any())
-                        {
-                            <tr><td colspan="5" class="text-center py-4 text-muted">No hay tasas registradas.</td></tr>
-                        }
-                        else
-                        {
-                            foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td class="fw-bold ps-3">@item.FechaVigencia.ToShortDateString()</td>
-                                    <td>
-                                        <span class="badge bg-secondary">@item.NombreMonedaOrigen</span> 
-                                        <i class="bi bi-arrow-right"></i> 
-                                        <span class="badge bg-primary">@item.NombreMonedaDestino</span>
-                                    </td>
-                                    <td class="text-end text-monospace fw-bold">@item.Tasa.ToString("N6")</td>
-                                    <td class="text-center">
-                                        @if (item.Activo) { <span class="badge bg-success">Vigente</span> }
-                                        else { <span class="badge bg-danger">Inactiva</span> }
-                                    </td>
-                                    <td class="text-center pe-3">
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <span class="currency-rate">@item.Tasa.ToString("N4")</span>
+                        <span class="currency-base">DOP</span>
+                    </div>
+
+                    <div class="currency-updated d-flex align-items-center gap-1 mt-2">
+                        <i class="bi bi-clock-history"></i>
+                        Vigente: @item.FechaVigencia.ToString("dd/MM/yyyy")
+                    </div>
+
+                    <div class="mt-2 pt-2" style="border-top: 1px solid var(--border-color);">
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn-icp-delete">
+                            <i class="bi bi-trash3"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
+        }
     </div>
-</div>
+}

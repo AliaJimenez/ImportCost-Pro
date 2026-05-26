@@ -1,42 +1,50 @@
-﻿@model ImportCostPro.Core.ViewModels.Pais.PaisFormViewModel
+@model ImportCostPro.Core.ViewModels.Pais.PaisFormViewModel
 
 @{
-    ViewData["Title"] = "Crear País";
+    ViewData["Title"] = "Registrar País";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h1>Crear País</h1>
-            <hr />
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.2);">
+            <i class="bi bi-globe-americas" style="color: var(--accent-cyan);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Registrar País</h1>
+            <p class="icp-page-subtitle">Añade un nuevo país de origen al sistema</p>
+        </div>
+    </div>
+</div>
 
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="icp-card">
             <form asp-action="Create" method="post">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="icp-alert-danger mb-4"></div>
 
                 <div class="mb-3">
-                    <label asp-for="Nombre" class="form-label">Nombre</label>
-                    <input asp-for="Nombre" class="form-control" />
-                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                    <label asp-for="CodigoISO" class="icp-field-label">Código ISO</label>
+                    <input asp-for="CodigoISO" class="form-control font-monospace"
+                           placeholder="Ej: CN, US, DE" maxlength="3" />
+                    <span asp-validation-for="CodigoISO" class="text-danger fs-xs"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="CodigoISO" class="form-label">Código ISO (2-3 caracteres)</label>
-                    <input asp-for="CodigoISO" class="form-control" />
-                    <span asp-validation-for="CodigoISO" class="text-danger"></span>
+                <div class="mb-4">
+                    <label asp-for="Nombre" class="icp-field-label">Nombre del País</label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Ej: China, Alemania" />
+                    <span asp-validation-for="Nombre" class="text-danger fs-xs"></span>
                 </div>
 
-                <div class="mb-3 form-check">
-                    <input asp-for="Activo" class="form-check-input" />
-                    <label asp-for="Activo" class="form-check-label">Activo</label>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Cancelar
+                <div class="icp-form-footer">
+                    <a asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
                     </a>
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-check-lg me-1"></i> Guardar País
+                    </button>
                 </div>
             </form>
         </div>
@@ -44,7 +52,5 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

@@ -1,87 +1,102 @@
-﻿@model IEnumerable<ImportCostPro.Core.ViewModels.Importador.ImportadorIndexViewModel>
+@model IEnumerable<ImportCostPro.Core.ViewModels.Importador.ImportadorIndexViewModel>
 
 @{
     ViewData["Title"] = "Importadores";
 }
 
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <h1><i class="fas fa-building"></i> Importadores</h1>
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <div class="icp-page-icon" style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.2);">
+            <i class="bi bi-person-badge" style="color: var(--accent-green);"></i>
         </div>
-        <div class="col-md-6 text-end">
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Nuevo Importador
-            </a>
+        <div>
+            <h1 class="icp-page-title">Importadores</h1>
+            <p class="icp-page-subtitle">Empresas importadoras registradas en el sistema</p>
         </div>
     </div>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @TempData["Success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @TempData["Error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-
-    @if (Model.Any())
-    {
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>RNC</th>
-                        <th>Email</th>
-                        <th>Teléfono</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@item.Nombre</td>
-                            <td><span class="badge bg-info">@item.Rnc</span></td>
-                            <td>@item.Email</td>
-                            <td>@item.Telefono</td>
-                            <td>
-                                @if (item.Activo)
-                                {
-                                    <span class="badge bg-success">Activo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Inactivo</span>
-                                }
-                            </td>
-                            <td>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i> Editar
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> Eliminar
-                                </a>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-info">
-            No hay importadores registrados. <a asp-action="Create">Crear uno.</a>
-        </div>
-    }
+    <a asp-action="Create" class="btn-icp-primary">
+        <i class="bi bi-plus-lg"></i> Crear Importador
+    </a>
 </div>
+
+<div class="icp-toolbar">
+    <div class="icp-toolbar-left">
+        <div class="icp-search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" id="searchImportador" placeholder="Buscar por nombre, RNC, email..." />
+        </div>
+    </div>
+    <div class="icp-toolbar-right">
+        <span class="icp-count-label" id="countImportador">@Model.Count() registros</span>
+    </div>
+</div>
+
+<div class="icp-table-wrapper">
+    <table class="icp-table">
+        <thead>
+            <tr>
+                <th style="width:18%;">RNC</th>
+                <th style="width:30%;">Razón Social</th>
+                <th style="width:20%;">Teléfono</th>
+                <th style="width:22%;">Correo Electrónico</th>
+                <th style="width:10%;" class="text-end">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="text-center py-5" style="color: var(--text-muted);">
+                        <i class="bi bi-building display-5 d-block mb-3" style="opacity: .25;"></i>
+                        No hay empresas importadoras registradas.
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    <tr class="imp-row">
+                        <td><span class="icp-code-badge">@item.Rnc</span></td>
+                        <td class="fw-600" style="color: var(--text-primary);">
+                            <i class="bi bi-building me-2" style="color: var(--accent-green); font-size: 0.75rem;"></i>
+                            @item.Nombre
+                        </td>
+                        <td style="color: var(--text-secondary);">
+                            <i class="bi bi-telephone me-1" style="font-size: 0.72rem; opacity: 0.6;"></i>
+                            @item.Telefono
+                        </td>
+                        <td class="fs-sm" style="color: var(--text-muted);">
+                            <i class="bi bi-envelope me-1" style="font-size: 0.72rem; opacity: 0.6;"></i>
+                            @item.Email
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn-icp-edit">
+                                    <i class="bi bi-pencil-square"></i> Editar
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn-icp-delete">
+                                    <i class="bi bi-trash3"></i> Eliminar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+    document.getElementById('searchImportador')?.addEventListener('input', function () {
+        var q = this.value.toLowerCase(); var vis = 0;
+        document.querySelectorAll('.imp-row').forEach(function (r) {
+            var show = r.textContent.toLowerCase().includes(q);
+            r.style.display = show ? '' : 'none';
+            if (show) vis++;
+        });
+        document.getElementById('countImportador').textContent = vis + ' registros';
+    });
+</script>
+}

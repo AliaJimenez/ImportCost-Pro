@@ -1,46 +1,131 @@
-﻿@{
-    ViewData["Title"] = "Dashboard - ImportCost Pro";
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="container mt-5">
-    <div class="jumbotron bg-light p-5 rounded">
-        <h1 class="display-4">
-            <i class="fas fa-calculator"></i> ImportCost Pro
-        </h1>
-        <p class="lead">Sistema integral para el cálculo del costo de importación (Landed Cost)</p>
-        <hr class="my-4">
-        <p>Selecciona una opción del menú para comenzar.</p>
+<!-- ── Encabezado ──────────────────────────────────────────── -->
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <div class="icp-page-icon" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.2);">
+            <i class="bi bi-grid-1x2-fill" style="color: var(--accent-blue);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Dashboard</h1>
+            <p class="icp-page-subtitle">Resumen ejecutivo del sistema logístico de importaciones</p>
+        </div>
     </div>
+    <a asp-controller="CalculoLandedCost" asp-action="Index" class="btn-icp-primary">
+        <i class="bi bi-calculator-fill"></i> Calcular Landed Cost
+    </a>
+</div>
 
-    <div class="row mt-5">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-map"></i> Geografía</h5>
-                    <p class="card-text">Gestión de países.</p>
-                    <a asp-controller="Pais" asp-action="Index" class="btn btn-primary">Ir</a>
+<!-- ── KPI Metrics ─────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-4">
+        <a asp-controller="Pais" asp-action="Index" class="text-decoration-none d-block">
+            <div class="icp-metric-card" style="--metric-accent: var(--accent-cyan);">
+                <div class="icp-metric-header">
+                    <span class="icp-metric-label">Países Registrados</span>
+                    <div class="icp-metric-icon" style="background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.2);">
+                        <i class="bi bi-globe-americas" style="color: var(--accent-cyan);"></i>
+                    </div>
                 </div>
+                <div class="icp-metric-value" style="color: var(--accent-cyan);">—</div>
+                <div class="icp-metric-desc">Orígenes geográficos activos</div>
             </div>
-        </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <a asp-controller="Moneda" asp-action="Index" class="text-decoration-none d-block">
+            <div class="icp-metric-card" style="--metric-accent: var(--accent-orange);">
+                <div class="icp-metric-header">
+                    <span class="icp-metric-label">Monedas</span>
+                    <div class="icp-metric-icon" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.2);">
+                        <i class="bi bi-currency-exchange" style="color: var(--accent-orange);"></i>
+                    </div>
+                </div>
+                <div class="icp-metric-value" style="color: var(--accent-orange);">—</div>
+                <div class="icp-metric-desc">Divisas disponibles en el sistema</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <a asp-controller="Proveedor" asp-action="Index" class="text-decoration-none d-block">
+            <div class="icp-metric-card" style="--metric-accent: var(--accent-purple);">
+                <div class="icp-metric-header">
+                    <span class="icp-metric-label">Proveedores</span>
+                    <div class="icp-metric-icon" style="background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.2);">
+                        <i class="bi bi-truck" style="color: var(--accent-purple);"></i>
+                    </div>
+                </div>
+                <div class="icp-metric-value" style="color: var(--accent-purple);">—</div>
+                <div class="icp-metric-desc">Suplidores internacionales</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <a asp-controller="Importador" asp-action="Index" class="text-decoration-none d-block">
+            <div class="icp-metric-card" style="--metric-accent: var(--accent-green);">
+                <div class="icp-metric-header">
+                    <span class="icp-metric-label">Importadores</span>
+                    <div class="icp-metric-icon" style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.2);">
+                        <i class="bi bi-person-badge" style="color: var(--accent-green);"></i>
+                    </div>
+                </div>
+                <div class="icp-metric-value" style="color: var(--accent-green);">—</div>
+                <div class="icp-metric-desc">Empresas importadoras locales</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <a asp-controller="Productos" asp-action="Index" class="text-decoration-none d-block">
+            <div class="icp-metric-card" style="--metric-accent: var(--accent-red);">
+                <div class="icp-metric-header">
+                    <span class="icp-metric-label">Productos</span>
+                    <div class="icp-metric-icon" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2);">
+                        <i class="bi bi-tags" style="color: var(--accent-red);"></i>
+                    </div>
+                </div>
+                <div class="icp-metric-value" style="color: var(--accent-red);">—</div>
+                <div class="icp-metric-desc">Artículos en catálogo</div>
+            </div>
+        </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+        <a asp-controller="CategoriasArancelarias" asp-action="Index" class="text-decoration-none d-block">
+            <div class="icp-metric-card" style="--metric-accent: var(--accent-blue);">
+                <div class="icp-metric-header">
+                    <span class="icp-metric-label">Categorías Arancelarias</span>
+                    <div class="icp-metric-icon" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.2);">
+                        <i class="bi bi-percent" style="color: var(--accent-blue);"></i>
+                    </div>
+                </div>
+                <div class="icp-metric-value" style="color: var(--accent-blue);">—</div>
+                <div class="icp-metric-desc">Grupos tributarios configurados</div>
+            </div>
+        </a>
+    </div>
+</div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-coins"></i> Finanzas</h5>
-                    <p class="card-text">Monedas, tasas y configuración de impuestos.</p>
-                    <a asp-controller="Moneda" asp-action="Index" class="btn btn-primary">Ir</a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title"><i class="fas fa-users"></i> Actores</h5>
-                    <p class="card-text">Importadores y proveedores.</p>
-                    <a asp-controller="Importador" asp-action="Index" class="btn btn-primary">Ir</a>
-                </div>
-            </div>
-        </div>
+<!-- ── Accesos Rápidos ─────────────────────────────────────── -->
+<div class="icp-card">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <span class="icp-form-section-label mb-0">Accesos Rápidos</span>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-controller="TasaCambio" asp-action="Index" class="icp-quick-link">
+            <i class="bi bi-arrow-left-right"></i> Tasas de Cambio
+        </a>
+        <a asp-controller="ConfiguracionImpuesto" asp-action="Index" class="icp-quick-link">
+            <i class="bi bi-sliders"></i> Config. Impuestos
+        </a>
+        <a asp-controller="CalculoLandedCost" asp-action="Index" class="icp-quick-link">
+            <i class="bi bi-calculator"></i> Cálculo Landed Cost
+        </a>
+        <a asp-controller="CategoriasArancelarias" asp-action="Create" class="icp-quick-link">
+            <i class="bi bi-plus-circle"></i> Nueva Categoría
+        </a>
+        <a asp-controller="Proveedor" asp-action="Create" class="icp-quick-link">
+            <i class="bi bi-plus-circle"></i> Nuevo Proveedor
+        </a>
     </div>
 </div>
