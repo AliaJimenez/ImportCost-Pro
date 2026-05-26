@@ -1,6 +1,6 @@
 ﻿using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
-using ImportCostPro.Core.ViewModels;
+using ImportCostPro.Core.ViewModels.CategoriaArancelaria;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ImportCostPro.Web.Controllers
