@@ -19,6 +19,6 @@ namespace ImportCostPro.Data.Entities
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
 
         // proximo navegacion ordenes aun no implementado
-        //public ICollection<Orden> Ordenes { get; set; } = new List<Orden>();
+     // public ICollection<Orden> Ordenes { get; set; } = new List<Orden>();
     }
 }
