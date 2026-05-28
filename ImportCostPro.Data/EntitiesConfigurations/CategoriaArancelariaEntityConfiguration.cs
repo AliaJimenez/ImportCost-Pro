@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ImportCostPro.Data.Entities;
 
-namespace ImportCostPro.Data.EntityConfigurations
+namespace ImportCostPro.Data.EntitiesConfigurations
 {
     public class CategoriaArancelariaEntityConfiguration: IEntityTypeConfiguration<CategoriaArancelaria>
     {
@@ -20,13 +20,11 @@ namespace ImportCostPro.Data.EntityConfigurations
             builder.Property(c => c.PorcentajeArancel).IsRequired().HasColumnType("decimal(5,2)");
             builder.Property(c => c.PorcentajeImpuestoSelectivo).HasColumnType("decimal(5,2)").HasDefaultValue(0);
             builder.Property(c => c.Activo).IsRequired().HasDefaultValue(true);
+            builder.Property(c => c.AplicaItbis).IsRequired();
+            builder.Property(c => c.AplicaImpuestoSelectivo).IsRequired();
             #endregion
 
             #region Relationship Configuration
-            builder.HasMany<Producto>(c => c.Productos)
-                .WithOne(p => p.CategoriaArancelaria)
-                .HasForeignKey(p => p.CategoriaArancelariaId)
-                .OnDelete(DeleteBehavior.Restrict);
             #endregion
         }
     }

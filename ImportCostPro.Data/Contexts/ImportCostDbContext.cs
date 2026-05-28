@@ -18,10 +18,12 @@ namespace ImportCostPro.Data.Contexts
         public DbSet<Moneda> Monedas { get; set; }
         public DbSet<TasaCambio> TasasCambio { get; set; }
         public DbSet<ConfiguracionImpuesto> ConfiguracionesImpuestos { get; set; }
-        public DbSet<ConfiguracionImpuesto> ConfiguracionesImpuesto { get; set; }
+        //public DbSet<ConfiguracionImpuesto> ConfiguracionesImpuesto { get; set; }
         public DbSet<Pais> Paises { get; set; }
         public DbSet<Importador> Importadores { get; set; }
         public DbSet <Proveedor> Proveedores { get; set; }
+        public DbSet<OrdenProducto> OrdenProductos { get; set; }
+        public DbSet<OrdenGasto> OrdenGastos { get; set; }
 
         public DbSet<OrdenImportacion> OrdenesImportacion { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,7 +32,9 @@ namespace ImportCostPro.Data.Contexts
 
             //trae todas las configuraciones de entidades 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        
+           
+
+
         }
     }
 }
