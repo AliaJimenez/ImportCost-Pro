@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ImportCostPro.Core.Interfaces
 {
-   public interface  IProveedorService
+    public interface  IProveedorService
     {
         
         Task<IEnumerable<ProveedorDto>> GetAllAsync();

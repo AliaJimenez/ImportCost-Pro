@@ -55,7 +55,7 @@ namespace ImportCostPro.Core.Services
         }
         public async Task<(bool exito, string mensaje)> CrearAsync(CategoriaArancelariaDto dto)
         {
-           var codigoExiste = await _context.CategoriasArancelarias
+        var codigoExiste = await _context.CategoriasArancelarias
             .AnyAsync(c => c.CodigoArancelario.ToUpper()
                     == dto.CodigoArancelario.Trim().ToUpper());
 

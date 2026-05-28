@@ -9,12 +9,12 @@ namespace ImportCostPro.Core.ViewModels
         [Required(ErrorMessage = "El código arancelario es requerido.")]
         [MaxLength(20, ErrorMessage = "El código no puede tener más de 20 caracteres.")]
         [Display(Name = "Código arancelario")]
-        public string CodigoArancelario { get; set; }
+        public string ? CodigoArancelario { get; set; }
 
         [Required(ErrorMessage = "El nombre es requerido.")]
         [MaxLength(150, ErrorMessage = "El nombre no puede tener más de 150 caracteres.")]
         [Display(Name = "Nombre o descripción")]
-        public string Nombre { get; set; }
+        public string?  Nombre { get; set; }
 
         [Required(ErrorMessage = "El porcentaje de arancel es requerido.")]
         [Range(0, 100, ErrorMessage = "El porcentaje debe estar entre 0 y 100.")]

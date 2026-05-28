@@ -9,9 +9,9 @@ namespace ImportCostPro.Data.Entities
         public int Id { get; set; }
         public required string Nombre { get; set; }
         public required int PaisOrigenId { get; set; }
-        public Pais PaisOrigen { get; set; }
+        public Pais ? PaisOrigen { get; set; }
         public required int MonedaPrincipalId { get; set; }
-        public Moneda MonedaPrincipal { get; set; } 
+        public Moneda ? MonedaPrincipal { get; set; } 
         public string? Contacto { get; set; }
         public string? Email { get; set; }
         public string? Telefono { get; set; }

@@ -1,0 +1,92 @@
+﻿@model ImportCostPro.Core.Dtos.CalculoLandedCostDto
+@{
+    ViewData["Title"] = "Resultado del Cálculo";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Resultados Landed Cost: <span class="text-primary">@Model.NumeroOrden</span></h2>
+        <a asp-action="Calcular" class="btn btn-secondary">Volver Atrás</a>
+    </div>
+
+    <div class="row mb-4 text-center">
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">FOB Total (Local)</h6>
+                    <h4 class="text-dark">@Model.FobTotalLocal.ToString("C2")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Gastos (Flete+Seguro+Locales)</h6>
+                    <h4 class="text-dark">@((Model.FleteTotalLocal + Model.SeguroTotalLocal + Model.GastosLocalesTotal).ToString("C2"))</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Impuestos (Aduanas e ITBIS)</h6>
+                    <h4 class="text-dark">@((Model.TotalArancel + Model.TotalIsc + Model.TotalTasaServicio + Model.TotalItbis).ToString("C2"))</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-primary shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-white">Costo Total de Importación</h6>
+                    <h4 class="fw-bold">@Model.CostoTotalImportacion.ToString("C2")</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Desglose por Producto (Prorrateo)</h5>
+        </div>
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cant.</th>
+                        <th>FOB Unit.</th>
+                        <th>Valor CIF</th>
+                        <th>Arancel</th>
+                        <th>ITBIS</th>
+                        <th class="table-info fw-bold">Costo Unit. Final</th>
+                        <th class="table-success fw-bold">Precio Venta Sug.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var det in Model.Detalles)
+                    {
+                        <tr>
+                            <td>@det.NombreProducto</td>
+                            <td>@det.Cantidad.ToString("N0")</td>
+                            <td>@det.FobOriginalUnitario.ToString("C2")</td>
+                            <td>@det.ValorCif.ToString("C2")</td>
+                            <td>@det.MontoArancel.ToString("C2")</td>
+                            <td>@det.MontoItbis.ToString("C2")</td>
+                            <td class="table-info fw-bold">@det.CostoUnitarioImportado.ToString("C2")</td>
+                            <td class="table-success fw-bold">@det.PrecioVentaSugerido.ToString("C2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-end mb-5">
+        <form asp-action="ConfirmarGuardado" method="post">
+            <input type="hidden" name="ordenImportacionId" value="@Model.OrdenImportacionId" />
+            <button type="submit" class="btn btn-success btn-lg shadow" onclick="return confirm('¿Está seguro de confirmar? Este cálculo será inmutable y la orden pasará a estado Cerrada/Calculada.');">
+                <i class="bi bi-save"></i> Confirmar y Guardar Cálculo Oficial
+            </button>
+        </form>
+    </div>
+</div>

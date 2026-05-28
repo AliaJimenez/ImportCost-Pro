@@ -14,7 +14,7 @@ namespace ImportCostPro.Core.ViewModels.Proveedor
 
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [StringLength(150, ErrorMessage = "Máximo 150 caracteres")]
-        public string Nombre { get; set; }
+        public string ? Nombre { get; set; }
 
         [Required(ErrorMessage = "El país es obligatorio")]
         public int PaisOrigenId { get; set; }
@@ -23,22 +23,22 @@ namespace ImportCostPro.Core.ViewModels.Proveedor
         public int MonedaPrincipalId { get; set; }
 
         [StringLength(100, ErrorMessage = "Máximo 100 caracteres")]
-        public string Contacto { get; set; }
+        public string ? Contacto { get; set; }
 
         [EmailAddress(ErrorMessage = "Email no válido")]
         [StringLength(100)]
-        public string Email { get; set; }
+        public string ? Email { get; set; }
 
         [Phone(ErrorMessage = "Teléfono no válido")]
         [StringLength(20)]
-        public string Telefono { get; set; }
+        public string ? Telefono { get; set; }
 
         [StringLength(300, ErrorMessage = "Máximo 300 caracteres")]
-        public string Direccion { get; set; }
+        public string ? Direccion { get; set; }
 
         public bool Activo { get; set; } = true;
 
-      
+    
         public List<SelectListItem> Paises { get; set; } = new();
         public List<SelectListItem> Monedas { get; set; } = new();
     }

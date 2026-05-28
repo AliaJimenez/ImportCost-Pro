@@ -8,7 +8,7 @@ namespace ImportCostPro.Core.ViewModels.Pais
 {
     public class PaisIndexViewModel
     {
-        public int Id { get; set; }
+        public int ? Id { get; set; }
         public required string Nombre { get; set; }
         public required string CodigoISO { get; set; }
         public bool Activo { get; set; }
