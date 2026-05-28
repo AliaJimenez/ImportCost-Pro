@@ -9,7 +9,7 @@ namespace ImportCostPro.Data.EntitiesConfigurations
         public void Configure(EntityTypeBuilder<Producto> builder)
         {
             #region Basic Configuration
-            builder.HasKey(p => p.Id);
+            builder.HasKey(x => x.Id);
             builder.ToTable("Productos");
             #endregion
 

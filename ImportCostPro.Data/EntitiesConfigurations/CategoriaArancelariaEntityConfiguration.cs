@@ -10,7 +10,7 @@ namespace ImportCostPro.Data.EntitiesConfigurations
         {
             //fluent API 
             #region Basic Configuration
-            builder.HasKey(c => c.Id);
+            builder.HasKey(x => x.Id);
             builder.ToTable("CategoriasArancelarias");
             #endregion
 

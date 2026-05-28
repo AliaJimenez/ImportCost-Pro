@@ -41,7 +41,7 @@ namespace ImportCostPro.Data.Entities
         public bool Activo { get; set; } = true;
 
         // Colecciones
-      //  public ICollection<OrdenProducto> Productos { get; set; } = new List<OrdenProducto>();
-      //  public ICollection<OrdenGasto> Gastos { get; set; } = new List<OrdenGasto>();
+        public ICollection<OrdenProducto> Productos { get; set; } = new List<OrdenProducto>();
+        public ICollection<OrdenGasto> Gastos { get; set; } = new List<OrdenGasto>();
     }
 }

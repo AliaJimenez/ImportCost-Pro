@@ -172,12 +172,10 @@ namespace ImportCostPro.Core.Services
 
             if (entidad == null)
                 return (false, "Producto no encontrado.");
-
-            // Aquí voy a valdar el producto asociado cuando ordenes este creado
             
-            // bool tieneOrdenes = await _context.OrdenProductos.AnyAsync(op => op.ProductoId == id);
-            // if (tieneOrdenes)
-            //     return (false, "No se puede eliminar porque está asociado a órdenes.");
+             bool tieneOrdenes = await _context.OrdenProductos.AnyAsync(op => op.ProductoId == id);
+            if (tieneOrdenes)
+             return (false, "No se puede eliminar porque está asociado a órdenes.");
 
             _context.Productos.Remove(entidad);
             await _context.SaveChangesAsync();
