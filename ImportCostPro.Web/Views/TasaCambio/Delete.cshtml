@@ -4,33 +4,57 @@
     ViewData["Title"] = "Eliminar Tasa de Cambio";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-danger shadow">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> ¿Confirmar Eliminación?</h4>
-                </div>
-                <div class="card-body text-center">
-                    <p class="fs-5">¿Estás seguro de que deseas eliminar esta tasa de cambio?</p>
-                    
-                    <div class="alert alert-warning text-start">
-                        <strong>Fecha Vigencia:</strong> @Model.FechaVigencia.ToShortDateString()<br />
-                        <strong>Conversión:</strong> @Model.NombreMonedaOrigen -> @Model.NombreMonedaDestino<br />
-                        <strong>Tasa:</strong> @Model.Tasa.ToString("N6")<br />
-                    </div>
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-2">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2);">
+            <i class="bi bi-exclamation-triangle-fill" style="color: var(--accent-red);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">¿Eliminar Tasa Histórica?</h1>
+            <p class="icp-page-subtitle">Se perderá el registro de conversión para esta fecha</p>
+        </div>
+    </div>
+</div>
 
-                    <form asp-action="Delete" method="post">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="Id" />
-                        
-                        <div class="d-flex justify-content-between mt-4">
-                            <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Cancelar</a>
-                            <button type="submit" class="btn btn-danger"><i class="bi bi-trash-fill"></i> Sí, Eliminar</button>
-                        </div>
-                    </form>
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="icp-card" style="border-color: rgba(239,68,68,0.25);">
+            <div class="icp-alert-danger mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Esta acción eliminará permanentemente el registro de conversión.
+            </div>
+
+            <div class="icp-delete-preview mb-4">
+                <div class="preview-row">
+                    <span class="preview-label">Conversión</span>
+                    <span class="preview-value fw-600">
+                        @Model.NombreMonedaOrigen <i class="bi bi-arrow-right mx-1" style="color:var(--text-muted);"></i> @Model.NombreMonedaDestino
+                    </span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Multiplicador</span>
+                    <span class="preview-value fw-bold font-monospace fs-5" style="color:var(--accent-orange);">@Model.Tasa.ToString("N4")</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Fecha Aplicada</span>
+                    <span class="preview-value">
+                        <i class="bi bi-calendar-event me-1"></i>@Model.FechaVigencia.ToString("dd/MM/yyyy")
+                    </span>
                 </div>
             </div>
+
+            <form asp-action="Delete" method="post">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn-cancel">Cancelar</a>
+                    <button type="submit" class="btn btn-danger fw-semibold px-4">
+                        <i class="bi bi-trash3-fill me-2"></i>Borrar Definitivamente
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

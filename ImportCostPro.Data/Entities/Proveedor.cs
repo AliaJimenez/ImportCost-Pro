@@ -23,6 +23,6 @@ namespace ImportCostPro.Data.Entities
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
 
         // ordenes pendiente 
-        // public ICollection<Orden> Ordenes { get; set; } = new List<Orden>();
+       //  public ICollection<Orden> Ordenes { get; set; } = new List<Orden>();
     }
 }

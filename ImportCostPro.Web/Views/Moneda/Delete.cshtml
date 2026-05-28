@@ -1,40 +1,80 @@
-@model ImportCostPro.Core.Dtos.MonedaDto
+@model ImportCostPro.Core.ViewModels.MonedaViewModel
 
 @{
     ViewData["Title"] = "Eliminar Moneda";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-danger shadow">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> ¿Confirmar Eliminación?</h4>
-                </div>
-                <div class="card-body text-center">
-                    <p class="fs-5">¿Estás seguro de que deseas eliminar permanentemente esta moneda?</p>
-                    
-                    <div class="alert alert-warning text-start">
-                        <strong>Moneda:</strong> @Model.Nombre (@Model.CodigoISO)<br />
-                        <strong>Símbolo:</strong> @Model.Simbolo<br />
-                        <strong>Nota:</strong> Esta acción no se puede deshacer y fallará si la moneda está amarrada a tasas de cambio vigentes.
-                    </div>
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2);">
+            <i class="bi bi-exclamation-triangle-fill" style="color: var(--accent-red);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Eliminar Moneda</h1>
+            <p class="icp-page-subtitle">Esta acción puede afectar las tasas de cambio vinculadas</p>
+        </div>
+    </div>
+</div>
 
-                    <form asp-action="Delete" method="post">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" asp-for="Id" />
-                        
-                        <div class="d-flex justify-content-between mt-4">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left-circle"></i> No, Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-trash-fill"></i> Sí, Eliminar Moneda
-                            </button>
-                        </div>
-                    </form>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="icp-card" style="border-color: rgba(239,68,68,0.25);">
+            <div class="icp-alert-danger mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Esta acción es irreversible y puede romper las tasas de cambio vinculadas a esta moneda.
+            </div>
+
+            <div class="icp-delete-preview mb-4">
+                <div class="preview-row">
+                    <span class="preview-label">Código</span>
+                    <span class="preview-value"><span class="icp-code-badge">@Model.CodigoISO</span></span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Nombre</span>
+                    <span class="preview-value fw-600">@Model.Nombre</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Símbolo</span>
+                    <span class="preview-value fw-bold fs-5" style="color: var(--accent-orange);">@Model.Simbolo</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Tipo</span>
+                    <span class="preview-value">
+                        @if (Model.EsMonedaLocal)
+                        {
+                            <span class="icp-badge icp-badge-danger"><i class="bi bi-lock-fill" style="font-size:0.6rem;"></i> MONEDA BASE</span>
+                        }
+                        else
+                        {
+                            <span class="icp-badge icp-badge-cerrada">Divisa Extranjera</span>
+                        }
+                    </span>
                 </div>
             </div>
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    @if (Model.EsMonedaLocal)
+                    {
+                        <button type="button" class="btn btn-danger fw-semibold px-4" disabled>
+                            <i class="bi bi-lock-fill me-1"></i> Bloqueado (Moneda Base)
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="btn btn-danger fw-semibold px-4">
+                            <i class="bi bi-trash3-fill me-1"></i> Eliminar Definitivamente
+                        </button>
+                    }
+                </div>
+            </form>
         </div>
     </div>
 </div>

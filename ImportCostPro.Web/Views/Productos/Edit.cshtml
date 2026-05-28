@@ -1,152 +1,149 @@
-﻿@model ImportCostPro.Core.ViewModels.Producto.ProductoViewModel
+@model ImportCostPro.Core.ViewModels.Producto.ProductoViewModel
 
 @{
-    ViewData["Title"] = "Editar producto";
+    ViewData["Title"] = "Editar Producto";
 }
 
-<div class="container">
-    <h2 class="mb-4">Editar producto</h2>
-
-    <form asp-action="Edit" method="post">
-        @Html.AntiForgeryToken()
-        <input asp-for="Id" type="hidden" />
-        <input asp-for="TieneOrdenesAsociadas" type="hidden" />
-
-        <div asp-validation-summary="All"
-             class="alert alert-danger"></div>
-
-        <div class="row">
-            <div class="col-md-8 mb-3">
-                <label asp-for="Nombre" class="form-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre"
-                      class="text-danger small"></span>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label asp-for="CodigoReferencia" class="form-label"></label>
-                <input asp-for="CodigoReferencia" class="form-control" />
-                <span asp-validation-for="CodigoReferencia"
-                      class="text-danger small"></span>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label asp-for="CategoriaArancelariaId"
-                       class="form-label"></label>
-                <select asp-for="CategoriaArancelariaId"
-                        asp-items="Model.CategoriasDisponibles"
-                        class="form-select">
-                    <option value="">-- Seleccione una categoría --</option>
-                </select>
-                <span asp-validation-for="CategoriaArancelariaId"
-                      class="text-danger small"></span>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label asp-for="PaisOrigenId" class="form-label"></label>
-                <select asp-for="PaisOrigenId"
-                        class="form-select" disabled>
-                    <option value="">-- Disponible pronto --</option>
-                </select>
-                <input type="hidden" asp-for="PaisOrigenId" />
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label asp-for="PesoUnitario" class="form-label"></label>
-                <div class="input-group">
-                    <input asp-for="PesoUnitario" class="form-control" />
-                    <span class="input-group-text">kg</span>
-                </div>
-                <span asp-validation-for="PesoUnitario"
-                      class="text-danger small"></span>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label asp-for="UnidadMedida" class="form-label"></label>
-                <select asp-for="UnidadMedida"
-                        asp-items="Model.UnidadesMedidaDisponibles"
-                        class="form-select">
-                    <option value="">-- Seleccione --</option>
-                </select>
-                <span asp-validation-for="UnidadMedida"
-                      class="text-danger small"></span>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-header">
-                Dimensiones <small class="text-muted">
-                (opcional — si ingresa una debe ingresar las tres)
-            </small>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label asp-for="Largo" class="form-label"></label>
-                    <div class="input-group">
-                        <input asp-for="Largo" class="form-control" />
-                        <span class="input-group-text">cm</span>
-                    </div>
-                    <span asp-validation-for="Largo"
-                          class="text-danger small"></span>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label asp-for="Ancho" class="form-label"></label>
-                    <div class="input-group">
-                        <input asp-for="Ancho" class="form-control" />
-                        <span class="input-group-text">cm</span>
-                    </div>
-                    <span asp-validation-for="Ancho"
-                          class="text-danger small"></span>
-                </div>
-
-                <div class="col-md-4 mb-3">
-                    <label asp-for="Alto" class="form-label"></label>
-                    <div class="input-group">
-                        <input asp-for="Alto" class="form-control" />
-                        <span class="input-group-text">cm</span>
-                    </div>
-                    <span asp-validation-for="Alto"
-                          class="text-danger small"></span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mb-3">
-        <label asp-for="Descripcion" class="form-label"></label>
-        <textarea asp-for="Descripcion" class="form-control"
-                  rows="3"></textarea>
-        <span asp-validation-for="Descripcion"
-              class="text-danger small"></span>
-    </div>
-
-    <div class="mb-3">
-        <div class="form-check form-switch">
-            <input asp-for="Activo" class="form-check-input"
-                   type="checkbox" />
-            <label asp-for="Activo" class="form-check-label"></label>
-        </div>
-    </div>
-
-    <div class="d-flex gap-2 mt-4">
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-floppy"></i> Guardar cambios
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Volver atrás
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
         </a>
+        <div class="icp-page-icon" style="background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.2);">
+            <i class="bi bi-pencil-square" style="color: var(--accent-cyan);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Editar Producto</h1>
+            <p class="icp-page-subtitle">Actualiza los datos del artículo en el catálogo</p>
+        </div>
     </div>
-</form>
+</div>
+
+<div class="row">
+    <div class="col-lg-10">
+        <div class="icp-card">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="TieneOrdenesAsociadas" type="hidden" />
+
+                <div asp-validation-summary="All" class="icp-alert-danger mb-4"></div>
+
+                <span class="icp-form-section-label">Identificación</span>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-8">
+                        <label asp-for="Nombre" class="icp-field-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="CodigoReferencia" class="icp-field-label"></label>
+                        <input asp-for="CodigoReferencia" class="form-control" />
+                        <span asp-validation-for="CodigoReferencia" class="text-danger fs-xs"></span>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="CategoriaArancelariaId" class="icp-field-label"></label>
+                        <select asp-for="CategoriaArancelariaId"
+                                asp-items="Model.CategoriasDisponibles"
+                                class="form-select">
+                            <option value="">-- Seleccione una categoría --</option>
+                        </select>
+                        <span asp-validation-for="CategoriaArancelariaId" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="PaisOrigenId" class="icp-field-label"></label>
+                        <select asp-for="PaisOrigenId" class="form-select" disabled>
+                            <option value="">-- Disponible pronto --</option>
+                        </select>
+                        <input type="hidden" asp-for="PaisOrigenId" />
+                    </div>
+                </div>
+
+                <span class="icp-form-section-label">Medidas</span>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label asp-for="PesoUnitario" class="icp-field-label"></label>
+                        <div class="input-group">
+                            <input asp-for="PesoUnitario" class="form-control" />
+                            <span class="input-group-text">kg</span>
+                        </div>
+                        <span asp-validation-for="PesoUnitario" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="UnidadMedida" class="icp-field-label"></label>
+                        <select asp-for="UnidadMedida"
+                                asp-items="Model.UnidadesMedidaDisponibles"
+                                class="form-select">
+                            <option value="">-- Seleccione --</option>
+                        </select>
+                        <span asp-validation-for="UnidadMedida" class="text-danger fs-xs"></span>
+                    </div>
+                </div>
+
+                <div class="icp-toggle-panel mb-4">
+                    <span class="icp-form-section-label">
+                        Dimensiones
+                        <small style="color:var(--text-muted);font-size:0.72rem;">(opcional)</small>
+                    </span>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Largo" class="icp-field-label"></label>
+                            <div class="input-group">
+                                <input asp-for="Largo" class="form-control" />
+                                <span class="input-group-text">cm</span>
+                            </div>
+                            <span asp-validation-for="Largo" class="text-danger fs-xs"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Ancho" class="icp-field-label"></label>
+                            <div class="input-group">
+                                <input asp-for="Ancho" class="form-control" />
+                                <span class="input-group-text">cm</span>
+                            </div>
+                            <span asp-validation-for="Ancho" class="text-danger fs-xs"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Alto" class="icp-field-label"></label>
+                            <div class="input-group">
+                                <input asp-for="Alto" class="form-control" />
+                                <span class="input-group-text">cm</span>
+                            </div>
+                            <span asp-validation-for="Alto" class="text-danger fs-xs"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Descripcion" class="icp-field-label"></label>
+                    <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Descripcion" class="text-danger fs-xs"></span>
+                </div>
+
+                <div class="icp-toggle-panel mb-4">
+                    <div class="icp-toggle-row">
+                        <label asp-for="Activo" class="fw-600 fs-sm" style="color:var(--text-primary);"></label>
+                        <input asp-for="Activo" class="form-check-input ms-3 fs-5" type="checkbox" />
+                    </div>
+                </div>
+
+                <div class="icp-form-footer">
+                    <a asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-arrow-left me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save btn-save-cyan">
+                        <i class="bi bi-floppy me-1"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

@@ -1,65 +1,73 @@
 @model ImportCostPro.Core.ViewModels.MonedaViewModel
 
 @{
-    ViewData["Title"] = "Nueva Moneda";
+    ViewData["Title"] = "Registrar Moneda";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Registrar Nueva Moneda</h4>
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.2);">
+            <i class="bi bi-currency-dollar" style="color: var(--accent-green);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Registrar Moneda</h1>
+            <p class="icp-page-subtitle">Agrega un nuevo activo monetario al sistema</p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="icp-card">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="icp-alert-danger mb-4"></div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-5">
+                        <label asp-for="CodigoISO" class="icp-field-label"></label>
+                        <input asp-for="CodigoISO" class="form-control font-monospace"
+                               placeholder="USD" maxlength="3" />
+                        <span asp-validation-for="CodigoISO" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Simbolo" class="icp-field-label"></label>
+                        <input asp-for="Simbolo" class="form-control" placeholder="$" maxlength="5" />
+                        <span asp-validation-for="Simbolo" class="text-danger fs-xs"></span>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        @Html.AntiForgeryToken()
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 fw-bold"></div>
-
-                        <div class="mb-3">
-                            <label asp-for="CodigoISO" class="form-label fw-bold"></label>
-                            <input asp-for="CodigoISO" class="form-control text-uppercase" placeholder="Ej. USD, DOP, EUR" />
-                            <span asp-validation-for="CodigoISO" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Nombre" class="form-label fw-bold"></label>
-                            <input asp-for="Nombre" class="form-control" placeholder="Ej. Dólar Estadounidense" />
-                            <span asp-validation-for="Nombre" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Simbolo" class="form-label fw-bold"></label>
-                            <input asp-for="Simbolo" class="form-control" placeholder="Ej. $, RD$, €" />
-                            <span asp-validation-for="Simbolo" class="text-danger small"></span>
-                        </div>
-
-                        <div class="mb-3 form-check form-switch">
-                            <input asp-for="EsMonedaLocal" class="form-check-input" type="checkbox" role="switch">
-                            <label asp-for="EsMonedaLocal" class="form-check-label fw-bold"></label>
-                        </div>
-
-                        <div class="mb-4 form-check form-switch">
-                            <input asp-for="Activo" class="form-check-input" type="checkbox" role="switch" checked>
-                            <label asp-for="Activo" class="form-check-label fw-bold"></label>
-                        </div>
-
-                        <div class="d-flex justify-content-between">
-                            <a asp-action="Index" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left-circle"></i> Cancelar
-                            </a>
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-save"></i> Guardar Moneda
-                            </button>
-                        </div>
-                    </form>
+                <div class="mb-4">
+                    <label asp-for="Nombre" class="icp-field-label"></label>
+                    <input asp-for="Nombre" class="form-control" placeholder="Dólar Estadounidense" />
+                    <span asp-validation-for="Nombre" class="text-danger fs-xs"></span>
                 </div>
-            </div>
+
+                <div class="icp-toggle-panel mb-5">
+                    <div class="icp-toggle-row">
+                        <div>
+                            <label asp-for="EsMonedaLocal" class="fw-600 fs-sm" style="color: var(--text-primary); cursor: pointer;"></label>
+                            <small class="d-block mt-1" style="color: var(--text-muted);">Si se activa, esta será la moneda de reporte oficial del sistema.</small>
+                        </div>
+                        <input asp-for="EsMonedaLocal" class="form-check-input ms-3 fs-4" type="checkbox" role="switch" style="cursor: pointer;" />
+                    </div>
+                </div>
+
+                <div class="icp-form-footer">
+                    <a asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-check-lg me-1"></i> Guardar Moneda
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

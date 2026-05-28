@@ -4,14 +4,15 @@ using ImportCostPro.Core.ViewModels.Producto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
+
 namespace ImportCostPro.Web.Controllers
 {
     public class ProductosController : Controller
     {
         private readonly IProductoService _productoService;
         private readonly ICategoriaArancelariaService _categoriaService;
-        // private readonly IPaisService _paisService;
-        // descomentar cuando Waldin haga merge
+        private readonly IPaisService _paisService;
+        
 
         public ProductosController(
             IProductoService productoService,
@@ -150,11 +151,10 @@ namespace ImportCostPro.Web.Controllers
                 },
                 viewModel.UnidadMedida);
 
-            // Descomentar cuando Waldin haga merge
-            // var paises = await _paisService.ObtenerPaisesActivosAsync();
-            // viewModel.PaisesDisponibles = new SelectList(
-            //     paises, "Id", "Nombre",
-            //     viewModel.PaisOrigenId);
+            var paises = await _paisService.GetActivosAsync();
+            viewModel.PaisesDisponibles = new SelectList(
+               paises, "Id", "Nombre",
+               viewModel.PaisOrigenId);
         }
 
         private ProductoDto ViewModelToDto(ProductoViewModel viewModel)

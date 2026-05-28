@@ -9,7 +9,7 @@ namespace ImportCostPro.Data.EntitiesConfigurations
         public void Configure(EntityTypeBuilder<Producto> builder)
         {
             #region Basic Configuration
-            builder.HasKey(x => x.Id);
+            builder.HasKey(p => p.Id);
             builder.ToTable("Productos");
             #endregion
 
@@ -17,19 +17,26 @@ namespace ImportCostPro.Data.EntitiesConfigurations
             builder.Property(p => p.Nombre).IsRequired().HasMaxLength(150);
             builder.Property(p => p.CodigoReferencia).IsRequired().HasMaxLength(50);
             builder.Property(p => p.PesoUnitario).IsRequired().HasColumnType("decimal(10,4)");
-            builder.Property(p => p.Largo).IsRequired().HasColumnType("decimal(10,4)");
-            builder.Property(p => p.Ancho).IsRequired().HasColumnType("decimal(10,4)");
-            builder.Property(p => p.Alto).IsRequired().HasColumnType("decimal(10,4)");
+            builder.Property(p => p.Largo).HasColumnType("decimal(10,4)");
+            builder.Property(p => p.Ancho).HasColumnType("decimal(10,4)");
+            builder.Property(p => p.Alto).HasColumnType("decimal(10,4)");
             builder.Property(p => p.UnidadMedida).IsRequired().HasMaxLength(20);
             builder.Property(p => p.Descripcion).HasMaxLength(250);
             builder.Property(p => p.Activo).IsRequired().HasDefaultValue(true);
             #endregion
 
             #region Relationship Configuration
-            // builder.HasOne<Pais>(p => p.PaisOrigen)
-            //     .WithMany()
-            //     .HasForeignKey(p => p.PaisOrigenId)
-            //     .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne<Pais>(p => p.PaisOrigen)
+                 .WithMany()
+                 .HasForeignKey(p => p.PaisOrigenId)
+                 .IsRequired()
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(p => p.CategoriaArancelaria)
+                 .WithMany(c => c.Productos)
+                 .HasForeignKey(p => p.CategoriaArancelariaId)
+                 .IsRequired() 
+                 .OnDelete(DeleteBehavior.Restrict);
             #endregion
         }
 

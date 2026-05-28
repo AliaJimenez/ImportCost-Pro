@@ -18,7 +18,7 @@ namespace ImportCostPro.Core.Services
         {
             return await _context.Productos
                 .Include(p => p.CategoriaArancelaria)
-                // .Include(p => p.PaisOrigen) // descomentar cuando Waldin haga merge
+                .Include(p => p.PaisOrigen) 
                 .Select(p => new ProductoDto
                 {
                     Id = p.Id,
@@ -34,7 +34,7 @@ namespace ImportCostPro.Core.Services
                     PaisOrigenId = p.PaisOrigenId,
                     CategoriaArancelariaId = p.CategoriaArancelariaId,
                     NombreCategoria = p.CategoriaArancelaria.Nombre,
-                    // NombrePais = p.PaisOrigen.Nombre // descomentar cuando Waldin haga merge
+                    NombrePais = p.PaisOrigen.Nombre 
                 })
                 .ToListAsync();
         }
@@ -73,7 +73,7 @@ namespace ImportCostPro.Core.Services
             if (codigoExiste)
                 return (false, "Ya existe un producto con este código o referencia.");
 
-            // Valida dimensiones
+            // Validar dimensiones
             bool algunaTieneDimension = dto.Largo.HasValue
                 || dto.Ancho.HasValue
                 || dto.Alto.HasValue;

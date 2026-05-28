@@ -1,54 +1,78 @@
-﻿@model ImportCostPro.Core.Dtos.ProductoDto
+@model ImportCostPro.Core.Dtos.ProductoDto
 
 @{
-    ViewData["Title"] = "Eliminar producto";
+    ViewData["Title"] = "Eliminar Producto";
 }
 
-<div class="container">
-    <h2 class="mb-4">Eliminar producto</h2>
-
-    <div class="alert alert-danger">
-        <i class="bi bi-exclamation-triangle"></i>
-        ¿Está seguro que desea eliminar este producto?
-    </div>
-
-    <div class="card mb-4">
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-4">Código o referencia</dt>
-                <dd class="col-sm-8">@Model.CodigoReferencia</dd>
-
-                <dt class="col-sm-4">Nombre</dt>
-                <dd class="col-sm-8">@Model.Nombre</dd>
-
-                <dt class="col-sm-4">Categoría arancelaria</dt>
-                <dd class="col-sm-8">@Model.NombreCategoria</dd>
-
-                <dt class="col-sm-4">Peso unitario</dt>
-                <dd class="col-sm-8">@Model.PesoUnitario kg</dd>
-
-                <dt class="col-sm-4">Unidad de medida</dt>
-                <dd class="col-sm-8">@Model.UnidadMedida</dd>
-
-                <dt class="col-sm-4">Estado</dt>
-                <dd class="col-sm-8">
-                    @(Model.Activo ? "Activo" : "Inactivo")
-                </dd>
-            </dl>
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-2">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2);">
+            <i class="bi bi-exclamation-octagon-fill" style="color: var(--accent-red);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Eliminar Producto</h1>
+            <p class="icp-page-subtitle">Esta acción es irreversible</p>
         </div>
     </div>
+</div>
 
-    <form asp-action="Delete" method="post">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="id" value="@Model.Id" />
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="icp-card" style="border-color: rgba(239,68,68,0.25);">
+            <div class="icp-alert-danger mb-4">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                ¿Está seguro que desea eliminar este producto?
+            </div>
 
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-danger">
-                <i class="bi bi-trash"></i> Aceptar
-            </button>
-            <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-x-circle"></i> Cancelar
-            </a>
+            <div class="icp-delete-preview mb-4">
+                <div class="preview-row">
+                    <span class="preview-label">Código</span>
+                    <span class="preview-value"><span class="icp-code-badge">@Model.CodigoReferencia</span></span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Nombre</span>
+                    <span class="preview-value fw-600">@Model.Nombre</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Categoría</span>
+                    <span class="preview-value" style="color:var(--text-secondary);">@Model.NombreCategoria</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Peso Unit.</span>
+                    <span class="preview-value">@Model.PesoUnitario kg</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Unidad</span>
+                    <span class="preview-value"><span class="icp-code-badge">@Model.UnidadMedida</span></span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Estado</span>
+                    <span class="preview-value">
+                        @if (Model.Activo)
+                        {
+                            <span class="icp-badge icp-badge-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="icp-badge icp-badge-danger">Inactivo</span>
+                        }
+                    </span>
+                </div>
+            </div>
+
+            <form asp-action="Delete" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="icp-form-footer">
+                    <a asp-action="Index" class="btn-cancel">Cancelar</a>
+                    <button type="submit" class="btn btn-danger fw-semibold px-4">
+                        <i class="bi bi-trash me-1"></i> Eliminar Definitivamente
+                    </button>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>

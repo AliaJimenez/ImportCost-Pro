@@ -21,15 +21,18 @@ namespace ImportCostPro.Data.Contexts
         public DbSet<ConfiguracionImpuesto> ConfiguracionesImpuesto { get; set; }
         public DbSet<Pais> Paises { get; set; }
         public DbSet<Importador> Importadores { get; set; }
-        public DbSet <Proveedor> Proveedores { get; set; }  
+        public DbSet <Proveedor> Proveedores { get; set; }
 
+        public DbSet<OrdenImportacion> OrdenesImportacion { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder); //principio liskov
 
             //trae todas las configuraciones de entidades 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        
+           
+
+
         }
     }
 }

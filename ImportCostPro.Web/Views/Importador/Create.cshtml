@@ -1,66 +1,79 @@
-﻿@model ImportCostPro.Core.ViewModels.Importador.ImportadorFormViewModel
+@model ImportCostPro.Core.ViewModels.Importador.ImportadorFormViewModel
 
 @{
-    ViewData["Title"] = "Crear Importador";
+    ViewData["Title"] = "Registrar Importador";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h1>Crear Importador</h1>
-            <hr />
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.2);">
+            <i class="bi bi-person-badge" style="color: var(--accent-green);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Registrar Importador</h1>
+            <p class="icp-page-subtitle">Define el perfil fiscal corporativo</p>
+        </div>
+    </div>
+</div>
 
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="icp-card">
             <form asp-action="Create" method="post">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="icp-alert-danger mb-4"></div>
 
-                <div class="mb-3">
-                    <label asp-for="Nombre" class="form-label">Nombre</label>
-                    <input asp-for="Nombre" class="form-control" />
-                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                <span class="icp-form-section-label">Datos Corporativos</span>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-8">
+                        <label asp-for="Nombre" class="icp-field-label"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Importaciones Dominicana SAS" />
+                        <span asp-validation-for="Nombre" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Rnc" class="icp-field-label">RNC</label>
+                        <input asp-for="Rnc" class="form-control font-monospace" placeholder="131-XXXXX-X" />
+                        <span asp-validation-for="Rnc" class="text-danger fs-xs"></span>
+                    </div>
+                </div>
+
+                <span class="icp-form-section-label">Contacto</span>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label asp-for="Telefono" class="icp-field-label"></label>
+                        <input asp-for="Telefono" class="form-control" placeholder="809-555-0199" />
+                        <span asp-validation-for="Telefono" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="icp-field-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="finanzas@empresa.com" type="email" />
+                        <span asp-validation-for="Email" class="text-danger fs-xs"></span>
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Rnc" class="form-label">RNC</label>
-                    <input asp-for="Rnc" class="form-control" />
-                    <span asp-validation-for="Rnc" class="text-danger"></span>
+                    <label asp-for="Contacto" class="icp-field-label"></label>
+                    <input asp-for="Contacto" class="form-control" placeholder="Nombre de la persona encargada" />
+                    <span asp-validation-for="Contacto" class="text-danger fs-xs"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label">Email</label>
-                    <input asp-for="Email" type="email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                <div class="mb-4">
+                    <label asp-for="Direccion" class="icp-field-label"></label>
+                    <textarea asp-for="Direccion" class="form-control" rows="2" placeholder="Dirección física legal..."></textarea>
+                    <span asp-validation-for="Direccion" class="text-danger fs-xs"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Telefono" class="form-label">Teléfono</label>
-                    <input asp-for="Telefono" class="form-control" />
-                    <span asp-validation-for="Telefono" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Contacto" class="form-label">Contacto</label>
-                    <input asp-for="Contacto" class="form-control" />
-                    <span asp-validation-for="Contacto" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Direccion" class="form-label">Dirección</label>
-                    <input asp-for="Direccion" class="form-control" />
-                    <span asp-validation-for="Direccion" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3 form-check">
-                    <input asp-for="Activo" class="form-check-input" />
-                    <label asp-for="Activo" class="form-check-label">Activo</label>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Cancelar
+                <div class="icp-form-footer">
+                    <a asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
                     </a>
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-check-lg me-1"></i> Guardar Importador
+                    </button>
                 </div>
             </form>
         </div>
@@ -68,7 +81,5 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

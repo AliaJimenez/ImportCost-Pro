@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImportCostPro.Data.EntitiesConfigurations
 {
-    internal class OrdenImportacionConfiguration
+    public class OrdenImportacionConfiguration
     {//waldin
     }
 }
