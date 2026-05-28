@@ -7,10 +7,10 @@ namespace ImportCostPro.Data.Entities
         public int Id { get; set; }
         
         // Porcentaje ITBIS (0-100)
-        public decimal PorcentajeITBIS { get; set; }
+        public required decimal PorcentajeITBIS { get; set; }
         
         // Porcentaje Tasa de Servicio Aduanal (0-100)
-        public decimal PorcentajeTasaServicioAduanal { get; set; }
+        public required decimal PorcentajeTasaServicioAduanal { get; set; }
         
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
     }
