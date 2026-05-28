@@ -10,12 +10,12 @@ namespace ImportCostPro.Core.ViewModels.Producto
         [Required(ErrorMessage = "El nombre del producto es requerido.")]
         [MaxLength(150, ErrorMessage = "El nombre no puede tener más de 150 caracteres.")]
         [Display(Name = "Nombre del producto")]
-        public required string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El código o referencia es requerido.")]
         [MaxLength(50, ErrorMessage = "El código no puede tener más de 50 caracteres.")]
         [Display(Name = "Código o referencia")]
-        public required string CodigoReferencia { get; set; }
+        public string CodigoReferencia { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "El país de origen es requerido.")]
         [Display(Name = "País de origen predeterminado")]
@@ -44,7 +44,7 @@ namespace ImportCostPro.Core.ViewModels.Producto
 
         [Required(ErrorMessage = "La unidad de medida es requerida.")]
         [Display(Name = "Unidad de medida")]
-        public required string UnidadMedida { get; set; }
+        public string UnidadMedida { get; set; } = string.Empty;
 
         [MaxLength(250, ErrorMessage = "La descripción no puede tener más de 250 caracteres.")]
         [Display(Name = "Descripción")]

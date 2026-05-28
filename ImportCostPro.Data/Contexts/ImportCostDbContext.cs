@@ -30,7 +30,9 @@ namespace ImportCostPro.Data.Contexts
 
             //trae todas las configuraciones de entidades 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        
+           
+
+
         }
     }
 }

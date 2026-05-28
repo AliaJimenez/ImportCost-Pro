@@ -4,9 +4,9 @@
     {
         public int Id { get; set; }
 
-        public required string CodigoArancelario { get; set; }
+        public required string CodigoArancelario { get; set; } = string.Empty;
 
-        public required string Nombre { get; set; }
+        public required string Nombre { get; set; } = string.Empty;
 
         public required decimal PorcentajeArancel { get; set; }
 

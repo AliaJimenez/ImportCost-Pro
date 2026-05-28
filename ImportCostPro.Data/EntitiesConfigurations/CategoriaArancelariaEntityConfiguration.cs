@@ -10,7 +10,7 @@ namespace ImportCostPro.Data.EntitiesConfigurations
         {
             //fluent API 
             #region Basic Configuration
-            builder.HasKey(x => x.Id);
+            builder.HasKey(c => c.Id);
             builder.ToTable("CategoriasArancelarias");
             #endregion
 
@@ -25,10 +25,6 @@ namespace ImportCostPro.Data.EntitiesConfigurations
             #endregion
 
             #region Relationship Configuration
-            builder.HasMany<Producto>(c => c.Productos)
-                .WithOne(p => p.CategoriaArancelaria)
-                .HasForeignKey(p => p.CategoriaArancelariaId)
-                .OnDelete(DeleteBehavior.Restrict);
             #endregion
         }
     }
