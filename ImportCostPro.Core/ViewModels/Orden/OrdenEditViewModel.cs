@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
             [Required(ErrorMessage = "El número de orden es obligatorio")]
             [StringLength(50, ErrorMessage = "Máximo 50 caracteres")]
-            public string ? NumeroOrden { get; set; }
+            public string NumeroOrden { get; set; }
 
             [Required(ErrorMessage = "El importador es obligatorio")]
             public int ImportadorId { get; set; }
@@ -25,7 +25,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
             [Required(ErrorMessage = "La moneda es obligatoria")]
             public int MonedaId { get; set; }
 
-            public string ? Estado { get; set; }  // Abierta, Calculada, Cerrada, Cancelada
+            public string Estado { get; set; }  // Abierta, Calculada, Cerrada, Cancelada
             public bool Activo { get; set; } = true;
 
             // Datos calculados (solo lectura)

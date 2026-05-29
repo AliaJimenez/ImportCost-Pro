@@ -64,14 +64,15 @@ namespace ImportCostPro.Core.Services
             if (dto.MonedaOrigenId == dto.MonedaDestinoId)
                 return (false, "La moneda de origen y la de destino no pueden ser la misma.");
 
-            // Valida que no se dupliquen tasas el mismo día para el mismo par de monedas
+            // Corrección: Valida duplicados SOLO si la tasa está activa
             var duplicado = await _context.TasasCambio.AnyAsync(t => 
+                t.Activo && 
                 t.MonedaOrigenId == dto.MonedaOrigenId && 
                 t.MonedaDestinoId == dto.MonedaDestinoId && 
                 t.FechaVigencia.Date == dto.FechaVigencia.Date);
 
             if (duplicado)
-                return (false, "Ya existe una tasa de cambio registrada para estas monedas en la fecha seleccionada.");
+                return (false, "Ya existe una tasa de cambio ACTIVA para estas monedas en la fecha seleccionada.");
 
             var entidad = new TasaCambio
             {
@@ -98,9 +99,26 @@ namespace ImportCostPro.Core.Services
             if (dto.MonedaOrigenId == dto.MonedaDestinoId)
                 return (false, "La moneda de origen y la de destino no pueden ser la misma.");
 
-            // TO DO: Descomentar esto en el Sprint 2 cuando esté creada la tabla 'Ordenes'.
-            // var usada = await _context.Ordenes.AnyAsync(o => o.TasaCambioId == dto.Id);
-            // if (usada) return (false, "No se puede editar: esta tasa ya se usó en cálculos transaccionales.");
+            // Corrección: Validación de uso en un cálculo oficial existente
+            var usada = await _context.CalculosLandedCost
+                .Include(c => c.OrdenImportacion)
+                    .ThenInclude(o => o.Gastos)
+                .AnyAsync(c => 
+                    (c.OrdenImportacion.MonedaId == entidad.MonedaOrigenId || 
+                     c.OrdenImportacion.Gastos.Any(g => g.MonedaId == entidad.MonedaOrigenId)) &&
+                    c.FechaCalculo >= entidad.FechaVigencia);
+
+            if (usada)
+            {
+                // Solo permitimos cambiar el estado. Si intenta cambiar algo más, bloqueamos.
+                if (entidad.MonedaOrigenId != dto.MonedaOrigenId ||
+                    entidad.MonedaDestinoId != dto.MonedaDestinoId ||
+                    entidad.Tasa != dto.Tasa ||
+                    entidad.FechaVigencia.Date != dto.FechaVigencia.Date)
+                {
+                    return (false, "No se pueden modificar los campos críticos (Monedas, Tasa o Fecha) porque esta tasa ya fue utilizada en un cálculo oficial de Landed Cost. Solo puede cambiar su estado (Activo/Inactivo).");
+                }
+            }
 
             entidad.MonedaOrigenId = dto.MonedaOrigenId;
             entidad.MonedaDestinoId = dto.MonedaDestinoId;
@@ -118,9 +136,17 @@ namespace ImportCostPro.Core.Services
             var entidad = await _context.TasasCambio.FindAsync(id);
             if (entidad == null) return (false, "Tasa de cambio no encontrada.");
 
-            // TO DO: Descomentar en el Sprint 2 cuando esté la tabla 'Ordenes'.
-            // var usada = await _context.Ordenes.AnyAsync(o => o.TasaCambioId == id);
-            // if (usada) return (false, "No se puede eliminar: esta tasa ya se usó en cálculos transaccionales.");
+            // Corrección: Validación de uso para impedir eliminación
+            var usada = await _context.CalculosLandedCost
+                .Include(c => c.OrdenImportacion)
+                    .ThenInclude(o => o.Gastos)
+                .AnyAsync(c => 
+                    (c.OrdenImportacion.MonedaId == entidad.MonedaOrigenId || 
+                    c.OrdenImportacion.Gastos.Any(g => g.MonedaId == entidad.MonedaOrigenId)) &&
+                    c.FechaCalculo >= entidad.FechaVigencia);
+
+            if (usada) 
+                return (false, "No se puede eliminar: esta tasa ya se usó en un cálculo oficial de Landed Cost. Por favor, edítela y cambie su estado a inactivo.");
 
             _context.TasasCambio.Remove(entidad);
             await _context.SaveChangesAsync();

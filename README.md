@@ -5,9 +5,9 @@ Sistema de gestión de importaciones y cálculo automatizado de **Landed Cost** 
 ---
 
 ## 👥 Equipo de Desarrollo
-*   **Aliandy Jimenez** 
-*   **Waldin Ceballos** 
-*   **Yailyn Santana**
+*   **Aliandy Jimenez | 2025-1018** 
+*   **Waldin Ceballos | 2025-1112** 
+*   **Yailyn Santana    | 2025-1111**
 
 ---
 
@@ -20,9 +20,9 @@ Sistema de gestión de importaciones y cálculo automatizado de **Landed Cost** 
 ---
 
 ## 🏗️ Reglas de Arquitectura
-El proyecto se divide estrictamente en **3 capas independientes**. Está totalmente penalizado por la rúbrica mezclar responsabilidades:
+El proyecto se divide estrictamente en **3 capas independientes**:
 
-1.  **`ImportCostPro.Web` (Presentación):** Controladores MVC y vistas. *Regla de oro:* Los controladores solo reciben peticiones y devuelven vistas; **no hacen cálculos ni validaciones complejas de negocio**.
+1.  **`ImportCostPro.Web` (Presentación):** Controladores MVC y vistas.
 2.  **`ImportCostPro.Core` (Lógica de Negocio):** Clases de servicio puros, DTOs y lógica matemática (prorrateos, tasas e impuestos).
 3.  **`ImportCostPro.Data` (Acceso a Datos):** El `DbContext`, las entidades de la base de datos y las migraciones de EF Core.
 

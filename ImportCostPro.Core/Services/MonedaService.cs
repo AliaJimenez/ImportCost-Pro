@@ -66,21 +66,20 @@ namespace ImportCostPro.Core.Services
 
         public async Task<(bool exito, string mensaje)> CrearAsync(MonedaDto dto)
         {
-            // Validación ISO Único
             var isoExiste = await _context.Monedas
                 .AnyAsync(m => m.CodigoISO.ToUpper() == dto.CodigoISO.Trim().ToUpper());
 
             if (isoExiste)
                 return (false, "Ya existe una moneda con este código ISO.");
 
-            // Validación de Moneda Local Única Activa
-            if (dto.EsMonedaLocal && dto.Activo)
+            // CORRECCIÓN 3: Validación de Moneda Local (no permite ni activas ni inactivas si ya hay una)
+            if (dto.EsMonedaLocal)
             {
-                var otraLocalActiva = await _context.Monedas
-                    .AnyAsync(m => m.EsMonedaLocal && m.Activo);
+                var otraLocal = await _context.Monedas
+                    .AnyAsync(m => m.EsMonedaLocal);
                 
-                if (otraLocalActiva)
-                    return (false, "Ya existe una moneda local activa. Solo puede haber una en el sistema.");
+                if (otraLocal)
+                    return (false, "Ya existe una moneda marcada como local. Solo puede haber una en el sistema, independientemente de su estado.");
             }
 
             var entidad = new Moneda
@@ -106,21 +105,32 @@ namespace ImportCostPro.Core.Services
             if (entidad == null)
                 return (false, "Moneda no encontrada.");
 
-            // Validación ISO Único 
-            var isoExiste = await _context.Monedas
-                .AnyAsync(m => m.CodigoISO.ToUpper() == dto.CodigoISO.Trim().ToUpper() && m.Id != dto.Id);
-
-            if (isoExiste)
-                return (false, "Ya existe otra moneda con este código ISO.");
-
-            // Validación de Moneda Local Única Activa
-            if (dto.EsMonedaLocal && dto.Activo)
+            // CORRECCIÓN 4: Validar uso antes de cambiar CodigoISO
+            if (entidad.CodigoISO.ToUpper() != dto.CodigoISO.Trim().ToUpper())
             {
-                var otraLocalActiva = await _context.Monedas
-                    .AnyAsync(m => m.EsMonedaLocal && m.Activo && m.Id != dto.Id);
+                var enUso = await _context.TasasCambio.AnyAsync(t => t.MonedaOrigenId == dto.Id || t.MonedaDestinoId == dto.Id) ||
+                            await _context.Proveedores.AnyAsync(p => p.MonedaPrincipalId == dto.Id) ||
+                            await _context.OrdenesImportacion.AnyAsync(o => o.MonedaId == dto.Id) ||
+                            await _context.Set<OrdenGasto>().AnyAsync(g => g.MonedaId == dto.Id); // Asumiendo que la entidad se llama OrdenGasto
                 
-                if (otraLocalActiva)
-                    return (false, "Ya existe otra moneda local activa. Solo puede haber una en el sistema.");
+                if (enUso)
+                    return (false, "No se puede modificar el Código ISO porque esta moneda ya está siendo utilizada en tasas, proveedores, órdenes o gastos.");
+
+                var isoExiste = await _context.Monedas
+                    .AnyAsync(m => m.CodigoISO.ToUpper() == dto.CodigoISO.Trim().ToUpper() && m.Id != dto.Id);
+
+                if (isoExiste)
+                    return (false, "Ya existe otra moneda con este código ISO.");
+            }
+
+            // CORRECCIÓN 3: Validación de Moneda Local
+            if (dto.EsMonedaLocal)
+            {
+                var otraLocal = await _context.Monedas
+                    .AnyAsync(m => m.EsMonedaLocal && m.Id != dto.Id);
+                
+                if (otraLocal)
+                    return (false, "Ya existe otra moneda local. Solo puede haber una en el sistema.");
             }
 
             entidad.CodigoISO = dto.CodigoISO.Trim().ToUpper();
@@ -140,11 +150,23 @@ namespace ImportCostPro.Core.Services
             if (entidad == null)
                 return (false, "Moneda no encontrada.");
 
-            var usadaEnTasas = await _context.TasasCambio
-                .AnyAsync(t => t.MonedaOrigenId == id || t.MonedaDestinoId == id);
+            // CORRECCIÓN 5: No permitir eliminar la moneda local
+            if (entidad.EsMonedaLocal)
+                return (false, "No se puede eliminar la moneda local del sistema. Desmárquela como local primero editándola.");
 
-            if (usadaEnTasas)
-                return (false, "No se puede eliminar esta moneda porque está siendo utilizada en Tasas de Cambio.");
+            // CORRECCIÓN 6: Validación de dependencias completa
+            var usadaEnTasas = await _context.TasasCambio.AnyAsync(t => t.MonedaOrigenId == id || t.MonedaDestinoId == id);
+            if (usadaEnTasas) return (false, "No se puede eliminar esta moneda porque está siendo utilizada en Tasas de Cambio.");
+
+            var usadaEnProveedores = await _context.Proveedores.AnyAsync(p => p.MonedaPrincipalId == id);
+            if (usadaEnProveedores) return (false, "No se puede eliminar esta moneda porque está asignada a uno o más Proveedores.");
+
+            var usadaEnOrdenes = await _context.OrdenesImportacion.AnyAsync(o => o.MonedaId == id);
+            if (usadaEnOrdenes) return (false, "No se puede eliminar esta moneda porque está asociada a Órdenes de Importación.");
+
+            // Dependiendo de cómo Yailyn llamó a la entidad de Gastos
+            var usadaEnGastos = await _context.Set<OrdenGasto>().AnyAsync(g => g.MonedaId == id);
+            if (usadaEnGastos) return (false, "No se puede eliminar esta moneda porque está siendo utilizada en Gastos de Importación.");
 
             _context.Monedas.Remove(entidad);
             await _context.SaveChangesAsync();

@@ -23,7 +23,7 @@ namespace ImportCostPro.Web.Controllers
         public async Task<IActionResult> Calcular()
         {
             // Buscamos las órdenes para el Select (Dropdown).
-            // Cuando Ken termine, filtraremos por .Where(o => o.Estado == "Abierta")
+            // Cuando Ken termine, filtrar por .Where(o => o.Estado == "Abierta")
             var ordenes = await _context.OrdenesImportacion
                 .Select(o => new { o.Id, Nombre = (o.NumeroOrden ?? "Orden-") + o.Id })
                 .ToListAsync();

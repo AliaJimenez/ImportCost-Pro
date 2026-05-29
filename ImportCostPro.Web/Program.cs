@@ -20,7 +20,8 @@ builder.Services.AddScoped<ICategoriaArancelariaService, CategoriaArancelariaSer
 builder.Services.AddScoped<IPaisService, PaisService>();
 builder.Services.AddScoped<IProveedorService, ProveedorService>();
 builder.Services.AddScoped<IImportadorService, ImportadorService>();
-builder.Services.AddScoped<ICalculoLandedCostService, CalculoLandedCostService>();
+builder.Services.AddScoped<IOrdenProductoService, OrdenProductoService>();
+builder.Services.AddScoped<IOrdenGastoService, OrdenGastoService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

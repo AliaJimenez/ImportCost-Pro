@@ -14,7 +14,7 @@ namespace ImportCostPro.Core.ViewModels.Orden
 
         [Required(ErrorMessage = "El número de orden es obligatorio")]
         [StringLength(50, ErrorMessage = "Máximo 50 caracteres")]
-        public string ? NumeroOrden { get; set; }
+        public string NumeroOrden { get; set; }
 
         [Required(ErrorMessage = "El importador es obligatorio")]
         public int ImportadorId { get; set; }
@@ -30,7 +30,7 @@ namespace ImportCostPro.Core.ViewModels.Orden
 
         public bool Activo { get; set; } = true;
 
-
+  
         public List<SelectListItem> Importadores { get; set; } = new();
         public List<SelectListItem> Proveedores { get; set; } = new();
         public List<SelectListItem> Paises { get; set; } = new();

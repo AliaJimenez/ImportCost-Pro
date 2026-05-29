@@ -6,7 +6,7 @@ namespace ImportCostPro.Data.Entities
     public class OrdenImportacion
     {
         public int Id { get; set; }
-        public string ? NumeroOrden { get; set; }
+        public string NumeroOrden { get; set; }
 
         // Foreign Keys
         public int ImportadorId { get; set; }
@@ -15,10 +15,10 @@ namespace ImportCostPro.Data.Entities
         public int MonedaId { get; set; }
 
         // Navigation Properties
-        public Importador ? Importador { get; set; }
-        public Proveedor ? Proveedor { get; set; }
-        public Pais ? PaisOrigen { get; set; }
-        public Moneda ? Moneda { get; set; }
+        public Importador Importador { get; set; }
+        public Proveedor Proveedor { get; set; }
+        public Pais PaisOrigen { get; set; }
+        public Moneda Moneda { get; set; }
 
         // Estados: Abierta, Calculada, Cerrada, Cancelada
         public string Estado { get; set; } = "Abierta";
@@ -41,7 +41,7 @@ namespace ImportCostPro.Data.Entities
         public bool Activo { get; set; } = true;
 
         // Colecciones
-      //  public ICollection<OrdenProducto> Productos { get; set; } = new List<OrdenProducto>();
-      //  public ICollection<OrdenGasto> Gastos { get; set; } = new List<OrdenGasto>();
-    }
+        public ICollection<OrdenProducto> Productos { get; set; } = new List<OrdenProducto>();
+        public ICollection<OrdenGasto> Gastos { get; set; } = new List<OrdenGasto>();
+        }
 }
