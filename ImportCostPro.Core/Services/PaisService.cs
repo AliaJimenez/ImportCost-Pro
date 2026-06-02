@@ -47,7 +47,7 @@ namespace ImportCostPro.Core.Services
             var pais = new Pais
             {
                 Nombre = paisDto.Nombre,
-                CodigoISO = paisDto.CodigoISO?.ToUpper(),
+                CodigoISO = paisDto.CodigoISO?.ToUpper()!,
                 Activo = paisDto.Activo,
                 FechaCreacion = DateTime.Now,
                 FechaModificacion = DateTime.Now
@@ -68,7 +68,7 @@ namespace ImportCostPro.Core.Services
                 throw new Exception("El código ISO ya existe");
 
             pais.Nombre = paisDto.Nombre;
-            pais.CodigoISO = paisDto.CodigoISO?.ToUpper();
+            pais.CodigoISO = paisDto.CodigoISO?.ToUpper()!;
             pais.Activo = paisDto.Activo;
             pais.FechaModificacion = DateTime.Now;
 

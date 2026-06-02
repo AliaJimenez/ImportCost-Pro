@@ -1,5 +1,99 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ImportCostPro.Core.Dtos.OrdenImportacionDto
+
 @{
+    ViewData["Title"] = "Eliminar Orden — " + Model.NumeroOrden;
 }
+
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Index" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2);">
+            <i class="bi bi-trash3" style="color: var(--accent-red);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Eliminar Orden</h1>
+            <p class="icp-page-subtitle">Esta acción no se puede deshacer</p>
+        </div>
+    </div>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="icp-alert-danger mb-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="icp-card" style="border-color: rgba(239,68,68,0.2);">
+            <div class="icp-alert-danger mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>¿Está seguro que desea eliminar esta orden de importación?</strong>
+                <div class="mt-1" style="font-size: 0.8rem;">
+                    Esta acción eliminará permanentemente todos los datos asociados. No se puede deshacer.
+                </div>
+            </div>
+
+            <div class="icp-delete-preview mb-4">
+                <div class="preview-row">
+                    <span class="preview-label">N° Orden</span>
+                    <span class="preview-value fw-600">
+                        <span class="icp-code-badge">@Model.NumeroOrden</span>
+                    </span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Importador</span>
+                    <span class="preview-value">@Model.NombreImportador</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Proveedor</span>
+                    <span class="preview-value">@Model.NombreProveedor</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">País Origen</span>
+                    <span class="preview-value">@Model.NombrePais</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Moneda</span>
+                    <span class="preview-value">@Model.NombreMoneda</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Estado</span>
+                    <span class="preview-value">
+                        @if (Model.Estado == "Abierta")
+                        {
+                            <span class="icp-badge icp-badge-abierta">Abierta</span>
+                        }
+                        else if (Model.Estado == "Calculada")
+                        {
+                            <span class="icp-badge icp-badge-calculada">Calculada</span>
+                        }
+                        else
+                        {
+                            <span class="icp-badge icp-badge-cerrada">@Model.Estado</span>
+                        }
+                    </span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Fecha Creación</span>
+                    <span class="preview-value">@Model.FechaCreacion.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="icp-form-footer">
+                    <a asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save" style="background: var(--accent-red); box-shadow: 0 2px 8px rgba(239,68,68,0.25);">
+                        <i class="bi bi-trash3 me-1"></i> Eliminar Orden
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

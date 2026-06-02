@@ -43,5 +43,5 @@ namespace ImportCostPro.Data.Entities
         // Colecciones
         public ICollection<OrdenProducto> Productos { get; set; } = new List<OrdenProducto>();
         public ICollection<OrdenGasto> Gastos { get; set; } = new List<OrdenGasto>();
-    }
+        }
 }

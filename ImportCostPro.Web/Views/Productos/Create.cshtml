@@ -145,4 +145,24 @@
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const largo = document.getElementById('Largo').value;
+        const ancho = document.getElementById('Ancho').value;
+        const alto = document.getElementById('Alto').value;
+        
+        const isAnyFilled = largo || ancho || alto;
+        
+        if (isAnyFilled) {
+            const lVal = parseFloat(largo);
+            const wVal = parseFloat(ancho);
+            const hVal = parseFloat(alto);
+            
+            if (isNaN(lVal) || lVal <= 0 || isNaN(wVal) || wVal <= 0 || isNaN(hVal) || hVal <= 0) {
+                e.preventDefault();
+                alert('Si ingresa una dimensión (Largo, Ancho, Alto), debe ingresar las tres y todas deben ser mayores a 0.');
+            }
+        }
+    });
+</script>
 }

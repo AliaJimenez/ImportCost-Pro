@@ -41,8 +41,8 @@ namespace ImportCostPro.Web.Controllers
             {
                 var importadorDto = new ImportadorDto
                 {
-                    Nombre = model.Nombre,
-                    Rnc = model.Rnc,
+                    Nombre = model.Nombre!,
+                    Rnc = model.Rnc!,
                     Direccion = model.Direccion,
                     Contacto = model.Contacto,
                     Email = model.Email,
@@ -102,8 +102,8 @@ namespace ImportCostPro.Web.Controllers
                 var importadorDto = new ImportadorDto
                 {
                     Id = model.Id,
-                    Nombre = model.Nombre,
-                    Rnc = model.Rnc,
+                    Nombre = model.Nombre!,
+                    Rnc = model.Rnc!,
                     Direccion = model.Direccion,
                     Contacto = model.Contacto,
                     Email = model.Email,

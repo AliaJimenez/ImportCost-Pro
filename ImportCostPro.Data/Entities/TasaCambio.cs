@@ -8,20 +8,20 @@ namespace ImportCostPro.Data.Entities
         
         // Moneda origen
         public int MonedaOrigenId { get; set; }
-        public Moneda ? MonedaOrigen { get; set; }
+        public Moneda? MonedaOrigen { get; set; }
         
         // Moneda destino
         public int MonedaDestinoId { get; set; }
-        public Moneda ? MonedaDestino { get; set; }
+        public Moneda? MonedaDestino { get; set; }
         
         // Tasa (factor de conversión - decimal con 6 decimales)
-        public decimal Tasa { get; set; }
+        public required decimal Tasa { get; set; }
         
         // Fecha de vigencia de la tasa
-        public DateTime FechaVigencia { get; set; }
+        public required DateTime FechaVigencia { get; set; }
         
         // Estado
-        public bool Activo { get; set; } = true;
+        public required bool Activo { get; set; } = true;
         
         // Auditoría
         public DateTime FechaCreacion { get; set; } = DateTime.Now;

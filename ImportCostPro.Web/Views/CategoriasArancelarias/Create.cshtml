@@ -103,4 +103,35 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const switchIsc = document.getElementById('switchIsc');
+        const boxIsc = document.getElementById('boxIsc');
+        const inputIsc = document.getElementById('PorcentajeImpuestoSelectivo');
+        const form = document.querySelector('form');
+
+        function toggleIsc() {
+            if (switchIsc.checked) {
+                boxIsc.style.display = 'block';
+            } else {
+                boxIsc.style.display = 'none';
+                inputIsc.value = '0.00';
+            }
+        }
+
+        switchIsc.addEventListener('change', toggleIsc);
+        toggleIsc();
+
+        form.addEventListener('submit', function(e) {
+            if (switchIsc.checked) {
+                const val = parseFloat(inputIsc.value);
+                if (isNaN(val) || val <= 0) {
+                    e.preventDefault();
+                    alert('Debe ingresar un porcentaje de Impuesto Selectivo mayor a 0 si aplica dicho impuesto.');
+                    inputIsc.focus();
+                }
+            }
+        });
+    });
+</script>
 }

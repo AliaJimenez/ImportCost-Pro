@@ -1,5 +1,128 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ImportCostPro.Core.Dtos.OrdenProductoDto
+
 @{
+    ViewData["Title"] = "Editar Producto de Orden";
+}
+
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-controller="Orden" asp-action="Details" asp-route-id="@Model.OrdenImportacionId" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.2);">
+            <i class="bi bi-pencil-square" style="color: var(--accent-blue);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Editar Producto</h1>
+            <p class="icp-page-subtitle">
+                Orden: <strong style="color: var(--accent-cyan);">@Model.NumeroOrden</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="icp-card">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="OrdenImportacionId" value="@Model.OrdenImportacionId" />
+                <input type="hidden" name="ProductoId" value="@Model.ProductoId" />
+                <div asp-validation-summary="ModelOnly" class="icp-alert-danger mb-4"></div>
+
+                <!-- Producto: Solo lectura -->
+                <span class="icp-form-section-label">
+                    <i class="bi bi-box-seam me-2" style="color: var(--accent-blue);"></i>
+                    Producto (Solo Lectura)
+                </span>
+                <div class="mb-4">
+                    <div class="icp-delete-preview">
+                        <div class="preview-row">
+                            <span class="preview-label">Nombre</span>
+                            <span class="preview-value fw-600">@Model.NombreProducto</span>
+                        </div>
+                        <div class="preview-row">
+                            <span class="preview-label">Código</span>
+                            <span class="preview-value"><span class="icp-code-badge">@Model.CodigoProducto</span></span>
+                        </div>
+                    </div>
+                    <small class="d-block mt-2" style="color: var(--text-muted);">
+                        <i class="bi bi-lock-fill me-1"></i>
+                        El producto no puede modificarse una vez agregado a la orden.
+                    </small>
+                </div>
+
+                <span class="icp-form-section-label">
+                    <i class="bi bi-calculator me-2" style="color: var(--accent-cyan);"></i>
+                    Cantidades y Precios
+                </span>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="Cantidad" class="icp-field-label">Cantidad</label>
+                        <input type="number" name="Cantidad" id="Cantidad" class="form-control"
+                               value="@Model.Cantidad" min="0.0001" step="0.0001" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="PrecioUnitarioFOB" class="icp-field-label">Precio Unitario FOB</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                            <input type="number" name="PrecioUnitarioFOB" id="PrecioUnitarioFOB"
+                                   class="form-control" value="@Model.PrecioUnitarioFOB"
+                                   min="0.0001" step="0.0001" required />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="MargenGananciaDeseado" class="icp-field-label">Margen de Ganancia (%)</label>
+                        <div class="input-group">
+                            <input type="number" name="MargenGananciaDeseado" id="MargenGananciaDeseado"
+                                   class="form-control" value="@Model.MargenGananciaDeseado"
+                                   min="0" max="99.99" step="0.01" required />
+                            <span class="input-group-text"><i class="bi bi-percent"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preview de totales actuales -->
+                <div class="icp-delete-preview mb-4">
+                    <div class="preview-row">
+                        <span class="preview-label">FOB Total Actual</span>
+                        <span class="preview-value fw-700" style="color: var(--accent-cyan);" id="fobTotalVal">
+                            @Model.FOBTotal.ToString("N2")
+                        </span>
+                    </div>
+                    <div class="preview-row">
+                        <span class="preview-label">Peso Total Actual</span>
+                        <span class="preview-value" style="color: var(--text-secondary);">@Model.PesoTotal.ToString("N3") kg</span>
+                    </div>
+                </div>
+
+                <div class="icp-form-footer">
+                    <a asp-controller="Orden" asp-action="Details" asp-route-id="@Model.OrdenImportacionId" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-check-lg me-1"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+<script>
+    function actualizarFOB() {
+        const cant = parseFloat(document.getElementById('Cantidad').value) || 0;
+        const precio = parseFloat(document.getElementById('PrecioUnitarioFOB').value) || 0;
+        const fobTotal = cant * precio;
+        if (cant > 0 && precio > 0) {
+            document.getElementById('fobTotalVal').textContent = fobTotal.toFixed(2);
+        }
+    }
+    document.getElementById('Cantidad').addEventListener('input', actualizarFOB);
+    document.getElementById('PrecioUnitarioFOB').addEventListener('input', actualizarFOB);
+</script>
 }

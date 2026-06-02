@@ -22,6 +22,8 @@ builder.Services.AddScoped<IProveedorService, ProveedorService>();
 builder.Services.AddScoped<IImportadorService, ImportadorService>();
 builder.Services.AddScoped<IOrdenProductoService, OrdenProductoService>();
 builder.Services.AddScoped<IOrdenGastoService, OrdenGastoService>();
+builder.Services.AddScoped<ICalculoLandedCostService, CalculoLandedCostService>();
+builder.Services.AddScoped<IOrdenImportacionService, OrdenImportacionService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

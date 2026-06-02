@@ -1,5 +1,125 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ImportCostPro.Core.Dtos.OrdenGastoDto
+
 @{
+    ViewData["Title"] = "Registrar Gasto de Importación";
+    var ordenId = ViewBag.OrdenId as int? ?? Model?.OrdenImportacionId ?? 0;
+    var numeroOrden = ViewBag.NumeroOrden as string ?? "";
+    var monedas = ViewBag.Monedas as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+}
+
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-controller="Orden" asp-action="Details" asp-route-id="@ordenId" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.2);">
+            <i class="bi bi-receipt-cutoff" style="color: var(--accent-purple);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Registrar Gasto</h1>
+            <p class="icp-page-subtitle">
+                Orden: <strong style="color: var(--accent-cyan);">@numeroOrden</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="icp-card">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="OrdenImportacionId" value="@ordenId" />
+                <div asp-validation-summary="ModelOnly" class="icp-alert-danger mb-4"></div>
+
+                <span class="icp-form-section-label">
+                    <i class="bi bi-tag-fill me-2" style="color: var(--accent-purple);"></i>
+                    Tipo y Monto
+                </span>
+
+                <div class="mb-4">
+                    <label for="TipoGasto" class="icp-field-label">Tipo de Gasto</label>
+                    <select name="TipoGasto" id="TipoGasto" class="form-select" required>
+                        <option value="">— Seleccione el tipo —</option>
+                        <option value="Flete internacional">🚢 Flete internacional</option>
+                        <option value="Seguro internacional">🛡️ Seguro internacional</option>
+                        <option value="Gastos portuarios">⚓ Gastos portuarios</option>
+                        <option value="Transporte local">🚛 Transporte local</option>
+                        <option value="Honorarios aduanales">📋 Honorarios aduanales</option>
+                        <option value="Almacenaje">📦 Almacenaje</option>
+                        <option value="Manejo de carga">🏗️ Manejo de carga</option>
+                        <option value="Otros gastos">📌 Otros gastos</option>
+                    </select>
+                    <small class="d-block mt-1" style="color: var(--text-muted);">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Solo puede haber un <strong>Flete internacional</strong> y un <strong>Seguro internacional</strong> por orden.
+                    </small>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="Monto" class="icp-field-label">Monto</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                            <input type="number" name="Monto" id="Monto" class="form-control"
+                                   min="0.0001" step="0.01" placeholder="0.00" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="MonedaId" class="icp-field-label">Moneda</label>
+                        <select name="MonedaId" id="MonedaId" class="form-select" required>
+                            <option value="">— Seleccione moneda —</option>
+                            @if (monedas != null)
+                            {
+                                @foreach (var m in monedas)
+                                {
+                                    <option value="@m.Value">@m.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <span class="icp-form-section-label">
+                    <i class="bi bi-distribute-horizontal me-2" style="color: var(--accent-blue);"></i>
+                    Distribución y Fecha
+                </span>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-7">
+                        <label for="MetodoDistribucion" class="icp-field-label">Método de Distribución</label>
+                        <select name="MetodoDistribucion" id="MetodoDistribucion" class="form-select" required>
+                            <option value="">— Seleccione método —</option>
+                            <option value="Por valor FOB">Por valor FOB</option>
+                            <option value="Por peso">Por peso</option>
+                            <option value="Por volumen">Por volumen</option>
+                            <option value="Por cantidad">Por cantidad</option>
+                        </select>
+                        <small class="d-block mt-1" style="color: var(--text-muted);">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Si elige "Por peso" o "Por volumen", todos los productos deben tener esos datos.
+                        </small>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="FechaGasto" class="icp-field-label">Fecha del Gasto</label>
+                        <input type="date" name="FechaGasto" id="FechaGasto" class="form-control"
+                               value="@DateTime.Today.ToString("yyyy-MM-dd")" required />
+                    </div>
+                </div>
+
+                <div class="icp-form-footer">
+                    <a asp-controller="Orden" asp-action="Details" asp-route-id="@ordenId" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save" style="background: var(--accent-purple); box-shadow: 0 2px 8px rgba(139,92,246,0.25);">
+                        <i class="bi bi-plus-lg me-1"></i> Registrar Gasto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

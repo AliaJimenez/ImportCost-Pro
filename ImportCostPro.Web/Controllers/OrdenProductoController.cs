@@ -1,6 +1,5 @@
-﻿using ImportCostPro.Core.Dtos;
+using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
-using ImportCostPro.Core.ViewModels.OrdenProducto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -8,169 +7,125 @@ namespace ImportCostPro.Web.Controllers
 {
     public class OrdenProductoController : Controller
     {
-        private readonly IOrdenProductoService _service;
-        private readonly IProductoService _productoService;
+        private readonly IOrdenProductoService _productoService;
+        private readonly IProductoService _catalogoProductoService;
+        private readonly IOrdenImportacionService _ordenService;
 
         public OrdenProductoController(
-            IOrdenProductoService service,
-            IProductoService productoService)
+            IOrdenProductoService productoService, 
+            IProductoService catalogoProductoService,
+            IOrdenImportacionService ordenService)
         {
-            _service = service;
             _productoService = productoService;
+            _catalogoProductoService = catalogoProductoService;
+            _ordenService = ordenService;
         }
-        public async Task<IActionResult> Index(int ordenId)
+
+        public async Task<IActionResult> Index(int? filtroOrdenId)
         {
-            var productos = await _service.ObtenerPorOrdenAsync(ordenId);
-            var resumen = await _service.ObtenerResumenFOBAsync(ordenId);
-
-            var viewModel = new OrdenProductoIndexViewModel
+            // Similar a gastos, mostramos según orden
+            var todosLosProductos = new List<OrdenProductoDto>();
+            if (filtroOrdenId.HasValue)
             {
-                OrdenImportacionId = ordenId,
-                Productos = productos,
-                Resumen = resumen,
-                NumeroOrden = productos.FirstOrDefault()?.NumeroOrden ?? string.Empty,
-                EstadoOrden = productos.FirstOrDefault()?.EstadoOrden ?? string.Empty,
-                OrdenPermiteModificaciones = productos.FirstOrDefault()
-                    ?.OrdenPermiteModificaciones ?? false
-            };
-
-            return View(viewModel);
+                todosLosProductos = await _productoService.ObtenerPorOrdenAsync(filtroOrdenId.Value);
+            }
+            return View(todosLosProductos);
         }
+
         public async Task<IActionResult> Create(int ordenId)
         {
-            var viewModel = new OrdenProductoFormViewModel
+            var orden = await _ordenService.GetByIdAsync(ordenId);
+            if (orden == null || orden.Estado != "Abierta") return RedirectToAction("Details", "Orden", new { id = ordenId });
+
+            var dto = new OrdenProductoDto
             {
                 OrdenImportacionId = ordenId
             };
 
-            await LlenarSelectsAsync(viewModel);
-            return View(viewModel);
+            await CargarProductosCat(null);
+            ViewBag.OrdenId = ordenId;
+            ViewBag.NumeroOrden = orden.NumeroOrden;
+            
+            return View(dto);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Create(OrdenProductoFormViewModel viewModel)
+        public async Task<IActionResult> Create(OrdenProductoDto model)
         {
             if (!ModelState.IsValid)
             {
-                await LlenarSelectsAsync(viewModel);
-                return View(viewModel);
+                await CargarProductosCat(model.ProductoId);
+                return View(model);
             }
 
-            var dto = new OrdenProductoDto
+            var (exito, mensaje) = await _productoService.AgregarAsync(model);
+            if (exito)
             {
-                OrdenImportacionId = viewModel.OrdenImportacionId,
-                ProductoId = viewModel.ProductoId,
-                Cantidad = viewModel.Cantidad,
-                PrecioUnitarioFOB = viewModel.PrecioUnitarioFOB,
-                MargenGananciaDeseado = viewModel.MargenGananciaDeseado
-            };
-
-            var (exito, mensaje) = await _service.AgregarAsync(dto);
-
-            if (!exito)
-            {
-                ModelState.AddModelError("", mensaje);
-                await LlenarSelectsAsync(viewModel);
-                return View(viewModel);
+                TempData["Success"] = "Producto agregado correctamente.";
+                return RedirectToAction("Details", "Orden", new { id = model.OrdenImportacionId });
             }
-
-            TempData["Mensaje"] = mensaje;
-            return RedirectToAction(nameof(Index),
-                new { ordenId = viewModel.OrdenImportacionId });
+            
+            TempData["Error"] = mensaje;
+            await CargarProductosCat(model.ProductoId);
+            return View(model);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var dto = await _service.ObtenerPorIdAsync(id);
+            var op = await _productoService.ObtenerPorIdAsync(id);
+            if (op == null) return NotFound();
 
-            if (dto == null)
-                return NotFound();
-
-            if (!dto.OrdenPermiteModificaciones)
-            {
-                TempData["Error"] = "No se puede editar un producto de una orden que no está abierta.";
-                return RedirectToAction(nameof(Index),
-                    new { ordenId = dto.OrdenImportacionId });
-            }
-
-            var viewModel = new OrdenProductoFormViewModel
-            {
-                Id = dto.Id,
-                OrdenImportacionId = dto.OrdenImportacionId,
-                ProductoId = dto.ProductoId,
-                Cantidad = dto.Cantidad,
-                PrecioUnitarioFOB = dto.PrecioUnitarioFOB,
-                MargenGananciaDeseado = dto.MargenGananciaDeseado,
-                NumeroOrden = dto.NumeroOrden
-            };
-
-            await LlenarSelectsAsync(viewModel);
-            return View(viewModel);
+            await CargarProductosCat(op.ProductoId);
+            return View(op);
         }
+
         [HttpPost]
-        public async Task<IActionResult> Edit(OrdenProductoFormViewModel viewModel)
+        public async Task<IActionResult> Edit(OrdenProductoDto model)
         {
             if (!ModelState.IsValid)
             {
-                await LlenarSelectsAsync(viewModel);
-                return View(viewModel);
+                await CargarProductosCat(model.ProductoId);
+                return View(model);
             }
 
-            var dto = new OrdenProductoDto
+            var (exito, mensaje) = await _productoService.EditarAsync(model);
+            if (exito)
             {
-                Id = viewModel.Id,
-                OrdenImportacionId = viewModel.OrdenImportacionId,
-                ProductoId = viewModel.ProductoId,
-                Cantidad = viewModel.Cantidad,
-                PrecioUnitarioFOB = viewModel.PrecioUnitarioFOB,
-                MargenGananciaDeseado = viewModel.MargenGananciaDeseado
-            };
-
-            var (exito, mensaje) = await _service.EditarAsync(dto);
-
-            if (!exito)
-            {
-                ModelState.AddModelError("", mensaje);
-                await LlenarSelectsAsync(viewModel);
-                return View(viewModel);
+                TempData["Success"] = "Producto actualizado correctamente.";
+                return RedirectToAction("Details", "Orden", new { id = model.OrdenImportacionId });
             }
 
-            TempData["Mensaje"] = mensaje;
-            return RedirectToAction(nameof(Index),
-                new { ordenId = viewModel.OrdenImportacionId });
+            TempData["Error"] = mensaje;
+            await CargarProductosCat(model.ProductoId);
+            return View(model);
         }
+
         public async Task<IActionResult> Delete(int id)
         {
-            var dto = await _service.ObtenerPorIdAsync(id);
-
-            if (dto == null)
-                return NotFound();
-
-            return View(dto);
+            var op = await _productoService.ObtenerPorIdAsync(id);
+            if (op == null) return NotFound();
+            return View(op);
         }
 
         [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id, int ordenId)
+        public async Task<IActionResult> DeleteConfirmed(int id, int OrdenImportacionId)
         {
-            var (exito, mensaje) = await _service.EliminarAsync(id);
-
-            if (!exito)
+            var (exito, mensaje) = await _productoService.EliminarAsync(id);
+            if (exito)
+            {
+                TempData["Success"] = "Producto eliminado correctamente.";
+            }
+            else
             {
                 TempData["Error"] = mensaje;
-                return RedirectToAction(nameof(Delete), new { id });
             }
-
-            TempData["Mensaje"] = mensaje;
-            return RedirectToAction(nameof(Index), new { ordenId });
+            return RedirectToAction("Details", "Orden", new { id = OrdenImportacionId });
         }
 
-        private async Task LlenarSelectsAsync(OrdenProductoFormViewModel viewModel)
+        private async Task CargarProductosCat(int? productoId)
         {
-            var productos = await _productoService.ObtenerTodosAsync();
-            var productosActivos = productos.Where(p => p.Activo).ToList();
-
-            viewModel.ProductosDisponibles = new SelectList(
-                productosActivos, "Id", "Nombre",
-                viewModel.ProductoId);
+            var productos = await _catalogoProductoService.ObtenerTodosAsync();
+            ViewBag.ProductosCat = new SelectList(productos, "Id", "Nombre", productoId);
         }
     }
 }

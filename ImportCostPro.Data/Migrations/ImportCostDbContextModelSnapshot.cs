@@ -22,6 +22,131 @@ namespace ImportCostPro.Data.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ImportCostPro.Data.Entities.CalculoLandedCost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("CifTotalLocal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CostoTotalImportacion")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("FechaCalculo")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("FleteTotalLocal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FobTotalLocal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("GastosLocalesTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("OrdenImportacionId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PorcentajeItbisUsado")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("PorcentajeTasaServicioUsado")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("SeguroTotalLocal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalArancel")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalIsc")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalItbis")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("TotalTasaServicio")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdenImportacionId");
+
+                    b.ToTable("CalculosLandedCost");
+                });
+
+            modelBuilder.Entity("ImportCostPro.Data.Entities.CalculoLandedCostDetalle", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CalculoLandedCostId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CostoTotalImportado")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("CostoUnitarioImportado")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FleteAsignado")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FobLocalTotal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("FobOriginalUnitario")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("GastosLocalesAsignados")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MargenDeseadoAplicado")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<decimal>("MontoArancel")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MontoIsc")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MontoItbis")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MontoTasaServicio")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PrecioVentaSugerido")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SeguroAsignado")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("ValorCif")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CalculoLandedCostId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("DetallesLandedCost");
+                });
+
             modelBuilder.Entity("ImportCostPro.Data.Entities.CategoriaArancelaria", b =>
                 {
                     b.Property<int>("Id")
@@ -197,6 +322,163 @@ namespace ImportCostPro.Data.Migrations
                     b.ToTable("Monedas", (string)null);
                 });
 
+            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenGasto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FechaGasto")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("MetodoDistribucion")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("MonedaId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Monto")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("MontoEnMonedaLocal")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("OrdenImportacionId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TipoGasto")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MonedaId");
+
+                    b.HasIndex("OrdenImportacionId");
+
+                    b.ToTable("OrdenGastos", (string)null);
+                });
+
+            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenImportacion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("Arancel")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("CIF")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("CostoFOB")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Estado")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FechaCierre")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaCreacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaModificacion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("ITBIS")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ImportadorId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("ImpuestoSelectivo")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MonedaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NumeroOrden")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PaisOrigenId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("PrecioSugerido")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ProveedorId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("TasaAduanal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImportadorId");
+
+                    b.HasIndex("MonedaId");
+
+                    b.HasIndex("PaisOrigenId");
+
+                    b.HasIndex("ProveedorId");
+
+                    b.ToTable("OrdenesImportacion");
+                });
+
+            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenProducto", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("FOBTotal")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("MargenGananciaDeseado")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<int>("OrdenImportacionId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PesoTotal")
+                        .HasColumnType("decimal(10,4)");
+
+                    b.Property<decimal>("PrecioUnitarioFOB")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("VolumenTotal")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrdenImportacionId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("OrdenProductos", (string)null);
+                });
+
             modelBuilder.Entity("ImportCostPro.Data.Entities.Pais", b =>
                 {
                     b.Property<int>("Id")
@@ -254,10 +536,10 @@ namespace ImportCostPro.Data.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<decimal>("Alto")
+                    b.Property<decimal?>("Alto")
                         .HasColumnType("decimal(10,4)");
 
-                    b.Property<decimal>("Ancho")
+                    b.Property<decimal?>("Ancho")
                         .HasColumnType("decimal(10,4)");
 
                     b.Property<int>("CategoriaArancelariaId")
@@ -272,13 +554,16 @@ namespace ImportCostPro.Data.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<decimal>("Largo")
+                    b.Property<decimal?>("Largo")
                         .HasColumnType("decimal(10,4)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
+
+                    b.Property<int?>("PaisId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PaisOrigenId")
                         .HasColumnType("int");
@@ -294,6 +579,8 @@ namespace ImportCostPro.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriaArancelariaId");
+
+                    b.HasIndex("PaisId");
 
                     b.HasIndex("PaisOrigenId");
 
@@ -406,6 +693,109 @@ namespace ImportCostPro.Data.Migrations
                     b.ToTable("TasasCambio", (string)null);
                 });
 
+            modelBuilder.Entity("ImportCostPro.Data.Entities.CalculoLandedCost", b =>
+                {
+                    b.HasOne("ImportCostPro.Data.Entities.OrdenImportacion", "OrdenImportacion")
+                        .WithMany()
+                        .HasForeignKey("OrdenImportacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrdenImportacion");
+                });
+
+            modelBuilder.Entity("ImportCostPro.Data.Entities.CalculoLandedCostDetalle", b =>
+                {
+                    b.HasOne("ImportCostPro.Data.Entities.CalculoLandedCost", "CalculoLandedCost")
+                        .WithMany("Detalles")
+                        .HasForeignKey("CalculoLandedCostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ImportCostPro.Data.Entities.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CalculoLandedCost");
+
+                    b.Navigation("Producto");
+                });
+
+            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenGasto", b =>
+                {
+                    b.HasOne("ImportCostPro.Data.Entities.Moneda", "Moneda")
+                        .WithMany()
+                        .HasForeignKey("MonedaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ImportCostPro.Data.Entities.OrdenImportacion", "OrdenImportacion")
+                        .WithMany("Gastos")
+                        .HasForeignKey("OrdenImportacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Moneda");
+
+                    b.Navigation("OrdenImportacion");
+                });
+
+            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenImportacion", b =>
+                {
+                    b.HasOne("ImportCostPro.Data.Entities.Importador", "Importador")
+                        .WithMany()
+                        .HasForeignKey("ImportadorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ImportCostPro.Data.Entities.Moneda", "Moneda")
+                        .WithMany()
+                        .HasForeignKey("MonedaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ImportCostPro.Data.Entities.Pais", "PaisOrigen")
+                        .WithMany()
+                        .HasForeignKey("PaisOrigenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ImportCostPro.Data.Entities.Proveedor", "Proveedor")
+                        .WithMany()
+                        .HasForeignKey("ProveedorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Importador");
+
+                    b.Navigation("Moneda");
+
+                    b.Navigation("PaisOrigen");
+
+                    b.Navigation("Proveedor");
+                });
+
+            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenProducto", b =>
+                {
+                    b.HasOne("ImportCostPro.Data.Entities.OrdenImportacion", "OrdenImportacion")
+                        .WithMany("Productos")
+                        .HasForeignKey("OrdenImportacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ImportCostPro.Data.Entities.Producto", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("OrdenImportacion");
+
+                    b.Navigation("Producto");
+                });
+
             modelBuilder.Entity("ImportCostPro.Data.Entities.Producto", b =>
                 {
                     b.HasOne("ImportCostPro.Data.Entities.CategoriaArancelaria", "CategoriaArancelaria")
@@ -414,10 +804,14 @@ namespace ImportCostPro.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ImportCostPro.Data.Entities.Pais", "PaisOrigen")
+                    b.HasOne("ImportCostPro.Data.Entities.Pais", null)
                         .WithMany("Productos")
+                        .HasForeignKey("PaisId");
+
+                    b.HasOne("ImportCostPro.Data.Entities.Pais", "PaisOrigen")
+                        .WithMany()
                         .HasForeignKey("PaisOrigenId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CategoriaArancelaria");
@@ -463,6 +857,11 @@ namespace ImportCostPro.Data.Migrations
                     b.Navigation("MonedaOrigen");
                 });
 
+            modelBuilder.Entity("ImportCostPro.Data.Entities.CalculoLandedCost", b =>
+                {
+                    b.Navigation("Detalles");
+                });
+
             modelBuilder.Entity("ImportCostPro.Data.Entities.CategoriaArancelaria", b =>
                 {
                     b.Navigation("Productos");
@@ -473,6 +872,13 @@ namespace ImportCostPro.Data.Migrations
                     b.Navigation("TasasCambioDestino");
 
                     b.Navigation("TasasCambioOrigen");
+                });
+
+            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenImportacion", b =>
+                {
+                    b.Navigation("Gastos");
+
+                    b.Navigation("Productos");
                 });
 
             modelBuilder.Entity("ImportCostPro.Data.Entities.Pais", b =>

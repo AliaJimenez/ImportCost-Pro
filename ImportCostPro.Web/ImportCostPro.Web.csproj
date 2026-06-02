@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
     <ProjectReference Include="..\ImportCostPro.Core\ImportCostPro.Core.csproj" />
@@ -25,6 +25,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>8618;8601;8603;8604;8629;1998</NoWarn>
   </PropertyGroup>
 
 </Project>

@@ -1,5 +1,159 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@* Views/CalculoLandedCost/Calcular.cshtml *@
 @{
+    ViewData["Title"] = "Calcular Landed Cost";
+    Layout = "_Layout";
+}
+
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <div class="icp-page-icon" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.2);">
+            <i class="bi bi-calculator-fill" style="color: var(--accent-blue);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Calcular Landed Cost</h1>
+            <p class="icp-page-subtitle">Selecciona una orden abierta para ejecutar el cálculo oficial</p>
+        </div>
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="icp-alert-danger mb-4">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>¡Atención!</strong> @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="icp-alert-warning mb-4">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Acción irreversible:</strong> Una vez ejecutado el cálculo oficial, la orden pasará al estado
+    <strong>Calculada</strong> y <strong>no podrá recalcularse ni modificarse</strong>. Verifica que todos
+    los productos y gastos estén correctamente registrados antes de continuar.
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="icp-card">
+            <span class="icp-form-section-label">
+                <i class="bi bi-list-check me-2" style="color: var(--accent-blue);"></i>
+                Selección de Orden
+            </span>
+
+            <form asp-action="Calcular" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-5">
+                    <label for="ordenImportacionId" class="icp-field-label">Orden de Importación (solo Abiertas)</label>
+                    <select class="form-select" id="ordenImportacionId" name="ordenImportacionId"
+                            asp-items="ViewBag.Ordenes" required>
+                        <option value="">— Seleccione una orden —</option>
+                    </select>
+                    <small class="d-block mt-2" style="color: var(--text-muted);">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Solo se muestran órdenes en estado <strong style="color: var(--accent-cyan);">Abierta</strong>.
+                    </small>
+                </div>
+
+                <!-- Resumen visual cuando se selecciona una orden -->
+                <div id="ordenInfoPanel" class="mb-4" style="display:none;">
+                    <div class="icp-delete-preview">
+                        <div class="preview-row">
+                            <span class="preview-label">Orden</span>
+                            <span class="preview-value fw-600" id="infoNumeroOrden">—</span>
+                        </div>
+                        <div class="preview-row">
+                            <span class="preview-label">Estado</span>
+                            <span class="preview-value">
+                                <span class="icp-badge icp-badge-abierta">
+                                    <i class="bi bi-circle-fill" style="font-size:0.45rem;"></i> Abierta
+                                </span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="icp-form-footer">
+                    <a asp-controller="Home" asp-action="Index" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save" id="btnCalcular">
+                        <i class="bi bi-calculator me-1"></i> Generar Previsualización
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tarjeta informativa del proceso -->
+        <div class="icp-card mt-3" style="border-color: rgba(59,130,246,0.15);">
+            <span class="icp-form-section-label">
+                <i class="bi bi-info-circle me-2" style="color: var(--accent-blue);"></i>
+                ¿Qué calcula el Landed Cost?
+            </span>
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="d-flex align-items-start gap-2">
+                        <div style="width:28px;height:28px;border-radius:8px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-box-seam" style="color:var(--accent-cyan);font-size:0.8rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.75rem;font-weight:600;color:var(--text-primary);">Valor FOB</div>
+                            <div style="font-size:0.67rem;color:var(--text-muted);">Precio en origen de los productos</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="d-flex align-items-start gap-2">
+                        <div style="width:28px;height:28px;border-radius:8px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-ship" style="color:var(--accent-green);font-size:0.8rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.75rem;font-weight:600;color:var(--text-primary);">CIF</div>
+                            <div style="font-size:0.67rem;color:var(--text-muted);">FOB + Flete + Seguro</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="d-flex align-items-start gap-2">
+                        <div style="width:28px;height:28px;border-radius:8px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-percent" style="color:var(--accent-orange);font-size:0.8rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.75rem;font-weight:600;color:var(--text-primary);">Impuestos</div>
+                            <div style="font-size:0.67rem;color:var(--text-muted);">Arancel + ISC + ITBIS + Aduanal</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="d-flex align-items-start gap-2">
+                        <div style="width:28px;height:28px;border-radius:8px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="bi bi-tag-fill" style="color:var(--accent-blue);font-size:0.8rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.75rem;font-weight:600;color:var(--text-primary);">Precio Sugerido</div>
+                            <div style="font-size:0.67rem;color:var(--text-muted);">Costo total + margen aplicado</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // Muestra panel de info cuando se selecciona una orden
+    const selectOrden = document.getElementById('ordenImportacionId');
+    const infoPanel = document.getElementById('ordenInfoPanel');
+    const infoNumero = document.getElementById('infoNumeroOrden');
+
+    selectOrden.addEventListener('change', function () {
+        if (this.value) {
+            const textoSeleccionado = this.options[this.selectedIndex].text;
+            infoNumero.textContent = textoSeleccionado;
+            infoPanel.style.display = '';
+        } else {
+            infoPanel.style.display = 'none';
+        }
+    });
+</script>
 }
