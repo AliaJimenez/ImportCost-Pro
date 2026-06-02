@@ -41,7 +41,7 @@ namespace ImportCostPro.Core.Services
 
         public async Task<ImportadorDto> CreateAsync(ImportadorDto importadorDto)
         {
-            var rncLimpio = importadorDto.Rnc.Trim(); 
+            var rncLimpio = importadorDto.Rnc.Trim();
 
             if (await ExistsByRncAsync(rncLimpio))
                 throw new Exception("El RNC ya existe");
@@ -54,6 +54,7 @@ namespace ImportCostPro.Core.Services
                 Direccion = importadorDto.Direccion,
                 Email = importadorDto.Email,
                 Telefono = importadorDto.Telefono,
+                Contacto = importadorDto.Contacto, 
                 Activo = importadorDto.Activo,
                 FechaCreacion = DateTime.Now,
                 FechaModificacion = DateTime.Now
@@ -76,7 +77,6 @@ namespace ImportCostPro.Core.Services
 
             bool tieneOrdenes = await HasOrdersAsync(importador.Id);
 
-            // Regla: No modificar RNC si tiene órdenes
             if (tieneOrdenes && importador.Rnc != rncLimpio)
                 throw new Exception("No se puede modificar el RNC porque este importador ya tiene órdenes registradas.");
 
@@ -86,6 +86,7 @@ namespace ImportCostPro.Core.Services
             importador.Direccion = importadorDto.Direccion;
             importador.Email = importadorDto.Email;
             importador.Telefono = importadorDto.Telefono;
+            importador.Contacto = importadorDto.Contacto;
             importador.Activo = importadorDto.Activo;
             importador.FechaModificacion = DateTime.Now;
 
@@ -97,8 +98,7 @@ namespace ImportCostPro.Core.Services
         public async Task<bool> DeleteAsync(int id)
         {
             var importador = await context.Importadores.FindAsync(id);
-            if (importador is null)
-                return false;
+            if (importador is null) return false;
 
             context.Importadores.Remove(importador);
             await context.SaveChangesAsync();
@@ -108,32 +108,17 @@ namespace ImportCostPro.Core.Services
         public async Task<bool> ExistsByRncAsync(string rnc, int? excludeId = null)
         {
             var query = context.Importadores.Where(i => i.Rnc == rnc);
-
-            if (excludeId.HasValue)
-                query = query.Where(i => i.Id != excludeId);
-
+            if (excludeId.HasValue) query = query.Where(i => i.Id != excludeId);
             return await query.AnyAsync();
         }
 
-        public async Task<bool> HasOrdersAsync(int importadorId)
-        {
-            return await Task.FromResult(false);
-        }
+        public async Task<bool> HasOrdersAsync(int importadorId) => await Task.FromResult(false);
 
-        public async Task<bool> CanDeleteAsync(int importadorId)
-        {
-            return !await HasOrdersAsync(importadorId);
-        }
+        public async Task<bool> CanDeleteAsync(int importadorId) => !await HasOrdersAsync(importadorId);
 
         public async Task<string> GetDeleteErrorMessageAsync(int importadorId)
-        {
-            if (await HasOrdersAsync(importadorId))
-                return "No se puede eliminar este importador porque tiene órdenes de importación registradas.";
+            => await HasOrdersAsync(importadorId) ? "No se puede eliminar porque tiene órdenes registradas." : "No se puede eliminar.";
 
-            return "No se puede eliminar este importador.";
-        }
-
-       
         private async Task<List<ImportadorDto>> MapToDtoAsync(IEnumerable<Importador> importadores)
         {
             var result = new List<ImportadorDto>();
@@ -144,24 +129,23 @@ namespace ImportCostPro.Core.Services
             return result;
         }
 
-        private async Task<ImportadorDto> MapToDtoAsync(Importador importador)
+        private async Task<ImportadorDto> MapToDtoAsync(Importador i)
         {
-            bool tieneOrdenes = await HasOrdersAsync(importador.Id);
-
             return new ImportadorDto
             {
-                Id = importador.Id,
-                Nombre = importador.Nombre,
-                Rnc = importador.Rnc,
-                PaisId = importador.PaisId,
-                NombrePais = importador.Pais?.Nombre,
-                Direccion = importador.Direccion,
-                Email = importador.Email,
-                Telefono = importador.Telefono,
-                Activo = importador.Activo,
-                TieneOrdenes = tieneOrdenes,
-                FechaCreacion = importador.FechaCreacion,
-                FechaModificacion = importador.FechaModificacion
+                Id = i.Id,
+                Nombre = i.Nombre,
+                Rnc = i.Rnc,
+                PaisId = i.PaisId,
+                NombrePais = i.Pais?.Nombre,
+                Direccion = i.Direccion,
+                Email = i.Email,
+                Telefono = i.Telefono,
+                Contacto = i.Contacto, 
+                Activo = i.Activo,
+                TieneOrdenes = await HasOrdersAsync(i.Id),
+                FechaCreacion = i.FechaCreacion,
+                FechaModificacion = i.FechaModificacion
             };
         }
     }

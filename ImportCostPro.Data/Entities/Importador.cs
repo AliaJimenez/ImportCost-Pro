@@ -10,7 +10,7 @@ namespace ImportCostPro.Data.Entities
         public required string Rnc { get; set; }
         public required int PaisId { get; set; }
         public Pais? Pais { get; set; }
-
+        public string? Contacto { get; set; }
         public string? Direccion { get; set; }
         public string? Telefono { get; set; }
         public string? Email { get; set; }

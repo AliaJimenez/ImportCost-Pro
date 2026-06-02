@@ -19,6 +19,9 @@ namespace ImportCostPro.Core.ViewModels.Importador
         [Required(ErrorMessage = "El país es obligatorio")]
         public required int PaisId { get; set; }
 
+        [StringLength(100, ErrorMessage = "Máximo 100 caracteres")]
+        public string? Contacto { get; set; }
+
         [StringLength(300, ErrorMessage = "Máximo 300 caracteres")]
         public string? Direccion { get; set; }
 
