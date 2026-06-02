@@ -23,7 +23,6 @@ namespace ImportCostPro.Web.Controllers
             return View(new CategoriaArancelariaViewModel());
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CategoriaArancelariaViewModel viewModel)
         {
             
@@ -75,7 +74,6 @@ namespace ImportCostPro.Web.Controllers
             return View(viewModel);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             CategoriaArancelariaViewModel viewModel)
         {
@@ -117,7 +115,6 @@ namespace ImportCostPro.Web.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var (exito, mensaje) = await _service.EliminarAsync(id);

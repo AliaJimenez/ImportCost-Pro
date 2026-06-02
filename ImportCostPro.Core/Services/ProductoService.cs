@@ -18,7 +18,7 @@ namespace ImportCostPro.Core.Services
         {
             return await _context.Productos
                 .Include(p => p.CategoriaArancelaria)
-                .Include(p => p.PaisOrigen) 
+                .Include(p => p.PaisOrigen)
                 .Select(p => new ProductoDto
                 {
                     Id = p.Id,
@@ -34,7 +34,8 @@ namespace ImportCostPro.Core.Services
                     PaisOrigenId = p.PaisOrigenId,
                     CategoriaArancelariaId = p.CategoriaArancelariaId,
                     NombreCategoria = p.CategoriaArancelaria.Nombre,
-                    NombrePais = p.PaisOrigen.Nombre 
+                    NombrePais = p.PaisOrigen.Nombre,
+                    TieneOrdenesAsociadas = p.OrdenProductos.Any()
                 })
                 .ToListAsync();
         }
@@ -42,6 +43,7 @@ namespace ImportCostPro.Core.Services
         {
             var entidad = await _context.Productos
                 .Include(p => p.CategoriaArancelaria)
+                .Include(p => p.OrdenProductos)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (entidad == null) return null;
@@ -60,7 +62,8 @@ namespace ImportCostPro.Core.Services
                 Activo = entidad.Activo,
                 PaisOrigenId = entidad.PaisOrigenId,
                 CategoriaArancelariaId = entidad.CategoriaArancelariaId,
-                NombreCategoria = entidad.CategoriaArancelaria.Nombre
+                NombreCategoria = entidad.CategoriaArancelaria.Nombre,
+                TieneOrdenesAsociadas = entidad.OrdenProductos.Any()
             };
         }
         public async Task<(bool exito, string mensaje)> CrearAsync(ProductoDto dto)
@@ -117,10 +120,23 @@ namespace ImportCostPro.Core.Services
         public async Task<(bool exito, string mensaje)> EditarAsync(ProductoDto dto)
         {
             var entidad = await _context.Productos
+                .Include(p => p.OrdenProductos)
                 .FirstOrDefaultAsync(p => p.Id == dto.Id);
 
             if (entidad == null)
                 return (false, "Producto no encontrado.");
+
+            bool tieneOrdenes = entidad.OrdenProductos.Any();
+
+            if (tieneOrdenes)
+            {
+                entidad.Nombre = dto.Nombre.Trim();
+                entidad.Descripcion = dto.Descripcion?.Trim();
+                entidad.Activo = dto.Activo;
+                entidad.UnidadMedida = dto.UnidadMedida;
+                await _context.SaveChangesAsync();
+                return (true, "Solo se actualizaron campos no críticos porque el producto tiene órdenes asociadas.");
+            }
 
             var codigoExiste = await _context.Productos
                 .AnyAsync(p => p.CodigoReferencia.ToUpper()
@@ -181,6 +197,19 @@ namespace ImportCostPro.Core.Services
             await _context.SaveChangesAsync();
 
             return (true, "Producto eliminado correctamente.");
+        }
+        public async Task<List<ProductoDto>> ObtenerProductosActivosAsync()
+        {
+            return await _context.Productos
+                .Include(p => p.CategoriaArancelaria)
+                .Where(p => p.Activo)
+                .Select(p => new ProductoDto
+                {
+                    Id = p.Id,
+                    Nombre = p.Nombre,
+                    CodigoReferencia = p.CodigoReferencia
+                })
+                .ToListAsync();
         }
     }
 }
