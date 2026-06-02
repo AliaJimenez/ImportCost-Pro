@@ -8,191 +8,133 @@ namespace ImportCostPro.Web.Controllers
 {
     public class OrdenGastoController : Controller
     {
-        private readonly IOrdenGastoService _service;
+        private readonly IOrdenGastoService _gastoService;
         private readonly IMonedaService _monedaService;
+        private readonly IOrdenImportacionService _ordenService;
 
         public OrdenGastoController(
-            IOrdenGastoService service,
-            IMonedaService monedaService)
+            IOrdenGastoService gastoService, 
+            IMonedaService monedaService,
+            IOrdenImportacionService ordenService)
         {
-            _service = service;
+            _gastoService = gastoService;
             _monedaService = monedaService;
+            _ordenService = ordenService;
         }
-        public async Task<IActionResult> Index(int ordenId)
+
+        public async Task<IActionResult> Index(int? filtroOrdenId)
         {
-            var gastos = await _service.ObtenerPorOrdenAsync(ordenId);
-
-            var viewModel = new OrdenGastoIndexViewModel
+            var ordenesAbiertas = await _gastoService.ObtenerOrdenesAbiertasAsync();
+            ViewBag.Ordenes = new SelectList(ordenesAbiertas, "Id", "NumeroOrden", filtroOrdenId);
+            
+            var todosLosGastos = new List<OrdenGastoDto>();
+            
+            if (filtroOrdenId.HasValue)
             {
-                OrdenImportacionId = ordenId,
-                Gastos = gastos,
-                NumeroOrden = gastos.FirstOrDefault()?.NumeroOrden ?? string.Empty,
-                EstadoOrden = gastos.FirstOrDefault()?.EstadoOrden ?? string.Empty,
-                OrdenPermiteModificaciones = gastos.FirstOrDefault()
-                    ?.OrdenPermiteModificaciones ?? false
-            };
-
-            return View(viewModel);
+                todosLosGastos = await _gastoService.ObtenerPorOrdenAsync(filtroOrdenId.Value);
+            }
+            // Para simplificar, si no hay filtro, podríamos traer todos, 
+            // pero IOrdenGastoService solo tiene ObtenerPorOrdenAsync en la interfaz. 
+            // Así que si es nulo devolvemos vacío y obligamos a seleccionar.
+            
+            return View(todosLosGastos);
         }
+
         public async Task<IActionResult> Create(int ordenId)
         {
-            var viewModel = new OrdenGastoFormViewModel
-            {
-                OrdenImportacionId = ordenId
-            };
-
-            await LlenarSelectsAsync(viewModel);
-            return View(viewModel);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Create(OrdenGastoFormViewModel viewModel)
-        {
-            if (!ModelState.IsValid)
-            {
-                await LlenarSelectsAsync(viewModel);
-                return View(viewModel);
-            }
+            var orden = await _ordenService.GetByIdAsync(ordenId);
+            if (orden == null || orden.Estado != "Abierta") return RedirectToAction(nameof(Index));
 
             var dto = new OrdenGastoDto
             {
-                OrdenImportacionId = viewModel.OrdenImportacionId,
-                MonedaId = viewModel.MonedaId,
-                TipoGasto = viewModel.TipoGasto,
-                Monto = viewModel.Monto,
-                MetodoDistribucion = viewModel.MetodoDistribucion,
-                FechaGasto = viewModel.FechaGasto
+                OrdenImportacionId = ordenId,
+                FechaGasto = DateTime.Today
             };
 
-            var (exito, mensaje) = await _service.RegistrarAsync(dto);
+            await CargarMonedas(null);
+            ViewBag.OrdenId = ordenId;
+            ViewBag.NumeroOrden = orden.NumeroOrden;
+            
+            return View(dto);
+        }
 
-            if (!exito)
+        [HttpPost]
+        public async Task<IActionResult> Create(OrdenGastoDto model)
+        {
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", mensaje);
-                await LlenarSelectsAsync(viewModel);
-                return View(viewModel);
+                await CargarMonedas(model.MonedaId);
+                return View(model);
             }
 
-            TempData["Mensaje"] = mensaje;
-            return RedirectToAction(nameof(Index),
-                new { ordenId = viewModel.OrdenImportacionId });
+            var (exito, mensaje) = await _gastoService.RegistrarAsync(model);
+            if (exito)
+            {
+                TempData["Success"] = "Gasto registrado correctamente.";
+                return RedirectToAction("Details", "Orden", new { id = model.OrdenImportacionId });
+            }
+            
+            TempData["Error"] = mensaje;
+            await CargarMonedas(model.MonedaId);
+            return View(model);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var dto = await _service.ObtenerPorIdAsync(id);
+            var gasto = await _gastoService.ObtenerPorIdAsync(id);
+            if (gasto == null) return NotFound();
 
-            if (dto == null)
-                return NotFound();
-
-            if (!dto.OrdenPermiteModificaciones)
-            {
-                TempData["Error"] = "No se puede editar un gasto de una orden que no está abierta.";
-                return RedirectToAction(nameof(Index),
-                    new { ordenId = dto.OrdenImportacionId });
-            }
-
-            var viewModel = new OrdenGastoFormViewModel
-            {
-                Id = dto.Id,
-                OrdenImportacionId = dto.OrdenImportacionId,
-                MonedaId = dto.MonedaId,
-                TipoGasto = dto.TipoGasto,
-                Monto = dto.Monto,
-                MetodoDistribucion = dto.MetodoDistribucion,
-                FechaGasto = dto.FechaGasto,
-                NumeroOrden = dto.NumeroOrden
-            };
-
-            await LlenarSelectsAsync(viewModel);
-            return View(viewModel);
+            await CargarMonedas(gasto.MonedaId);
+            return View(gasto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(OrdenGastoFormViewModel viewModel)
+        public async Task<IActionResult> Edit(OrdenGastoDto model)
         {
             if (!ModelState.IsValid)
             {
-                await LlenarSelectsAsync(viewModel);
-                return View(viewModel);
+                await CargarMonedas(model.MonedaId);
+                return View(model);
             }
 
-            var dto = new OrdenGastoDto
+            var (exito, mensaje) = await _gastoService.EditarAsync(model);
+            if (exito)
             {
-                Id = viewModel.Id,
-                OrdenImportacionId = viewModel.OrdenImportacionId,
-                MonedaId = viewModel.MonedaId,
-                TipoGasto = viewModel.TipoGasto,
-                Monto = viewModel.Monto,
-                MetodoDistribucion = viewModel.MetodoDistribucion,
-                FechaGasto = viewModel.FechaGasto
-            };
-
-            var (exito, mensaje) = await _service.EditarAsync(dto);
-
-            if (!exito)
-            {
-                ModelState.AddModelError("", mensaje);
-                await LlenarSelectsAsync(viewModel);
-                return View(viewModel);
+                TempData["Success"] = "Gasto actualizado correctamente.";
+                return RedirectToAction("Details", "Orden", new { id = model.OrdenImportacionId });
             }
 
-            TempData["Mensaje"] = mensaje;
-            return RedirectToAction(nameof(Index),
-                new { ordenId = viewModel.OrdenImportacionId });
+            TempData["Error"] = mensaje;
+            await CargarMonedas(model.MonedaId);
+            return View(model);
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var dto = await _service.ObtenerPorIdAsync(id);
-
-            if (dto == null)
-                return NotFound();
-
-            return View(dto);
+            var gasto = await _gastoService.ObtenerPorIdAsync(id);
+            if (gasto == null) return NotFound();
+            return View(gasto);
         }
 
         [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id, int ordenId)
+        public async Task<IActionResult> DeleteConfirmed(int id, int OrdenImportacionId)
         {
-            var (exito, mensaje) = await _service.EliminarAsync(id);
-
-            if (!exito)
+            var (exito, mensaje) = await _gastoService.EliminarAsync(id);
+            if (exito)
+            {
+                TempData["Success"] = "Gasto eliminado correctamente.";
+            }
+            else
             {
                 TempData["Error"] = mensaje;
-                return RedirectToAction(nameof(Delete), new { id });
             }
-
-            TempData["Mensaje"] = mensaje;
-            return RedirectToAction(nameof(Index), new { ordenId });
+            return RedirectToAction("Details", "Orden", new { id = OrdenImportacionId });
         }
 
-        private async Task LlenarSelectsAsync(OrdenGastoFormViewModel viewModel)
+        private async Task CargarMonedas(int? monedaId)
         {
-            viewModel.TiposGastoDisponibles = new SelectList(new List<string>
-            {
-                "FleteInternacional",
-                "SeguroInternacional",
-                "GastosPortuarios",
-                "TransporteLocal",
-                "HonorariosAduanales",
-                "Almacenaje",
-                "ManejoCarga",
-                "OtrosGastos"
-            }, viewModel.TipoGasto);
-
-            viewModel.MetodosDistribucionDisponibles = new SelectList(new List<string>
-            {
-                "PorValorFOB",
-                "PorPeso",
-                "PorVolumen",
-                "PorCantidad"
-            }, viewModel.MetodoDistribucion);
-
-            var monedas = await _monedaService.ObtenerActivasAsync();
-            viewModel.MonedasDisponibles = new SelectList(
-                monedas, "Id", "Nombre",
-                viewModel.MonedaId);
+            var monedas = await _monedaService.ObtenerTodasAsync();
+            ViewBag.Monedas = new SelectList(monedas, "Id", "Nombre", monedaId);
         }
     }
 }

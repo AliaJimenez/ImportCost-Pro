@@ -1,5 +1,176 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ImportCostPro.Core.ViewModels.Orden.OrdenEditViewModel
+
 @{
+    ViewData["Title"] = "Editar Orden — " + Model.NumeroOrden;
+    bool esEditable = Model.Estado == "Abierta";
+}
+
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Details" asp-route-id="@Model.Id" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.2);">
+            <i class="bi bi-pencil-square" style="color: var(--accent-cyan);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Editar Orden</h1>
+            <p class="icp-page-subtitle">
+                N° <strong style="color: var(--accent-cyan);">@Model.NumeroOrden</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+@if (!esEditable)
+{
+    <div class="icp-alert-warning mb-4">
+        <i class="bi bi-lock-fill me-2"></i>
+        <strong>Orden bloqueada:</strong> Esta orden se encuentra en estado
+        <strong>@Model.Estado</strong> y no puede ser modificada.
+        Solo las órdenes en estado <strong>Abierta</strong> permiten edición.
+    </div>
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="icp-card">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="icp-alert-danger mb-4"></div>
+
+                <span class="icp-form-section-label">
+                    <i class="bi bi-info-circle me-2" style="color: var(--accent-cyan);"></i>
+                    Identificación de la Orden
+                </span>
+
+                <div class="mb-4">
+                    <label asp-for="NumeroOrden" class="icp-field-label"></label>
+                    <input asp-for="NumeroOrden" class="form-control font-monospace"
+                           maxlength="50" readonly="@(!esEditable ? "readonly" : null)" />
+                    <span asp-validation-for="NumeroOrden" class="text-danger fs-xs"></span>
+                </div>
+
+                <span class="icp-form-section-label">
+                    <i class="bi bi-people me-2" style="color: var(--accent-blue);"></i>
+                    Partes Involucradas
+                </span>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label asp-for="ImportadorId" class="icp-field-label">Importador</label>
+                        <select asp-for="ImportadorId" asp-items="Model.Importadores" class="form-select"
+                                disabled="@(!esEditable ? "disabled" : null)">
+                            <option value="">— Seleccione importador —</option>
+                        </select>
+                        @if (!esEditable)
+                        {
+                            <input type="hidden" asp-for="ImportadorId" />
+                        }
+                        <span asp-validation-for="ImportadorId" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ProveedorId" class="icp-field-label">Proveedor</label>
+                        <select asp-for="ProveedorId" asp-items="Model.Proveedores" class="form-select"
+                                disabled="@(!esEditable ? "disabled" : null)">
+                            <option value="">— Seleccione proveedor —</option>
+                        </select>
+                        @if (!esEditable)
+                        {
+                            <input type="hidden" asp-for="ProveedorId" />
+                        }
+                        <span asp-validation-for="ProveedorId" class="text-danger fs-xs"></span>
+                    </div>
+                </div>
+
+                <span class="icp-form-section-label">
+                    <i class="bi bi-globe-americas me-2" style="color: var(--accent-green);"></i>
+                    Origen y Finanzas
+                </span>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label asp-for="PaisOrigenId" class="icp-field-label">País de Origen</label>
+                        <select asp-for="PaisOrigenId" asp-items="Model.Paises" class="form-select"
+                                disabled="@(!esEditable ? "disabled" : null)">
+                            <option value="">— Seleccione país —</option>
+                        </select>
+                        @if (!esEditable)
+                        {
+                            <input type="hidden" asp-for="PaisOrigenId" />
+                        }
+                        <span asp-validation-for="PaisOrigenId" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="MonedaId" class="icp-field-label">Moneda de la Orden</label>
+                        <select asp-for="MonedaId" asp-items="Model.Monedas" class="form-select"
+                                disabled="@(!esEditable ? "disabled" : null)">
+                            <option value="">— Seleccione moneda —</option>
+                        </select>
+                        @if (!esEditable)
+                        {
+                            <input type="hidden" asp-for="MonedaId" />
+                        }
+                        <span asp-validation-for="MonedaId" class="text-danger fs-xs"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="icp-field-label">Fecha de la Orden</label>
+                        <input type="date" name="FechaOrden" class="form-control"
+                               value="@Model.FechaCreacion.ToString("yyyy-MM-dd")"
+                               @(!esEditable ? "readonly" : "") />
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="icp-field-label">Modalidad de Transporte</label>
+                    <select name="ModalidadTransporte" class="form-select" @(!esEditable ? "disabled" : "")>
+                        <option value="">— Seleccione modalidad —</option>
+                        <option value="Maritimo">🚢 Marítimo</option>
+                        <option value="Aereo">✈️ Aéreo</option>
+                        <option value="Terrestre">🚛 Terrestre</option>
+                    </select>
+                </div>
+
+                <div class="icp-toggle-panel mb-4">
+                    <div class="icp-toggle-row">
+                        <div>
+                            <span class="fw-600 fs-sm" style="color: var(--text-secondary);">Estado actual</span>
+                            <small class="d-block mt-1" style="color: var(--text-muted);">
+                                El estado solo cambia mediante acciones del sistema (calcular, cerrar).
+                            </small>
+                        </div>
+                        @if (Model.Estado == "Abierta")
+                        {
+                            <span class="icp-badge icp-badge-abierta">Abierta</span>
+                        }
+                        else if (Model.Estado == "Calculada")
+                        {
+                            <span class="icp-badge icp-badge-calculada">Calculada</span>
+                        }
+                        else
+                        {
+                            <span class="icp-badge icp-badge-cerrada">@Model.Estado</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="icp-form-footer">
+                    <a asp-action="Details" asp-route-id="@Model.Id" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    @if (esEditable)
+                    {
+                        <button type="submit" class="btn-save">
+                            <i class="bi bi-check-lg me-1"></i> Guardar Cambios
+                        </button>
+                    }
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

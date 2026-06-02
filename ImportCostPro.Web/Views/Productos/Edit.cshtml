@@ -29,6 +29,14 @@
 
                 <div asp-validation-summary="All" class="icp-alert-danger mb-4"></div>
 
+                @if (Model.TieneOrdenesAsociadas)
+                {
+                    <div class="icp-alert-warning mb-4">
+                        <i class="bi bi-lock-fill me-2"></i>
+                        <strong>Atención:</strong> Este producto ya está asociado a una o más órdenes. Algunos campos críticos (categoría, medidas y dimensiones) no pueden ser modificados.
+                    </div>
+                }
+
                 <span class="icp-form-section-label">Identificación</span>
 
                 <div class="row g-3 mb-3">
@@ -49,9 +57,10 @@
                         <label asp-for="CategoriaArancelariaId" class="icp-field-label"></label>
                         <select asp-for="CategoriaArancelariaId"
                                 asp-items="Model.CategoriasDisponibles"
-                                class="form-select">
+                                class="form-select" disabled="@(Model.TieneOrdenesAsociadas ? "disabled" : null)">
                             <option value="">-- Seleccione una categoría --</option>
                         </select>
+                        @if (Model.TieneOrdenesAsociadas) { <input type="hidden" asp-for="CategoriaArancelariaId" /> }
                         <span asp-validation-for="CategoriaArancelariaId" class="text-danger fs-xs"></span>
                     </div>
                     <div class="col-md-6">
@@ -69,7 +78,7 @@
                     <div class="col-md-4">
                         <label asp-for="PesoUnitario" class="icp-field-label"></label>
                         <div class="input-group">
-                            <input asp-for="PesoUnitario" class="form-control" />
+                            <input asp-for="PesoUnitario" class="form-control" readonly="@(Model.TieneOrdenesAsociadas ? "readonly" : null)" />
                             <span class="input-group-text">kg</span>
                         </div>
                         <span asp-validation-for="PesoUnitario" class="text-danger fs-xs"></span>
@@ -78,9 +87,10 @@
                         <label asp-for="UnidadMedida" class="icp-field-label"></label>
                         <select asp-for="UnidadMedida"
                                 asp-items="Model.UnidadesMedidaDisponibles"
-                                class="form-select">
+                                class="form-select" disabled="@(Model.TieneOrdenesAsociadas ? "disabled" : null)">
                             <option value="">-- Seleccione --</option>
                         </select>
+                        @if (Model.TieneOrdenesAsociadas) { <input type="hidden" asp-for="UnidadMedida" /> }
                         <span asp-validation-for="UnidadMedida" class="text-danger fs-xs"></span>
                     </div>
                 </div>
@@ -94,7 +104,7 @@
                         <div class="col-md-4">
                             <label asp-for="Largo" class="icp-field-label"></label>
                             <div class="input-group">
-                                <input asp-for="Largo" class="form-control" />
+                                <input asp-for="Largo" class="form-control" readonly="@(Model.TieneOrdenesAsociadas ? "readonly" : null)" />
                                 <span class="input-group-text">cm</span>
                             </div>
                             <span asp-validation-for="Largo" class="text-danger fs-xs"></span>
@@ -102,7 +112,7 @@
                         <div class="col-md-4">
                             <label asp-for="Ancho" class="icp-field-label"></label>
                             <div class="input-group">
-                                <input asp-for="Ancho" class="form-control" />
+                                <input asp-for="Ancho" class="form-control" readonly="@(Model.TieneOrdenesAsociadas ? "readonly" : null)" />
                                 <span class="input-group-text">cm</span>
                             </div>
                             <span asp-validation-for="Ancho" class="text-danger fs-xs"></span>
@@ -110,7 +120,7 @@
                         <div class="col-md-4">
                             <label asp-for="Alto" class="icp-field-label"></label>
                             <div class="input-group">
-                                <input asp-for="Alto" class="form-control" />
+                                <input asp-for="Alto" class="form-control" readonly="@(Model.TieneOrdenesAsociadas ? "readonly" : null)" />
                                 <span class="input-group-text">cm</span>
                             </div>
                             <span asp-validation-for="Alto" class="text-danger fs-xs"></span>
@@ -146,4 +156,24 @@
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const largo = document.getElementById('Largo').value;
+        const ancho = document.getElementById('Ancho').value;
+        const alto = document.getElementById('Alto').value;
+        
+        const isAnyFilled = largo || ancho || alto;
+        
+        if (isAnyFilled) {
+            const lVal = parseFloat(largo);
+            const wVal = parseFloat(ancho);
+            const hVal = parseFloat(alto);
+            
+            if (isNaN(lVal) || lVal <= 0 || isNaN(wVal) || wVal <= 0 || isNaN(hVal) || hVal <= 0) {
+                e.preventDefault();
+                alert('Si ingresa una dimensión (Largo, Ancho, Alto), debe ingresar las tres y todas deben ser mayores a 0.');
+            }
+        }
+    });
+</script>
 }

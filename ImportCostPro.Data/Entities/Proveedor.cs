@@ -26,7 +26,7 @@ namespace ImportCostPro.Data.Entities
         public required DateTime FechaCreacion { get; set; } = DateTime.Now;
         public required DateTime FechaModificacion { get; set; } = DateTime.Now;
 
-        // Relación con órdenes de importación corregida (usando la clase correcta y C# 12)
+        
         public ICollection<OrdenImportacion> OrdenesImportacion { get; set; } = [];
     }
 }

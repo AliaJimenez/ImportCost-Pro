@@ -1,5 +1,71 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ImportCostPro.Core.Dtos.OrdenGastoDto
+
 @{
+    ViewData["Title"] = "Eliminar Gasto";
 }
+
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-controller="Orden" asp-action="Details" asp-route-id="@Model.OrdenImportacionId" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.2);">
+            <i class="bi bi-trash3" style="color: var(--accent-red);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Eliminar Gasto</h1>
+            <p class="icp-page-subtitle">
+                Orden: <strong style="color: var(--accent-cyan);">@Model.NumeroOrden</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="icp-card" style="border-color: rgba(239,68,68,0.2);">
+            <div class="icp-alert-danger mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>¿Está seguro que desea eliminar este gasto?</strong>
+            </div>
+
+            <div class="icp-delete-preview mb-4">
+                <div class="preview-row">
+                    <span class="preview-label">Tipo</span>
+                    <span class="preview-value fw-600">@Model.TipoGasto</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Monto</span>
+                    <span class="preview-value fw-700" style="color: var(--accent-orange);">
+                        @Model.SimboloMoneda @Model.Monto.ToString("N2")
+                    </span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Moneda</span>
+                    <span class="preview-value"><span class="icp-code-badge">@Model.NombreMoneda</span></span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Distribución</span>
+                    <span class="preview-value">@Model.MetodoDistribucion</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Fecha</span>
+                    <span class="preview-value">@Model.FechaGasto.ToString("dd/MM/yyyy")</span>
+                </div>
+            </div>
+
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="OrdenImportacionId" value="@Model.OrdenImportacionId" />
+                <div class="icp-form-footer">
+                    <a asp-controller="Orden" asp-action="Details" asp-route-id="@Model.OrdenImportacionId" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save" style="background: var(--accent-red); box-shadow: 0 2px 8px rgba(239,68,68,0.25);">
+                        <i class="bi bi-trash3 me-1"></i> Eliminar Gasto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -38,6 +38,16 @@
                     <span asp-validation-for="Nombre" class="text-danger fs-xs"></span>
                 </div>
 
+                <div class="icp-toggle-panel mb-4">
+                    <div class="icp-toggle-row">
+                        <div>
+                            <label asp-for="Activo" class="fw-600 fs-sm" style="color: var(--text-primary); cursor: pointer;">País Activo</label>
+                            <small class="d-block mt-1" style="color: var(--text-muted);">Solo los países activos aparecen como opción en los proveedores y productos.</small>
+                        </div>
+                        <input asp-for="Activo" class="form-check-input ms-3 fs-5" type="checkbox" role="switch" checked />
+                    </div>
+                </div>
+
                 <div class="icp-form-footer">
                     <a asp-action="Index" class="btn-cancel">
                         <i class="bi bi-x-lg me-1"></i> Cancelar

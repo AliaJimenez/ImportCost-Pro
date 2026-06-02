@@ -4,6 +4,7 @@ using ImportCostPro.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ImportCostPro.Data.Migrations
 {
     [DbContext(typeof(ImportCostDbContext))]
-    partial class ImportCostDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260528021250_RefactorLandedCostEntities")]
+    partial class RefactorLandedCostEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -322,48 +325,6 @@ namespace ImportCostPro.Data.Migrations
                     b.ToTable("Monedas", (string)null);
                 });
 
-            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenGasto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("FechaGasto")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MetodoDistribucion")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("MonedaId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Monto")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal>("MontoEnMonedaLocal")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<int>("OrdenImportacionId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TipoGasto")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MonedaId");
-
-                    b.HasIndex("OrdenImportacionId");
-
-                    b.ToTable("OrdenGastos", (string)null);
-                });
-
             modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenImportacion", b =>
                 {
                     b.Property<int>("Id")
@@ -410,7 +371,6 @@ namespace ImportCostPro.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("NumeroOrden")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PaisOrigenId")
@@ -436,47 +396,6 @@ namespace ImportCostPro.Data.Migrations
                     b.HasIndex("ProveedorId");
 
                     b.ToTable("OrdenesImportacion");
-                });
-
-            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenProducto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Cantidad")
-                        .HasColumnType("decimal(10,4)");
-
-                    b.Property<decimal>("FOBTotal")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal>("MargenGananciaDeseado")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<int>("OrdenImportacionId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("PesoTotal")
-                        .HasColumnType("decimal(10,4)");
-
-                    b.Property<decimal>("PrecioUnitarioFOB")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("VolumenTotal")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrdenImportacionId");
-
-                    b.HasIndex("ProductoId");
-
-                    b.ToTable("OrdenProductos", (string)null);
                 });
 
             modelBuilder.Entity("ImportCostPro.Data.Entities.Pais", b =>
@@ -536,10 +455,10 @@ namespace ImportCostPro.Data.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
-                    b.Property<decimal?>("Alto")
+                    b.Property<decimal>("Alto")
                         .HasColumnType("decimal(10,4)");
 
-                    b.Property<decimal?>("Ancho")
+                    b.Property<decimal>("Ancho")
                         .HasColumnType("decimal(10,4)");
 
                     b.Property<int>("CategoriaArancelariaId")
@@ -554,16 +473,13 @@ namespace ImportCostPro.Data.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<decimal?>("Largo")
+                    b.Property<decimal>("Largo")
                         .HasColumnType("decimal(10,4)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
-
-                    b.Property<int?>("PaisId")
-                        .HasColumnType("int");
 
                     b.Property<int>("PaisOrigenId")
                         .HasColumnType("int");
@@ -579,8 +495,6 @@ namespace ImportCostPro.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriaArancelariaId");
-
-                    b.HasIndex("PaisId");
 
                     b.HasIndex("PaisOrigenId");
 
@@ -723,25 +637,6 @@ namespace ImportCostPro.Data.Migrations
                     b.Navigation("Producto");
                 });
 
-            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenGasto", b =>
-                {
-                    b.HasOne("ImportCostPro.Data.Entities.Moneda", "Moneda")
-                        .WithMany()
-                        .HasForeignKey("MonedaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ImportCostPro.Data.Entities.OrdenImportacion", "OrdenImportacion")
-                        .WithMany("Gastos")
-                        .HasForeignKey("OrdenImportacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Moneda");
-
-                    b.Navigation("OrdenImportacion");
-                });
-
             modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenImportacion", b =>
                 {
                     b.HasOne("ImportCostPro.Data.Entities.Importador", "Importador")
@@ -777,25 +672,6 @@ namespace ImportCostPro.Data.Migrations
                     b.Navigation("Proveedor");
                 });
 
-            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenProducto", b =>
-                {
-                    b.HasOne("ImportCostPro.Data.Entities.OrdenImportacion", "OrdenImportacion")
-                        .WithMany("Productos")
-                        .HasForeignKey("OrdenImportacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ImportCostPro.Data.Entities.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("OrdenImportacion");
-
-                    b.Navigation("Producto");
-                });
-
             modelBuilder.Entity("ImportCostPro.Data.Entities.Producto", b =>
                 {
                     b.HasOne("ImportCostPro.Data.Entities.CategoriaArancelaria", "CategoriaArancelaria")
@@ -804,14 +680,10 @@ namespace ImportCostPro.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("ImportCostPro.Data.Entities.Pais", null)
-                        .WithMany("Productos")
-                        .HasForeignKey("PaisId");
-
                     b.HasOne("ImportCostPro.Data.Entities.Pais", "PaisOrigen")
-                        .WithMany()
+                        .WithMany("Productos")
                         .HasForeignKey("PaisOrigenId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CategoriaArancelaria");
@@ -872,13 +744,6 @@ namespace ImportCostPro.Data.Migrations
                     b.Navigation("TasasCambioDestino");
 
                     b.Navigation("TasasCambioOrigen");
-                });
-
-            modelBuilder.Entity("ImportCostPro.Data.Entities.OrdenImportacion", b =>
-                {
-                    b.Navigation("Gastos");
-
-                    b.Navigation("Productos");
                 });
 
             modelBuilder.Entity("ImportCostPro.Data.Entities.Pais", b =>
