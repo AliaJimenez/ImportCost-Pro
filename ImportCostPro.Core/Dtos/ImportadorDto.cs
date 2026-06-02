@@ -8,9 +8,10 @@ namespace ImportCostPro.Core.Dtos
         public required string Nombre { get; set; }
         public required string Rnc { get; set; }
         public required int PaisId { get; set; }
-        public string? NombrePais { get; set; } // Para mostrar en las tablas
+        public string? NombrePais { get; set; } 
         public string? Direccion { get; set; }
         public string? Email { get; set; }
+        public string? Contacto { get; set; }
         public string? Telefono { get; set; }
         public required bool Activo { get; set; }
         public bool TieneOrdenes { get; set; }
