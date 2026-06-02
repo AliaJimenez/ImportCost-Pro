@@ -62,8 +62,14 @@ namespace ImportCostPro.Core.Services
             if (codigoExiste)
                 return (false, "Ya existe una categoría con este código arancelario.");
 
+            if (dto.PorcentajeArancel < 0 || dto.PorcentajeArancel > 100)
+                return (false, "El porcentaje de arancel debe estar entre 0 y 100.");
+
             if (dto.AplicaImpuestoSelectivo && dto.PorcentajeImpuestoSelectivo <= 0)
                 return (false, "Si aplica impuesto selectivo, el porcentaje debe ser mayor que 0.");
+
+            if (dto.AplicaImpuestoSelectivo && dto.PorcentajeImpuestoSelectivo > 100)  
+                return (false, "El porcentaje de impuesto selectivo no puede ser mayor que 100.");
 
             if (!dto.AplicaImpuestoSelectivo)
                 dto.PorcentajeImpuestoSelectivo = 0;
@@ -113,8 +119,14 @@ namespace ImportCostPro.Core.Services
             if (codigoExiste)
                 return (false, "Ya existe otra categoría con este código arancelario.");
 
+            if (dto.PorcentajeArancel < 0 || dto.PorcentajeArancel > 100)
+                return (false, "El porcentaje de arancel debe estar entre 0 y 100.");
+
             if (dto.AplicaImpuestoSelectivo && dto.PorcentajeImpuestoSelectivo <= 0)
                 return (false, "Si aplica impuesto selectivo, el porcentaje debe ser mayor que 0.");
+
+            if (dto.AplicaImpuestoSelectivo && dto.PorcentajeImpuestoSelectivo > 100) 
+                return (false, "El porcentaje de impuesto selectivo no puede ser mayor que 100.");
 
             if (!dto.AplicaImpuestoSelectivo)
                 dto.PorcentajeImpuestoSelectivo = 0;

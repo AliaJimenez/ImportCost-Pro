@@ -19,6 +19,7 @@
         //navigation properties
         public Pais PaisOrigen { get; set; } = null!;
         public CategoriaArancelaria CategoriaArancelaria { get; set; } = null!;
+        public ICollection<OrdenProducto> OrdenProductos { get; set; } = new List<OrdenProducto>();
 
 
     }
