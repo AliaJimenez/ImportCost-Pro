@@ -1,92 +1,273 @@
-﻿@model ImportCostPro.Core.Dtos.CalculoLandedCostDto
+@* Views/CalculoLandedCost/Resultado.cshtml *@
+@model ImportCostPro.Core.Dtos.CalculoLandedCostDto
+
 @{
-    ViewData["Title"] = "Resultado del Cálculo";
+    ViewData["Title"] = "Resultado del Cálculo — " + Model.NumeroOrden;
+    Layout = "_Layout";
+
+    // Totales consolidados
+    var totalGastos = Model.FleteTotalLocal + Model.SeguroTotalLocal + Model.GastosLocalesTotal;
+    var totalImpuestos = Model.TotalArancel + Model.TotalIsc + Model.TotalTasaServicio + Model.TotalItbis;
 }
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Resultados Landed Cost: <span class="text-primary">@Model.NumeroOrden</span></h2>
-        <a asp-action="Calcular" class="btn btn-secondary">Volver Atrás</a>
-    </div>
-
-    <div class="row mb-4 text-center">
-        <div class="col-md-3">
-            <div class="card bg-light shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">FOB Total (Local)</h6>
-                    <h4 class="text-dark">@Model.FobTotalLocal.ToString("C2")</h4>
-                </div>
-            </div>
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-action="Calcular" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.2);">
+            <i class="bi bi-graph-up-arrow" style="color: var(--accent-green);"></i>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-light shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Total Gastos (Flete+Seguro+Locales)</h6>
-                    <h4 class="text-dark">@((Model.FleteTotalLocal + Model.SeguroTotalLocal + Model.GastosLocalesTotal).ToString("C2"))</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-light shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-muted">Total Impuestos (Aduanas e ITBIS)</h6>
-                    <h4 class="text-dark">@((Model.TotalArancel + Model.TotalIsc + Model.TotalTasaServicio + Model.TotalItbis).ToString("C2"))</h4>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-primary shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-white">Costo Total de Importación</h6>
-                    <h4 class="fw-bold">@Model.CostoTotalImportacion.ToString("C2")</h4>
-                </div>
-            </div>
+        <div>
+            <h1 class="icp-page-title">Resultado del Cálculo</h1>
+            <p class="icp-page-subtitle">
+                Orden: <strong style="color: var(--accent-cyan);">@Model.NumeroOrden</strong>
+                &nbsp;·&nbsp; Fecha: @Model.FechaCalculo.ToString("dd/MM/yyyy HH:mm")
+            </p>
         </div>
     </div>
+</div>
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Desglose por Producto (Prorrateo)</h5>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="icp-alert-success mb-4">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+<!-- Aviso de confirmación -->
+<div class="icp-alert-warning mb-4">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Vista previa:</strong> Este cálculo aún <strong>no ha sido guardado</strong>. Al confirmar,
+    la orden pasará a estado <strong>Calculada</strong> de forma permanente e irreversible.
+    Revisa detenidamente los resultados antes de confirmar.
+</div>
+
+<!-- ── MÉTRICAS RESUMEN ─────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="icp-metric-card" style="--metric-accent: var(--accent-cyan);">
+            <div class="icp-metric-header">
+                <span class="icp-metric-label">FOB Total (Local)</span>
+                <div class="icp-metric-icon" style="background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2);">
+                    <i class="bi bi-box-seam" style="color: var(--accent-cyan);"></i>
+                </div>
+            </div>
+            <div class="icp-metric-value" style="font-size:1.35rem;">@Model.FobTotalLocal.ToString("N2")</div>
+            <div class="icp-metric-desc">Valor origen convertido a moneda local</div>
         </div>
-        <div class="card-body p-0 table-responsive">
-            <table class="table table-hover table-striped mb-0">
-                <thead class="table-light">
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="icp-metric-card" style="--metric-accent: var(--accent-blue);">
+            <div class="icp-metric-header">
+                <span class="icp-metric-label">CIF Total</span>
+                <div class="icp-metric-icon" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);">
+                    <i class="bi bi-ship" style="color: var(--accent-blue);"></i>
+                </div>
+            </div>
+            <div class="icp-metric-value" style="font-size:1.35rem;">@Model.CifTotalLocal.ToString("N2")</div>
+            <div class="icp-metric-desc">FOB + Flete + Seguro + Gastos Locales</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="icp-metric-card" style="--metric-accent: var(--accent-orange);">
+            <div class="icp-metric-header">
+                <span class="icp-metric-label">Total Impuestos</span>
+                <div class="icp-metric-icon" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2);">
+                    <i class="bi bi-percent" style="color: var(--accent-orange);"></i>
+                </div>
+            </div>
+            <div class="icp-metric-value" style="font-size:1.35rem;">@totalImpuestos.ToString("N2")</div>
+            <div class="icp-metric-desc">Arancel + ISC + Aduanal + ITBIS</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="icp-metric-card" style="--metric-accent: var(--accent-green);">
+            <div class="icp-metric-header">
+                <span class="icp-metric-label">Costo Total Importación</span>
+                <div class="icp-metric-icon" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.2);">
+                    <i class="bi bi-calculator-fill" style="color: var(--accent-green);"></i>
+                </div>
+            </div>
+            <div class="icp-metric-value" style="font-size:1.35rem; color: var(--accent-green);">@Model.CostoTotalImportacion.ToString("N2")</div>
+            <div class="icp-metric-desc">Costo final total en moneda local</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── DESGLOSE GASTOS ─────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-6">
+        <div class="icp-card">
+            <span class="icp-form-section-label">
+                <i class="bi bi-receipt me-2" style="color:var(--accent-blue);"></i>
+                Desglose de Gastos de Transporte
+            </span>
+            <div class="icp-delete-preview">
+                <div class="preview-row">
+                    <span class="preview-label">Flete Internacional</span>
+                    <span class="preview-value fw-600 text-accent-cyan">@Model.FleteTotalLocal.ToString("N2")</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Seguro Internacional</span>
+                    <span class="preview-value fw-600 text-accent-blue">@Model.SeguroTotalLocal.ToString("N2")</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Gastos Locales</span>
+                    <span class="preview-value fw-600 text-accent-orange">@Model.GastosLocalesTotal.ToString("N2")</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label" style="color:var(--text-primary);font-weight:700;">Total Gastos</span>
+                    <span class="preview-value fw-700" style="color:var(--text-primary);">@totalGastos.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="icp-card">
+            <span class="icp-form-section-label">
+                <i class="bi bi-percent me-2" style="color:var(--accent-orange);"></i>
+                Desglose de Impuestos Aduanales
+            </span>
+            <div class="icp-delete-preview">
+                <div class="preview-row">
+                    <span class="preview-label">Arancel</span>
+                    <span class="preview-value fw-600 text-accent-orange">@Model.TotalArancel.ToString("N2")</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Imp. Selectivo (ISC)</span>
+                    <span class="preview-value fw-600" style="color:var(--accent-purple);">@Model.TotalIsc.ToString("N2")</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">Tasa Aduanal (@Model.PorcentajeTasaServicioUsado.ToString("N2")%)</span>
+                    <span class="preview-value fw-600 text-accent-red">@Model.TotalTasaServicio.ToString("N2")</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label">ITBIS (@Model.PorcentajeItbisUsado.ToString("N2")%)</span>
+                    <span class="preview-value fw-600 text-accent-blue">@Model.TotalItbis.ToString("N2")</span>
+                </div>
+                <div class="preview-row">
+                    <span class="preview-label" style="color:var(--text-primary);font-weight:700;">Total Impuestos</span>
+                    <span class="preview-value fw-700" style="color:var(--text-primary);">@totalImpuestos.ToString("N2")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── TABLA DETALLE POR PRODUCTO ──────────────────────────────── -->
+<div class="icp-card mb-4">
+    <span class="icp-form-section-label">
+        <i class="bi bi-table me-2" style="color:var(--accent-green);"></i>
+        Desglose por Producto — Prorrateo de Costos
+    </span>
+
+    <div class="icp-table-wrapper">
+        <div style="overflow-x: auto;">
+            <table class="icp-table" style="min-width: 900px;">
+                <thead>
                     <tr>
                         <th>Producto</th>
-                        <th>Cant.</th>
-                        <th>FOB Unit.</th>
-                        <th>Valor CIF</th>
-                        <th>Arancel</th>
-                        <th>ITBIS</th>
-                        <th class="table-info fw-bold">Costo Unit. Final</th>
-                        <th class="table-success fw-bold">Precio Venta Sug.</th>
+                        <th class="text-center">Cant.</th>
+                        <th class="text-end">FOB Unit.</th>
+                        <th class="text-end">FOB Total</th>
+                        <th class="text-end">CIF</th>
+                        <th class="text-end">Arancel</th>
+                        <th class="text-end">ISC</th>
+                        <th class="text-end">ITBIS</th>
+                        <th class="text-end" style="color: var(--accent-cyan);">Costo Unit.</th>
+                        <th class="text-end" style="color: var(--accent-green);">P. Sugerido</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var det in Model.Detalles)
+                    @if (Model.Detalles == null || !Model.Detalles.Any())
                     {
                         <tr>
-                            <td>@det.NombreProducto</td>
-                            <td>@det.Cantidad.ToString("N0")</td>
-                            <td>@det.FobOriginalUnitario.ToString("C2")</td>
-                            <td>@det.ValorCif.ToString("C2")</td>
-                            <td>@det.MontoArancel.ToString("C2")</td>
-                            <td>@det.MontoItbis.ToString("C2")</td>
-                            <td class="table-info fw-bold">@det.CostoUnitarioImportado.ToString("C2")</td>
-                            <td class="table-success fw-bold">@det.PrecioVentaSugerido.ToString("C2")</td>
+                            <td colspan="10" class="text-center py-4" style="color: var(--text-muted);">
+                                <i class="bi bi-inbox display-5 d-block mb-2" style="opacity:.25;"></i>
+                                No hay productos en esta orden.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var det in Model.Detalles)
+                        {
+                            <tr>
+                                <td class="fw-600" style="color: var(--text-primary);">
+                                    <i class="bi bi-box-seam me-2" style="color: var(--accent-blue); font-size:0.75rem;"></i>
+                                    @det.NombreProducto
+                                </td>
+                                <td class="text-center">@det.Cantidad.ToString("N0")</td>
+                                <td class="text-end">@det.FobOriginalUnitario.ToString("N4")</td>
+                                <td class="text-end fw-600">@det.FobLocalTotal.ToString("N2")</td>
+                                <td class="text-end" style="color: var(--accent-blue);">@det.ValorCif.ToString("N2")</td>
+                                <td class="text-end" style="color: var(--accent-orange);">@det.MontoArancel.ToString("N2")</td>
+                                <td class="text-end" style="color: var(--accent-purple);">@det.MontoIsc.ToString("N2")</td>
+                                <td class="text-end" style="color: var(--accent-blue-l);">@det.MontoItbis.ToString("N2")</td>
+                                <td class="text-end fw-700" style="color: var(--accent-cyan);">
+                                    @det.CostoUnitarioImportado.ToString("N2")
+                                </td>
+                                <td class="text-end fw-700" style="color: var(--accent-green);">
+                                    @det.PrecioVentaSugerido.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+
+                        <!-- Fila de totales -->
+                        <tr style="background: rgba(16,185,129,0.05); border-top: 2px solid rgba(16,185,129,0.2);">
+                            <td class="fw-700" style="color: var(--text-primary);" colspan="3">
+                                <i class="bi bi-sigma me-1" style="color:var(--accent-green);"></i> TOTALES
+                            </td>
+                            <td class="text-end fw-700">@Model.FobTotalLocal.ToString("N2")</td>
+                            <td class="text-end fw-700" style="color: var(--accent-blue);">@Model.CifTotalLocal.ToString("N2")</td>
+                            <td class="text-end fw-700" style="color: var(--accent-orange);">@Model.TotalArancel.ToString("N2")</td>
+                            <td class="text-end fw-700" style="color: var(--accent-purple);">@Model.TotalIsc.ToString("N2")</td>
+                            <td class="text-end fw-700" style="color: var(--accent-blue-l);">@Model.TotalItbis.ToString("N2")</td>
+                            <td colspan="2" class="text-end fw-700" style="color: var(--accent-green); font-size:1rem;">
+                                <i class="bi bi-currency-dollar me-1"></i>@Model.CostoTotalImportacion.ToString("N2")
+                            </td>
                         </tr>
                     }
                 </tbody>
             </table>
         </div>
     </div>
+</div>
 
-    <div class="text-end mb-5">
-        <form asp-action="ConfirmarGuardado" method="post">
+<!-- ── BOTÓN CONFIRMAR ─────────────────────────────────────────── -->
+<div class="icp-card mb-4" style="border-color: rgba(16,185,129,0.2);">
+    <div class="d-flex align-items-center gap-3">
+        <div style="flex:1;">
+            <div class="fw-600" style="color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.25rem;">
+                <i class="bi bi-shield-check me-2" style="color: var(--accent-green);"></i>
+                Confirmar y Guardar Cálculo Oficial
+            </div>
+            <div style="color: var(--text-muted); font-size: 0.78rem;">
+                Este paso es <strong>irreversible</strong>. La orden pasará al estado
+                <span class="icp-badge icp-badge-calculada ms-1">Calculada</span>
+                y los campos quedarán bloqueados.
+            </div>
+        </div>
+        <form asp-action="ConfirmarGuardado" method="post" id="formConfirmar">
+            @Html.AntiForgeryToken()
             <input type="hidden" name="ordenImportacionId" value="@Model.OrdenImportacionId" />
-            <button type="submit" class="btn btn-success btn-lg shadow" onclick="return confirm('¿Está seguro de confirmar? Este cálculo será inmutable y la orden pasará a estado Cerrada/Calculada.');">
-                <i class="bi bi-save"></i> Confirmar y Guardar Cálculo Oficial
+            <button type="button" class="btn-save" onclick="confirmarCalculo()" id="btnConfirmar">
+                <i class="bi bi-lock-fill me-1"></i> Confirmar y Guardar
             </button>
         </form>
     </div>
 </div>
+
+@section Scripts {
+<script>
+    function confirmarCalculo() {
+        const btn = document.getElementById('btnConfirmar');
+        if (confirm('¿Está seguro de confirmar el cálculo?\n\nEsta acción es IRREVERSIBLE. La orden pasará a estado Calculada y no podrá modificarse.')) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Guardando...';
+            document.getElementById('formConfirmar').submit();
+        }
+    }
+</script>
+}

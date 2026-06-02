@@ -1,5 +1,116 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+@model ImportCostPro.Core.Dtos.OrdenGastoDto
+
 @{
+    ViewData["Title"] = "Editar Gasto de Importación";
+    var monedas = ViewBag.Monedas as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+}
+
+<div class="icp-page-header">
+    <div class="icp-page-header-left">
+        <a asp-controller="Orden" asp-action="Details" asp-route-id="@Model.OrdenImportacionId" class="btn-icp-view me-1">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+        <div class="icp-page-icon" style="background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.2);">
+            <i class="bi bi-pencil-square" style="color: var(--accent-blue);"></i>
+        </div>
+        <div>
+            <h1 class="icp-page-title">Editar Gasto</h1>
+            <p class="icp-page-subtitle">
+                Orden: <strong style="color: var(--accent-cyan);">@Model.NumeroOrden</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="icp-card">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="OrdenImportacionId" value="@Model.OrdenImportacionId" />
+                <div asp-validation-summary="ModelOnly" class="icp-alert-danger mb-4"></div>
+
+                <span class="icp-form-section-label">
+                    <i class="bi bi-tag-fill me-2" style="color: var(--accent-purple);"></i>
+                    Tipo y Monto
+                </span>
+
+                <div class="mb-4">
+                    <label for="TipoGasto" class="icp-field-label">Tipo de Gasto</label>
+                    <select name="TipoGasto" id="TipoGasto" class="form-select" required>
+                        <option value="">— Seleccione el tipo —</option>
+                        <option value="Flete internacional" selected="@(Model.TipoGasto == "Flete internacional" ? "selected" : null)">🚢 Flete internacional</option>
+                        <option value="Seguro internacional" selected="@(Model.TipoGasto == "Seguro internacional" ? "selected" : null)">🛡️ Seguro internacional</option>
+                        <option value="Gastos portuarios" selected="@(Model.TipoGasto == "Gastos portuarios" ? "selected" : null)">⚓ Gastos portuarios</option>
+                        <option value="Transporte local" selected="@(Model.TipoGasto == "Transporte local" ? "selected" : null)">🚛 Transporte local</option>
+                        <option value="Honorarios aduanales" selected="@(Model.TipoGasto == "Honorarios aduanales" ? "selected" : null)">📋 Honorarios aduanales</option>
+                        <option value="Almacenaje" selected="@(Model.TipoGasto == "Almacenaje" ? "selected" : null)">📦 Almacenaje</option>
+                        <option value="Manejo de carga" selected="@(Model.TipoGasto == "Manejo de carga" ? "selected" : null)">🏗️ Manejo de carga</option>
+                        <option value="Otros gastos" selected="@(Model.TipoGasto == "Otros gastos" ? "selected" : null)">📌 Otros gastos</option>
+                    </select>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="Monto" class="icp-field-label">Monto</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                            <input type="number" name="Monto" id="Monto" class="form-control"
+                                   value="@Model.Monto" min="0.0001" step="0.01" required />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="MonedaId" class="icp-field-label">Moneda</label>
+                        <select name="MonedaId" id="MonedaId" class="form-select" required>
+                            <option value="">— Seleccione moneda —</option>
+                            @if (monedas != null)
+                            {
+                                @foreach (var m in monedas)
+                                {
+                                    <option value="@m.Value" selected="@(m.Value == Model.MonedaId.ToString() ? "selected" : null)">@m.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <span class="icp-form-section-label">
+                    <i class="bi bi-distribute-horizontal me-2" style="color: var(--accent-blue);"></i>
+                    Distribución y Fecha
+                </span>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-7">
+                        <label for="MetodoDistribucion" class="icp-field-label">Método de Distribución</label>
+                        <select name="MetodoDistribucion" id="MetodoDistribucion" class="form-select" required>
+                            <option value="">— Seleccione método —</option>
+                            <option value="Por valor FOB" selected="@(Model.MetodoDistribucion == "Por valor FOB" ? "selected" : null)">Por valor FOB</option>
+                            <option value="Por peso" selected="@(Model.MetodoDistribucion == "Por peso" ? "selected" : null)">Por peso</option>
+                            <option value="Por volumen" selected="@(Model.MetodoDistribucion == "Por volumen" ? "selected" : null)">Por volumen</option>
+                            <option value="Por cantidad" selected="@(Model.MetodoDistribucion == "Por cantidad" ? "selected" : null)">Por cantidad</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="FechaGasto" class="icp-field-label">Fecha del Gasto</label>
+                        <input type="date" name="FechaGasto" id="FechaGasto" class="form-control"
+                               value="@Model.FechaGasto.ToString("yyyy-MM-dd")" required />
+                    </div>
+                </div>
+
+                <div class="icp-form-footer">
+                    <a asp-controller="Orden" asp-action="Details" asp-route-id="@Model.OrdenImportacionId" class="btn-cancel">
+                        <i class="bi bi-x-lg me-1"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn-save">
+                        <i class="bi bi-check-lg me-1"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

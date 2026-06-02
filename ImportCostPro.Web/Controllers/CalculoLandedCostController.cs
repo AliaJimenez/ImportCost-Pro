@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -19,16 +19,28 @@ namespace ImportCostPro.Web.Controllers
             _context = context;
         }
 
+        // GET: /CalculoLandedCost → redirige a Calcular
+        public IActionResult Index() => RedirectToAction(nameof(Calcular));
+
         // GET: /CalculoLandedCost/Calcular
         public async Task<IActionResult> Calcular()
         {
-            // Buscamos las órdenes para el Select (Dropdown).
-            // Cuando Ken termine, filtrar por .Where(o => o.Estado == "Abierta")
-            var ordenes = await _context.OrdenesImportacion
-                .Select(o => new { o.Id, Nombre = (o.NumeroOrden ?? "Orden-") + o.Id })
-                .ToListAsync();
+            try
+            {
+                var ordenes = await _context.OrdenesImportacion
+                    .Where(o => o.Estado == "Abierta")
+                    .Select(o => new { o.Id, Nombre = (o.NumeroOrden ?? "Orden-") + o.Id })
+                    .ToListAsync();
 
-            ViewBag.Ordenes = new SelectList(ordenes, "Id", "Nombre");
+                ViewBag.Ordenes = new SelectList(ordenes, "Id", "Nombre");
+            }
+            catch
+            {
+                // La tabla aún no existe o hay un error de BD — mostrar lista vacía
+                ViewBag.Ordenes = new SelectList(Enumerable.Empty<object>(), "Id", "Nombre");
+                TempData["ErrorMessage"] = "No se pudo cargar la lista de órdenes. Verifique que la base de datos esté migrada correctamente.";
+            }
+
             return View();
         }
 

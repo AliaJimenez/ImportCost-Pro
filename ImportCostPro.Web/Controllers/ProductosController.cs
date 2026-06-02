@@ -1,4 +1,4 @@
-﻿using ImportCostPro.Core.Dtos;
+using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Core.ViewModels.Producto;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +16,12 @@ namespace ImportCostPro.Web.Controllers
 
         public ProductosController(
             IProductoService productoService,
-            ICategoriaArancelariaService categoriaService)
+            ICategoriaArancelariaService categoriaService,
+            IPaisService paisService)
         {
             _productoService = productoService;
             _categoriaService = categoriaService;
+            _paisService = paisService;
         }
 
         public async Task<IActionResult> Index()
