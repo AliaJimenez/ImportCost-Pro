@@ -2,24 +2,19 @@
 using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Core.ViewModels.Pais;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ImportCostPro.Web.Controllers
 {
-    public class PaisController : Controller
+    public class PaisController(IPaisService paisService) : Controller
     {
-        private readonly IPaisService _paisService;
-
-        public PaisController(IPaisService paisService)
-        {
-            _paisService = paisService;
-        }
-
         // GET: Pais
         public async Task<IActionResult> Index()
         {
-            var paises = await _paisService.GetAllAsync();
+            var paises = await paisService.GetAllAsync();
             var viewModel = MapToIndexViewModel(paises);
             return View(viewModel);
         }
@@ -27,7 +22,13 @@ namespace ImportCostPro.Web.Controllers
         // GET: Pais/Create
         public IActionResult Create()
         {
-            return View(new PaisFormViewModel());
+            var model = new PaisFormViewModel
+            {
+                Nombre = string.Empty,
+                CodigoISO = string.Empty,
+                Activo = true
+            };
+            return View(model);
         }
 
         // POST: Pais/Create
@@ -44,16 +45,18 @@ namespace ImportCostPro.Web.Controllers
                 {
                     Nombre = model.Nombre,
                     CodigoISO = model.CodigoISO,
-                    Activo = model.Activo
+                    Activo = model.Activo,
+                    FechaCreacion = DateTime.Now,
+                    FechaModificacion = DateTime.Now
                 };
 
-                await _paisService.CreateAsync(paisDto);
+                await paisService.CreateAsync(paisDto);
                 TempData["Success"] = "País creado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(model);
             }
         }
@@ -61,11 +64,11 @@ namespace ImportCostPro.Web.Controllers
         // GET: Pais/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id is null)
                 return NotFound();
 
-            var pais = await _paisService.GetByIdAsync(id.Value);
-            if (pais == null)
+            var pais = await paisService.GetByIdAsync(id.Value);
+            if (pais is null)
                 return NotFound();
 
             var viewModel = new PaisFormViewModel
@@ -92,21 +95,26 @@ namespace ImportCostPro.Web.Controllers
 
             try
             {
+                var paisActual = await paisService.GetByIdAsync(id)
+                    ?? throw new Exception("País no encontrado");
+
                 var paisDto = new PaisDto
                 {
                     Id = model.Id,
                     Nombre = model.Nombre,
                     CodigoISO = model.CodigoISO,
-                    Activo = model.Activo
+                    Activo = model.Activo,
+                    FechaCreacion = paisActual.FechaCreacion,
+                    FechaModificacion = DateTime.Now
                 };
 
-                await _paisService.UpdateAsync(paisDto);
+                await paisService.UpdateAsync(paisDto);
                 TempData["Success"] = "País actualizado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
                 return View(model);
             }
         }
@@ -114,16 +122,16 @@ namespace ImportCostPro.Web.Controllers
         // GET: Pais/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id is null)
                 return NotFound();
 
-            var pais = await _paisService.GetByIdAsync(id.Value);
-            if (pais == null)
+            var pais = await paisService.GetByIdAsync(id.Value);
+            if (pais is null)
                 return NotFound();
 
-            if (!await _paisService.CanDeleteAsync(id.Value))
+            if (!await paisService.CanDeleteAsync(id.Value))
             {
-                TempData["Error"] = await _paisService.GetDeleteErrorMessageAsync(id.Value);
+                TempData["Error"] = await paisService.GetDeleteErrorMessageAsync(id.Value);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -145,7 +153,7 @@ namespace ImportCostPro.Web.Controllers
         {
             try
             {
-                await _paisService.DeleteAsync(id);
+                await paisService.DeleteAsync(id);
                 TempData["Success"] = "País eliminado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
@@ -155,8 +163,7 @@ namespace ImportCostPro.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
-
-        private IEnumerable<PaisIndexViewModel> MapToIndexViewModel(IEnumerable<PaisDto> paises)
+        private static List<PaisIndexViewModel> MapToIndexViewModel(IEnumerable<PaisDto> paises)
         {
             return paises.Select(p => new PaisIndexViewModel
             {
@@ -165,7 +172,7 @@ namespace ImportCostPro.Web.Controllers
                 CodigoISO = p.CodigoISO,
                 Activo = p.Activo,
                 FechaCreacion = p.FechaCreacion
-            });
+            }).ToList();
         }
     }
 }

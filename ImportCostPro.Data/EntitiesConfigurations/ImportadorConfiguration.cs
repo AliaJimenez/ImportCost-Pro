@@ -18,7 +18,6 @@ namespace ImportCostPro.Data.EntitiesConfigurations
             builder.Property(i => i.Nombre).IsRequired().HasMaxLength(150);
             builder.Property(i => i.Rnc).IsRequired().HasMaxLength(20);
             builder.Property(i => i.Direccion).HasMaxLength(300);
-            builder.Property(i => i.Contacto).HasMaxLength(100);
             builder.Property(i => i.Email).HasMaxLength(100);
             builder.Property(i => i.Telefono).HasMaxLength(20);
             builder.Property(i => i.Activo).IsRequired().HasDefaultValue(true);

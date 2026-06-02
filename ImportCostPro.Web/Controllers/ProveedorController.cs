@@ -1,29 +1,25 @@
 ﻿using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Core.ViewModels.Proveedor;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ImportCostPro.Web.Controllers
 {
-    public class ProveedorController : Controller
+    // Uso de Primary Constructor
+    public class ProveedorController(
+        IProveedorService proveedorService,
+        IPaisService paisService,
+        IMonedaService monedaService) : Controller
     {
-        private readonly IProveedorService _proveedorService;
-        private readonly IPaisService _paisService;
-        private readonly IMonedaService _monedaService;
-
-        public ProveedorController(IProveedorService proveedorService, IPaisService paisService, IMonedaService monedaService)
-        {
-            _proveedorService = proveedorService;
-            _paisService = paisService;
-            _monedaService = monedaService;
-        }
-
         // GET: Proveedor
         public async Task<IActionResult> Index()
         {
-            var proveedores = await _proveedorService.GetAllAsync();
+            var proveedores = await proveedorService.GetAllAsync();
             var viewModel = MapToIndexViewModel(proveedores);
             return View(viewModel);
         }
@@ -33,6 +29,9 @@ namespace ImportCostPro.Web.Controllers
         {
             var model = new ProveedorFormViewModel
             {
+                Nombre = string.Empty,   
+                PaisOrigenId = 0,      
+                MonedaPrincipalId = 0,  
                 Paises = await GetPaisesSelectList(),
                 Monedas = await GetMonedasSelectList()
             };
@@ -53,30 +52,33 @@ namespace ImportCostPro.Web.Controllers
 
             try
             {
-                var paisDto = await _paisService.GetByIdAsync(model.PaisOrigenId);
-                var monedaDto = await _monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
+                var paisDto = await paisService.GetByIdAsync(model.PaisOrigenId);
+                var monedaDto = await monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
 
                 var proveedorDto = new ProveedorDto
                 {
                     Nombre = model.Nombre,
                     PaisOrigenId = model.PaisOrigenId,
-                    NombrePais = paisDto?.Nombre, 
+                    NombrePais = paisDto?.Nombre,
                     MonedaPrincipalId = model.MonedaPrincipalId,
-                    NombreMoneda = monedaDto?.Nombre, 
+                    NombreMoneda = monedaDto?.Nombre,
                     Contacto = model.Contacto,
                     Email = model.Email,
                     Telefono = model.Telefono,
                     Direccion = model.Direccion,
-                    Activo = model.Activo
+                    Activo = model.Activo,
+                    TieneOrdenes = false,
+                    FechaCreacion = DateTime.Now,
+                    FechaModificacion = DateTime.Now
                 };
 
-                await _proveedorService.CreateAsync(proveedorDto);
+                await proveedorService.CreateAsync(proveedorDto);
                 TempData["Success"] = "Proveedor creado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
                 model.Paises = await GetPaisesSelectList();
                 model.Monedas = await GetMonedasSelectList();
                 return View(model);
@@ -86,14 +88,14 @@ namespace ImportCostPro.Web.Controllers
         // GET: Proveedor/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id is null)
                 return NotFound();
 
-            var proveedor = await _proveedorService.GetByIdAsync(id.Value);
-            if (proveedor == null)
+            var proveedor = await proveedorService.GetByIdAsync(id.Value);
+            if (proveedor is null)
                 return NotFound();
 
-            bool tieneOrdenes = await _proveedorService.HasOrdersAsync(id.Value);
+            bool tieneOrdenes = await proveedorService.HasOrdersAsync(id.Value);
 
             var viewModel = new ProveedorEditViewModel
             {
@@ -101,7 +103,7 @@ namespace ImportCostPro.Web.Controllers
                 Nombre = proveedor.Nombre,
                 PaisOrigenId = proveedor.PaisOrigenId,
                 MonedaPrincipalId = proveedor.MonedaPrincipalId,
-                Contacto = proveedor.Contacto,  // ✅ AGREGAR
+                Contacto = proveedor.Contacto,
                 Email = proveedor.Email,
                 Telefono = proveedor.Telefono,
                 Direccion = proveedor.Direccion,
@@ -109,8 +111,8 @@ namespace ImportCostPro.Web.Controllers
                 TieneOrdenes = tieneOrdenes,
                 NombrePais = proveedor.NombrePais,
                 NombreMoneda = proveedor.NombreMoneda,
-                Paises = await GetPaisesSelectList(),  // ✅ AGREGAR
-                Monedas = await GetMonedasSelectList()  // ✅ AGREGAR
+                Paises = await GetPaisesSelectList(),
+                Monedas = await GetMonedasSelectList()
             };
 
             return View(viewModel);
@@ -133,49 +135,56 @@ namespace ImportCostPro.Web.Controllers
 
             try
             {
-                var paisDto = await _paisService.GetByIdAsync(model.PaisOrigenId);
-                var monedaDto = await _monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
+                var paisDto = await paisService.GetByIdAsync(model.PaisOrigenId);
+                var monedaDto = await monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
+
+                var proveedorActual = await proveedorService.GetByIdAsync(id)
+                    ?? throw new Exception("Proveedor no encontrado");
 
                 var proveedorDto = new ProveedorDto
                 {
                     Id = model.Id,
                     Nombre = model.Nombre,
                     PaisOrigenId = model.PaisOrigenId,
-                    NombrePais = paisDto?.Nombre,  
+                    NombrePais = paisDto?.Nombre,
                     MonedaPrincipalId = model.MonedaPrincipalId,
-                    NombreMoneda = monedaDto?.Nombre, 
+                    NombreMoneda = monedaDto?.Nombre,
                     Contacto = model.Contacto,
                     Email = model.Email,
                     Telefono = model.Telefono,
                     Direccion = model.Direccion,
-                    Activo = model.Activo
+                    Activo = model.Activo,
+                    TieneOrdenes = proveedorActual.TieneOrdenes,
+                    FechaCreacion = proveedorActual.FechaCreacion,
+                    FechaModificacion = DateTime.Now
                 };
 
-                await _proveedorService.UpdateAsync(proveedorDto);
+                await proveedorService.UpdateAsync(proveedorDto);
                 TempData["Success"] = "Proveedor actualizado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
                 model.Paises = await GetPaisesSelectList();
                 model.Monedas = await GetMonedasSelectList();
                 return View(model);
             }
         }
+
         // GET: Proveedor/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id is null)
                 return NotFound();
 
-            var proveedor = await _proveedorService.GetByIdAsync(id.Value);
-            if (proveedor == null)
+            var proveedor = await proveedorService.GetByIdAsync(id.Value);
+            if (proveedor is null)
                 return NotFound();
 
-            if (!await _proveedorService.CanDeleteAsync(id.Value))
+            if (!await proveedorService.CanDeleteAsync(id.Value))
             {
-                TempData["Error"] = await _proveedorService.GetDeleteErrorMessageAsync(id.Value);
+                TempData["Error"] = await proveedorService.GetDeleteErrorMessageAsync(id.Value);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -202,7 +211,7 @@ namespace ImportCostPro.Web.Controllers
         {
             try
             {
-                await _proveedorService.DeleteAsync(id);
+                await proveedorService.DeleteAsync(id);
                 TempData["Success"] = "Proveedor eliminado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
@@ -215,7 +224,7 @@ namespace ImportCostPro.Web.Controllers
 
         private async Task<List<SelectListItem>> GetPaisesSelectList()
         {
-            var paises = await _paisService.GetActivosAsync();
+            var paises = await paisService.GetActivosAsync();
             return paises.Select(p => new SelectListItem
             {
                 Value = p.Id.ToString(),
@@ -225,7 +234,7 @@ namespace ImportCostPro.Web.Controllers
 
         private async Task<List<SelectListItem>> GetMonedasSelectList()
         {
-            var monedas = await _monedaService.ObtenerActivasAsync();
+            var monedas = await monedaService.ObtenerActivasAsync();
             return monedas.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
@@ -233,7 +242,8 @@ namespace ImportCostPro.Web.Controllers
             }).ToList();
         }
 
-        private IEnumerable<ProveedorIndexViewModel> MapToIndexViewModel(IEnumerable<ProveedorDto> proveedores)
+        // Convertido a estático y retornando List<T>
+        private static List<ProveedorIndexViewModel> MapToIndexViewModel(IEnumerable<ProveedorDto> proveedores)
         {
             return proveedores.Select(p => new ProveedorIndexViewModel
             {
@@ -245,7 +255,7 @@ namespace ImportCostPro.Web.Controllers
                 Activo = p.Activo,
                 TieneOrdenes = p.TieneOrdenes,
                 FechaCreacion = p.FechaCreacion
-            });
+            }).ToList();
         }
     }
 }

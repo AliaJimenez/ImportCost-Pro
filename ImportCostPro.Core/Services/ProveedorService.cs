@@ -43,7 +43,7 @@ namespace ImportCostPro.Core.Services
             return await MapToDtoAsync(proveedores);
         }
 
-        public async Task<ProveedorDto> GetByIdAsync(int id)
+        public async Task<ProveedorDto?> GetByIdAsync(int id)  
         {
             var proveedor = await _context.Proveedores
                 .Include(p => p.PaisOrigen)
@@ -148,12 +148,10 @@ namespace ImportCostPro.Core.Services
         private async Task<IEnumerable<ProveedorDto>> MapToDtoAsync(IEnumerable<Proveedor> proveedores)
         {
             var result = new List<ProveedorDto>();
-
             foreach (var p in proveedores)
             {
                 result.Add(await MapToDtoAsync(p));
             }
-
             return result;
         }
 

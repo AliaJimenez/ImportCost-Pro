@@ -6,153 +6,163 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ImportCostPro.Core.Services
 {
-    public class ImportadorService : IImportadorService
+    public class ImportadorService(ImportCostDbContext context) : IImportadorService
     {
-        private readonly ImportCostDbContext _context;
-
-    public ImportadorService(ImportCostDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task<IEnumerable<ImportadorDto>> GetAllAsync()
-    {
-        var importadores = await _context.Importadores
-            .OrderBy(i => i.Nombre)
-            .ToListAsync();
-        return MapToDto(importadores);
-    }
-
-    public async Task<IEnumerable<ImportadorDto>> GetActivosAsync()
-    {
-        var importadores = await _context.Importadores
-            .Where(i => i.Activo)
-            .OrderBy(i => i.Nombre)
-            .ToListAsync();
-        return MapToDto(importadores);
-    }
-
-    public async Task<ImportadorDto> GetByIdAsync(int id)
-    {
-        var importador = await _context.Importadores.FindAsync(id);
-        return importador == null ? null : MapToDto(importador);
-    }
-
-    public async Task<ImportadorDto> CreateAsync(ImportadorDto importadorDto)
-    {
-        if (await ExistsByRncAsync(importadorDto.Rnc))
-            throw new Exception("El RNC ya existe");
-
-        var importador = new Importador
+        public async Task<List<ImportadorDto>> GetAllAsync()
         {
-            Nombre = importadorDto.Nombre,
-            Rnc = importadorDto.Rnc,
-            Direccion = importadorDto.Direccion,
-            Contacto = importadorDto.Contacto,
-            Email = importadorDto.Email,
-            Telefono = importadorDto.Telefono,
-            Activo = importadorDto.Activo,
-            FechaCreacion = DateTime.Now,
-            FechaModificacion = DateTime.Now
-        };
+            var importadores = await context.Importadores
+                .Include(i => i.Pais)
+                .OrderBy(i => i.Nombre)
+                .ToListAsync();
+            return await MapToDtoAsync(importadores);
+        }
 
-        _context.Importadores.Add(importador);
-        await _context.SaveChangesAsync();
-        return MapToDto(importador);
-    }
-
-    public async Task<ImportadorDto> UpdateAsync(ImportadorDto importadorDto)
-    {
-        var importador = await _context.Importadores.FindAsync(importadorDto.Id);
-        if (importador == null)
-            throw new Exception("Importador no encontrado");
-
-        if (await ExistsByRncAsync(importadorDto.Rnc, importadorDto.Id))
-            throw new Exception("El RNC ya existe");
-
-        importador.Nombre = importadorDto.Nombre;
-        importador.Rnc = importadorDto.Rnc;
-        importador.Direccion = importadorDto.Direccion;
-        importador.Contacto = importadorDto.Contacto;
-        importador.Email = importadorDto.Email;
-        importador.Telefono = importadorDto.Telefono;
-        importador.Activo = importadorDto.Activo;
-        importador.FechaModificacion = DateTime.Now;
-
-        _context.Importadores.Update(importador);
-        await _context.SaveChangesAsync();
-        return MapToDto(importador);
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var importador = await _context.Importadores.FindAsync(id);
-        if (importador == null)
-            return false;
-
-        _context.Importadores.Remove(importador);
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<bool> ExistsByRncAsync(string rnc, int? excludeId = null)
-    {
-        var query = _context.Importadores
-            .Where(i => i.Rnc == rnc);
-
-        if (excludeId.HasValue)
-            query = query.Where(i => i.Id != excludeId);
-
-        return await query.AnyAsync();
-    }
-
-    public async Task<bool> CanDeleteAsync(int importadorId)
-    {
-        return true;
-    }
-
-    public async Task<string> GetDeleteErrorMessageAsync(int importadorId)
-    {
-        return "Este importador tiene órdenes de importación registradas.";
-    }
-
-    private IEnumerable<ImportadorDto> MapToDto(IEnumerable<Importador> importadores)
-    {
-        return importadores.Select(i => new ImportadorDto
+        public async Task<List<ImportadorDto>> GetActivosAsync()
         {
-            Id = i.Id,
-            Nombre = i.Nombre,
-            Rnc = i.Rnc,
-            Direccion = i.Direccion,
-            Contacto = i.Contacto,
-            Email = i.Email,
-            Telefono = i.Telefono,
-            Activo = i.Activo,
-            FechaCreacion = i.FechaCreacion,
-            FechaModificacion = i.FechaModificacion
-        });
-    }
+            var importadores = await context.Importadores
+                .Include(i => i.Pais)
+                .Where(i => i.Activo)
+                .OrderBy(i => i.Nombre)
+                .ToListAsync();
+            return await MapToDtoAsync(importadores);
+        }
 
-    private ImportadorDto MapToDto(Importador importador)
-    {
-        return new ImportadorDto
+        public async Task<ImportadorDto?> GetByIdAsync(int id)
         {
-            Id = importador.Id,
-            Nombre = importador.Nombre,
-            Rnc = importador.Rnc,
-            Direccion = importador.Direccion,
-            Contacto = importador.Contacto,
-            Email = importador.Email,
-            Telefono = importador.Telefono,
-            Activo = importador.Activo,
-            FechaCreacion = importador.FechaCreacion,
-            FechaModificacion = importador.FechaModificacion
-        };
+            var importador = await context.Importadores
+                .Include(i => i.Pais)
+                .FirstOrDefaultAsync(i => i.Id == id);
+            return importador is null ? null : await MapToDtoAsync(importador);
+        }
+
+        public async Task<ImportadorDto> CreateAsync(ImportadorDto importadorDto)
+        {
+            var rncLimpio = importadorDto.Rnc.Trim(); 
+
+            if (await ExistsByRncAsync(rncLimpio))
+                throw new Exception("El RNC ya existe");
+
+            var importador = new Importador
+            {
+                Nombre = importadorDto.Nombre,
+                Rnc = rncLimpio,
+                PaisId = importadorDto.PaisId,
+                Direccion = importadorDto.Direccion,
+                Email = importadorDto.Email,
+                Telefono = importadorDto.Telefono,
+                Activo = importadorDto.Activo,
+                FechaCreacion = DateTime.Now,
+                FechaModificacion = DateTime.Now
+            };
+
+            context.Importadores.Add(importador);
+            await context.SaveChangesAsync();
+            return await MapToDtoAsync(importador);
+        }
+
+        public async Task<ImportadorDto> UpdateAsync(ImportadorDto importadorDto)
+        {
+            var importador = await context.Importadores.FindAsync(importadorDto.Id)
+                ?? throw new Exception("Importador no encontrado");
+
+            var rncLimpio = importadorDto.Rnc.Trim();
+
+            if (await ExistsByRncAsync(rncLimpio, importadorDto.Id))
+                throw new Exception("El RNC ya existe");
+
+            bool tieneOrdenes = await HasOrdersAsync(importador.Id);
+
+            // Regla: No modificar RNC si tiene órdenes
+            if (tieneOrdenes && importador.Rnc != rncLimpio)
+                throw new Exception("No se puede modificar el RNC porque este importador ya tiene órdenes registradas.");
+
+            importador.Nombre = importadorDto.Nombre;
+            importador.Rnc = rncLimpio;
+            importador.PaisId = importadorDto.PaisId;
+            importador.Direccion = importadorDto.Direccion;
+            importador.Email = importadorDto.Email;
+            importador.Telefono = importadorDto.Telefono;
+            importador.Activo = importadorDto.Activo;
+            importador.FechaModificacion = DateTime.Now;
+
+            context.Importadores.Update(importador);
+            await context.SaveChangesAsync();
+            return await MapToDtoAsync(importador);
+        }
+
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var importador = await context.Importadores.FindAsync(id);
+            if (importador is null)
+                return false;
+
+            context.Importadores.Remove(importador);
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ExistsByRncAsync(string rnc, int? excludeId = null)
+        {
+            var query = context.Importadores.Where(i => i.Rnc == rnc);
+
+            if (excludeId.HasValue)
+                query = query.Where(i => i.Id != excludeId);
+
+            return await query.AnyAsync();
+        }
+
+        public async Task<bool> HasOrdersAsync(int importadorId)
+        {
+            return await Task.FromResult(false);
+        }
+
+        public async Task<bool> CanDeleteAsync(int importadorId)
+        {
+            return !await HasOrdersAsync(importadorId);
+        }
+
+        public async Task<string> GetDeleteErrorMessageAsync(int importadorId)
+        {
+            if (await HasOrdersAsync(importadorId))
+                return "No se puede eliminar este importador porque tiene órdenes de importación registradas.";
+
+            return "No se puede eliminar este importador.";
+        }
+
+       
+        private async Task<List<ImportadorDto>> MapToDtoAsync(IEnumerable<Importador> importadores)
+        {
+            var result = new List<ImportadorDto>();
+            foreach (var i in importadores)
+            {
+                result.Add(await MapToDtoAsync(i));
+            }
+            return result;
+        }
+
+        private async Task<ImportadorDto> MapToDtoAsync(Importador importador)
+        {
+            bool tieneOrdenes = await HasOrdersAsync(importador.Id);
+
+            return new ImportadorDto
+            {
+                Id = importador.Id,
+                Nombre = importador.Nombre,
+                Rnc = importador.Rnc,
+                PaisId = importador.PaisId,
+                NombrePais = importador.Pais?.Nombre,
+                Direccion = importador.Direccion,
+                Email = importador.Email,
+                Telefono = importador.Telefono,
+                Activo = importador.Activo,
+                TieneOrdenes = tieneOrdenes,
+                FechaCreacion = importador.FechaCreacion,
+                FechaModificacion = importador.FechaModificacion
+            };
+        }
     }
-}
 }

@@ -12,7 +12,7 @@ namespace ImportCostPro.Core.Interfaces
         //waldin
         Task<IEnumerable<PaisDto>> GetAllAsync();
         Task<IEnumerable<PaisDto>> GetActivosAsync();
-        Task<PaisDto> GetByIdAsync(int id);
+        Task<PaisDto?> GetByIdAsync(int id);
         Task<PaisDto> CreateAsync(PaisDto paisDto);
         Task<PaisDto> UpdateAsync(PaisDto paisDto);
         Task<bool> DeleteAsync(int id);

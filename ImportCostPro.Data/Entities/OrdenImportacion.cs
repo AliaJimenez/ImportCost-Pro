@@ -6,29 +6,25 @@ namespace ImportCostPro.Data.Entities
     public class OrdenImportacion
     {
         public int Id { get; set; }
-        public string NumeroOrden { get; set; }
+        public required string NumeroOrden { get; set; }
+        public required int ImportadorId { get; set; }
+        public required int ProveedorId { get; set; }
+        public required int PaisOrigenId { get; set; }
+        public required int MonedaId { get; set; }
+        public required DateTime FechaOrden { get; set; }
+        public required string ModalidadTransporte { get; set; }
 
-        // Foreign Keys
-        public int ImportadorId { get; set; }
-        public int ProveedorId { get; set; }
-        public int PaisOrigenId { get; set; }
-        public int MonedaId { get; set; }
+        public Importador? Importador { get; set; }
+        public Proveedor? Proveedor { get; set; }
+        public Pais? PaisOrigen { get; set; }
+        public Moneda? Moneda { get; set; }
 
-        // Navigation Properties
-        public Importador Importador { get; set; }
-        public Proveedor Proveedor { get; set; }
-        public Pais PaisOrigen { get; set; }
-        public Moneda Moneda { get; set; }
+        public required string Estado { get; set; } = "Abierta";
 
-        // Estados: Abierta, Calculada, Cerrada, Cancelada
-        public string Estado { get; set; } = "Abierta";
-
-        // Fechas
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
-        public DateTime FechaModificacion { get; set; } = DateTime.Now;
+        public required DateTime FechaCreacion { get; set; } = DateTime.Now;
+        public required DateTime FechaModificacion { get; set; } = DateTime.Now;
         public DateTime? FechaCierre { get; set; }
 
-        // Datos de cálculo
         public decimal? CostoFOB { get; set; }
         public decimal? CIF { get; set; }
         public decimal? Arancel { get; set; }
@@ -37,11 +33,9 @@ namespace ImportCostPro.Data.Entities
         public decimal? ITBIS { get; set; }
         public decimal? PrecioSugerido { get; set; }
 
-        // Activo
-        public bool Activo { get; set; } = true;
+        public required bool Activo { get; set; } = true;
 
-        // Colecciones
-        public ICollection<OrdenProducto> Productos { get; set; } = new List<OrdenProducto>();
-        public ICollection<OrdenGasto> Gastos { get; set; } = new List<OrdenGasto>();
+        public ICollection<OrdenProducto> Productos { get; set; } = [];
+        public ICollection<OrdenGasto> Gastos { get; set; } = [];
     }
 }
