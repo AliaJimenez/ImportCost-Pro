@@ -7,8 +7,8 @@ namespace ImportCostPro.Core.Dtos
         public int Id { get; set; }
         public required string Nombre { get; set; }
         public required string CodigoISO { get; set; }
-        public bool Activo { get; set; }
-        public DateTime FechaCreacion { get; set; }
-        public DateTime FechaModificacion { get; set; }
+        public required bool Activo { get; set; }
+        public  required DateTime FechaCreacion { get; set; }
+        public  required DateTime FechaModificacion { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ImportCostPro.Data.Entities
 {
@@ -6,21 +7,20 @@ namespace ImportCostPro.Data.Entities
     {
         public int Id { get; set; }
 
-    
         public required string Nombre { get; set; }
 
-        public required string CodigoISO 
+        public required string CodigoISO
         {
             get => _codigoISO;
-            set => _codigoISO = value.ToUpper();
+            set => _codigoISO = value?.ToUpper() ?? string.Empty;
         }
         private string _codigoISO = string.Empty;
 
         public required bool Activo { get; set; } = true;
 
-        public ICollection<Proveedor> Proveedores { get; set; } = new List<Proveedor>();
-        public ICollection<Producto> Productos { get; set; } = new List<Producto>();
-        public DateTime FechaCreacion { get; set; } = DateTime.Now;
-        public DateTime FechaModificacion { get; set; } = DateTime.Now;
+        public required DateTime FechaCreacion { get; set; } = DateTime.Now;  
+        public required DateTime FechaModificacion { get; set; } = DateTime.Now; 
+        public ICollection<Proveedor> Proveedores { get; set; } = [];
+        public ICollection<Producto> Productos { get; set; } = [];
     }
 }

@@ -12,7 +12,7 @@ namespace ImportCostPro.Core.Interfaces
         
         Task<IEnumerable<ProveedorDto>> GetAllAsync();
         Task<IEnumerable<ProveedorDto>> GetActivosAsync();
-        Task<ProveedorDto> GetByIdAsync(int id);
+        Task<ProveedorDto?> GetByIdAsync(int id);
         Task<ProveedorDto> CreateAsync(ProveedorDto proveedorDto);
         Task<ProveedorDto> UpdateAsync(ProveedorDto proveedorDto);
         Task<bool> DeleteAsync(int id);

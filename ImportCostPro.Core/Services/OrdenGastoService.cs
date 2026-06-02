@@ -244,7 +244,16 @@ namespace ImportCostPro.Core.Services
                     Id = o.Id,
                     NumeroOrden = o.NumeroOrden,
                     Estado = o.Estado,
-                    NombreImportador = o.Importador.Nombre
+                    NombreImportador = o.Importador != null ? o.Importador.Nombre : string.Empty,
+                    ImportadorId = o.ImportadorId,
+                    ProveedorId = o.ProveedorId,
+                    PaisOrigenId = o.PaisOrigenId,
+                    MonedaId = o.MonedaId,
+                    FechaOrden = o.FechaOrden,
+                    ModalidadTransporte = o.ModalidadTransporte,
+                    Activo = o.Activo,
+                    FechaCreacion = o.FechaCreacion,
+                    FechaModificacion = o.FechaModificacion
                 })
                 .ToListAsync();
         }
