@@ -7,7 +7,7 @@ Sistema de gestión de importaciones y cálculo automatizado de **Landed Cost** 
 ## 👥 Equipo de Desarrollo
 *   **Aliandy Jimenez | 2025-1018** 
 *   **Waldin Ceballos | 2025-1112** 
-*   **Yailyn Santana    | 2025-1111**
+*   **Yailyn Santana  | 2025-1104**
 
 ---
 
