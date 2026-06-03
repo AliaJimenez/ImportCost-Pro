@@ -10,22 +10,17 @@ namespace ImportCostPro.Data.Contexts
             : base(options)
         {
         }
-
-        // Aqui iremos agregando sus DbSets (DbSet<Pais>, DbSet<Moneda>, etc.)
-
         public DbSet<CategoriaArancelaria> CategoriasArancelarias { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Moneda> Monedas { get; set; }
         public DbSet<TasaCambio> TasasCambio { get; set; }
         public DbSet<ConfiguracionImpuesto> ConfiguracionesImpuestos { get; set; }
-        //public DbSet<ConfiguracionImpuesto> ConfiguracionesImpuesto { get; set; }
         public DbSet<Pais> Paises { get; set; }
         public DbSet<Importador> Importadores { get; set; }
         public DbSet <Proveedor> Proveedores { get; set; }  
         public DbSet<OrdenImportacion> OrdenesImportacion { get; set; }
         public DbSet<CalculoLandedCost> CalculosLandedCost { get; set; }
         public DbSet<CalculoLandedCostDetalle> DetallesLandedCost { get; set; }
-        
         public DbSet<OrdenProducto> OrdenProductos { get; set; }
         public DbSet<OrdenGasto> OrdenGastos { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
