@@ -30,7 +30,7 @@ namespace ImportCostPro.Data.EntityConfigurations
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(op => op.Producto)
-                .WithMany()
+                .WithMany(p => p.OrdenProductos)
                 .HasForeignKey(op => op.ProductoId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);

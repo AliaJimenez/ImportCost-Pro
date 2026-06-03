@@ -80,12 +80,12 @@ namespace ImportCostPro.Data.EntityConfigurations
                     .HasForeignKey(o => o.ImportadorId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                builder.HasOne(o => o.Proveedor)
-                    .WithMany()
-                    .HasForeignKey(o => o.ProveedorId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(o => o.Proveedor)
+                  .WithMany(p => p.OrdenesImportacion)
+                  .HasForeignKey(o => o.ProveedorId)
+                  .OnDelete(DeleteBehavior.Restrict);
 
-                builder.HasOne(o => o.PaisOrigen)
+            builder.HasOne(o => o.PaisOrigen)
                     .WithMany()
                     .HasForeignKey(o => o.PaisOrigenId)
                     .OnDelete(DeleteBehavior.Restrict);
