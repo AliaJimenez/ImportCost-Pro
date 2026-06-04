@@ -11,6 +11,7 @@ namespace ImportCostPro.Core.ViewModels.Proveedor
         public string? Email { get; set; }
         public bool Activo { get; set; }
         public bool TieneOrdenes { get; set; }
+        public string? Telefono { get; set; }
         public DateTime FechaCreacion { get; set; }
     }
 }

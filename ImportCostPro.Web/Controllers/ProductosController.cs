@@ -133,27 +133,62 @@ namespace ImportCostPro.Web.Controllers
             TempData["Mensaje"] = mensaje;
             return RedirectToAction(nameof(Index));
         }
+     
         private async Task LlenarSelectsAsync(ProductoViewModel viewModel)
         {
-            var categorias = await _categoriaService
-                .ObtenerCategoriasActivasAsync();
+            var categorias = (await _categoriaService.ObtenerCategoriasActivasAsync()).ToList();
+
+            if (viewModel.CategoriaArancelariaId > 0)
+            {
+                var yaEsta = categorias.Any(c => c.Id == viewModel.CategoriaArancelariaId);
+                if (!yaEsta)
+                {
+                    var categoriaInactiva = await _categoriaService
+                        .ObtenerPorIdAsync(viewModel.CategoriaArancelariaId);
+
+                    if (categoriaInactiva != null)
+                    {
+                        categoriaInactiva.Nombre = $"{categoriaInactiva.Nombre} (Inactivo)";
+                        categorias.Add(categoriaInactiva);
+                    }
+                }
+            }
 
             viewModel.CategoriasDisponibles = new SelectList(
                 categorias, "Id", "Nombre",
                 viewModel.CategoriaArancelariaId);
 
+         
             viewModel.UnidadesMedidaDisponibles = new SelectList(
-                new List<string>
-                {
-                    "Unidad", "Caja", "Paquete",
-                    "Docena", "Galón", "Metro"
-                },
+                new List<string> { "Unidad", "Caja", "Paquete", "Docena", "Galón", "Metro" },
                 viewModel.UnidadMedida);
 
-            var paises = await _paisService.GetActivosAsync();
+           
+            var paises = (await _paisService.GetActivosAsync()).ToList();
+
+            if (viewModel.PaisOrigenId > 0)
+            {
+                var yaEsta = paises.Any(p => p.Id == viewModel.PaisOrigenId);
+                if (!yaEsta)
+                {
+                    var paisInactivo = await _paisService
+                        .GetByIdAsync(viewModel.PaisOrigenId);
+
+                    if (paisInactivo != null)
+                    {
+                        paisInactivo.Nombre = $"{paisInactivo.Nombre} (Inactivo)";
+                        paises.Add(paisInactivo);
+                    }
+                }
+            }
+
             viewModel.PaisesDisponibles = new SelectList(
-               paises, "Id", "Nombre",
-               viewModel.PaisOrigenId);
+                paises, "Id", "Nombre",
+                viewModel.PaisOrigenId);
+            viewModel.CategoriasDisponibles = new SelectList(
+                categorias, "Id", "Nombre",
+                viewModel.CategoriaArancelariaId);
+            
         }
 
         private ProductoDto ViewModelToDto(ProductoViewModel viewModel)

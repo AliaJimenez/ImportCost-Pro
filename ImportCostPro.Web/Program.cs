@@ -4,14 +4,12 @@ using ImportCostPro.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Configurar la cadena de conexión y el DbContext
+//  cadena de conexión y el DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ImportCostDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// 2. Inyección de Dependencias (Servicios de Aplicación)
-// Aquí iremos añadiendo los servicios según avancen
-// Asegúrate de tener esto en tu Program.cs
+// Inyección de Dependencias (Servicios de Aplicación)
 builder.Services.AddScoped<IMonedaService, MonedaService>();
 builder.Services.AddScoped<ITasaCambioService, TasaCambioService>();
 builder.Services.AddScoped<IConfiguracionImpuestoService, ConfiguracionImpuestoService>();
@@ -23,6 +21,7 @@ builder.Services.AddScoped<IImportadorService, ImportadorService>();
 builder.Services.AddScoped<IOrdenProductoService, OrdenProductoService>();
 builder.Services.AddScoped<IOrdenGastoService, OrdenGastoService>();
 builder.Services.AddScoped<IOrdenImportacionService, OrdenImportacionService>();
+builder.Services.AddScoped<ICalculoLandedCostService, CalculoLandedCostService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

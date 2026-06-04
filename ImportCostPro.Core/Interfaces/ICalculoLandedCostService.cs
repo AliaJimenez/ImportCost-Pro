@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using ImportCostPro.Core.Dtos;
+﻿using ImportCostPro.Core.Dtos;
 
 namespace ImportCostPro.Core.Interfaces
 {

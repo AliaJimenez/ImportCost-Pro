@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
 using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Data.Contexts;
 
@@ -19,10 +17,8 @@ namespace ImportCostPro.Web.Controllers
             _context = context;
         }
 
-        // GET: /CalculoLandedCost → redirige a Calcular
         public IActionResult Index() => RedirectToAction(nameof(Calcular));
 
-        // GET: /CalculoLandedCost/Calcular
         public async Task<IActionResult> Calcular()
         {
             try
@@ -36,7 +32,7 @@ namespace ImportCostPro.Web.Controllers
             }
             catch
             {
-                // La tabla aún no existe o hay un error de BD — mostrar lista vacía
+                
                 ViewBag.Ordenes = new SelectList(Enumerable.Empty<object>(), "Id", "Nombre");
                 TempData["ErrorMessage"] = "No se pudo cargar la lista de órdenes. Verifique que la base de datos esté migrada correctamente.";
             }
@@ -44,7 +40,6 @@ namespace ImportCostPro.Web.Controllers
             return View();
         }
 
-        // POST: /CalculoLandedCost/Calcular
         [HttpPost]
         public async Task<IActionResult> Calcular(int ordenImportacionId)
         {
@@ -61,7 +56,6 @@ namespace ImportCostPro.Web.Controllers
             }
         }
 
-        // POST: /CalculoLandedCost/ConfirmarGuardado
         [HttpPost]
         public async Task<IActionResult> ConfirmarGuardado(int ordenImportacionId)
         {
@@ -69,7 +63,6 @@ namespace ImportCostPro.Web.Controllers
             {
                 var resultadoDto = await _calculoService.CalcularLandedCostAsync(ordenImportacionId);
                 
-                // Llamamos al servicio para guardar en la BD Inmutable y cambiar estado
                 await _calculoService.GuardarCalculoOficialAsync(resultadoDto);
                 
                 TempData["SuccessMessage"] = "¡Cálculo de Landed Cost confirmado y guardado exitosamente!";

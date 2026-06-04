@@ -55,12 +55,13 @@
     <table class="icp-table">
         <thead>
             <tr>
-                <th style="width:15%;">RNC</th>
-                <th style="width:28%;">Razón Social</th>
-                <th style="width:18%;">Teléfono</th>
-                <th style="width:21%;">Correo Electrónico</th>
-                <th style="width:10%;">Estado</th>
-                <th style="width:8%;" class="text-end">Acciones</th>
+                <th style="width:12%;">RNC</th>
+                <th style="width:25%;">Razón Social</th>
+                <th style="width:15%;">Teléfono</th>
+                <th style="width:13%;">País</th>
+                <th style="width:25%;">Correo Electrónico</th>
+                <th style="width:5%;">Estado</th>
+                <th style="width:5%;" class="text-end">Acciones</th>
             </tr>
         </thead>
         <tbody id="tbodyImportador">
@@ -86,6 +87,10 @@
                         <td style="color: var(--text-secondary);">
                             <i class="bi bi-telephone me-1" style="font-size: 0.72rem; opacity: 0.6;"></i>
                             @(string.IsNullOrEmpty(item.Telefono) ? "—" : item.Telefono)
+                        </td>
+                        <td class="fs-sm" style="color: var(--text-muted);">
+                            <i class="bi bi-globe me-1" style="font-size: 0.72rem; opacity: 0.6;"></i>
+                            @(string.IsNullOrEmpty(item.NombrePais) ? "—" : item.NombrePais)
                         </td>
                         <td class="fs-sm" style="color: var(--text-muted);">
                             <i class="bi bi-envelope me-1" style="font-size: 0.72rem; opacity: 0.6;"></i>

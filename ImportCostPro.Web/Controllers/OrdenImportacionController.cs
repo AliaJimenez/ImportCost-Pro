@@ -61,6 +61,7 @@ namespace ImportCostPro.Web.Controllers
                 model.Paises = await GetPaisesSelectList();
                 model.Monedas = await GetMonedasSelectList();
                 model.Modalidades = GetModalidadesSelectList();
+                
                 return View(model);
             }
 

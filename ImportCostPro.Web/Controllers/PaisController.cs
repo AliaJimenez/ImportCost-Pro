@@ -11,15 +11,13 @@ namespace ImportCostPro.Web.Controllers
 {
     public class PaisController(IPaisService paisService) : Controller
     {
-        // GET: Pais
-        public async Task<IActionResult> Index()
+      public async Task<IActionResult> Index()
         {
             var paises = await paisService.GetAllAsync();
             var viewModel = MapToIndexViewModel(paises);
             return View(viewModel);
         }
 
-        // GET: Pais/Create
         public IActionResult Create()
         {
             var model = new PaisFormViewModel
@@ -31,9 +29,7 @@ namespace ImportCostPro.Web.Controllers
             return View(model);
         }
 
-        // POST: Pais/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PaisFormViewModel model)
         {
             if (!ModelState.IsValid)
@@ -61,7 +57,6 @@ namespace ImportCostPro.Web.Controllers
             }
         }
 
-        // GET: Pais/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id is null)
@@ -82,9 +77,7 @@ namespace ImportCostPro.Web.Controllers
             return View(viewModel);
         }
 
-        // POST: Pais/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PaisFormViewModel model)
         {
             if (id != model.Id)
@@ -119,7 +112,6 @@ namespace ImportCostPro.Web.Controllers
             }
         }
 
-        // GET: Pais/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id is null)
@@ -146,9 +138,7 @@ namespace ImportCostPro.Web.Controllers
             return View(viewModel);
         }
 
-        // POST: Pais/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try

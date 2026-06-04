@@ -76,7 +76,7 @@ namespace ImportCostPro.Data.EntityConfigurations
 
                 #region Relationship Configuration
                 builder.HasOne(o => o.Importador)
-                    .WithMany()
+                    .WithMany(i => i.Ordenes)
                     .HasForeignKey(o => o.ImportadorId)
                     .OnDelete(DeleteBehavior.Restrict);
 

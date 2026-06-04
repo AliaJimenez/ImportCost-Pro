@@ -7,6 +7,7 @@
     var estadoOrden = ViewBag.EstadoOrden as string ?? "";
     bool esAbierta = estadoOrden == "Abierta";
     var ordenes = ViewBag.Ordenes as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+    var filtroOrdenId = ViewBag.FiltroOrdenId as int?;
 }
 
 <div class="icp-page-header">
@@ -37,16 +38,26 @@
     @if (esAbierta && ordenId.HasValue)
     {
         <a asp-action="Create" asp-route-ordenId="@ordenId" class="btn-icp-primary"
-           style="background: var(--accent-purple); box-shadow: 0 2px 8px rgba(139,92,246,0.25);">
+        style="background: var(--accent-purple); box-shadow: 0 2px 8px rgba(139,92,246,0.25);">
             <i class="bi bi-plus-lg"></i> Registrar Gasto
         </a>
     }
     else if (!ordenId.HasValue)
     {
-        <a asp-action="Create" class="btn-icp-primary"
-           style="background: var(--accent-purple); box-shadow: 0 2px 8px rgba(139,92,246,0.25);">
-            <i class="bi bi-plus-lg"></i> Registrar Gasto
-        </a>
+        @if (filtroOrdenId.HasValue)
+        {
+            <a asp-action="Create" asp-route-ordenId="@filtroOrdenId" class="btn-icp-primary"
+            style="background: var(--accent-purple); box-shadow: 0 2px 8px rgba(139,92,246,0.25);">
+                <i class="bi bi-plus-lg"></i> Registrar Gasto
+            </a>
+        }
+        else
+        {
+            <span class="btn-icp-primary" style="opacity:0.5; cursor:not-allowed;"
+            title="Selecciona una orden primero para registrar un gasto">
+                <i class="bi bi-plus-lg"></i> Registrar Gasto
+            </span>
+        }
     }
 </div>
 
