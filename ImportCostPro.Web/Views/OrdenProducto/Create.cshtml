@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Agregar Producto a Orden";
-    var productos = ViewBag.Productos as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
+    var productos = ViewBag.ProductosCat as Microsoft.AspNetCore.Mvc.Rendering.SelectList;
     var ordenId = ViewBag.OrdenId as int? ?? Model?.OrdenImportacionId ?? 0;
     var numeroOrden = ViewBag.NumeroOrden as string ?? "";
 }

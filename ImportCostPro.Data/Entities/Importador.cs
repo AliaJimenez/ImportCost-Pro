@@ -20,7 +20,7 @@ namespace ImportCostPro.Data.Entities
         public DateTime FechaCreacion { get; set; } = DateTime.Now;
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
 
-        // Próxima navegación a órdenes (aún no implementada)
-        // public ICollection<OrdenImportacion> Ordenes { get; set; } = [];
+        // navigation
+        public ICollection<OrdenImportacion> Ordenes { get; set; } = [];
     }
 }

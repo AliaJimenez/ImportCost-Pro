@@ -3,10 +3,6 @@ using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Core.ViewModels.Importador;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ImportCostPro.Web.Controllers
 {
@@ -14,7 +10,6 @@ namespace ImportCostPro.Web.Controllers
         IImportadorService importadorService,
         IPaisService paisService) : Controller
     {
-        // GET: Importador
         public async Task<IActionResult> Index()
         {
             var importadores = await importadorService.GetAllAsync();
@@ -22,25 +17,25 @@ namespace ImportCostPro.Web.Controllers
             return View(viewModel);
         }
 
-        // GET: Importador/Create
         public async Task<IActionResult> Create()
         {
             var model = new ImportadorFormViewModel
             {
-                Nombre = string.Empty,  
-                Rnc = string.Empty,     
-                PaisId = 0,             
+                Nombre = string.Empty,
+                Rnc = string.Empty,
+                Pais = 0,
                 Activo = true,
                 Paises = await GetPaisesSelectList()
             };
             return View(model);
         }
 
-        // POST: Importador/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ImportadorFormViewModel model)
         {
+            if (model.Pais <= 0)
+                ModelState.AddModelError("Pais", "Debe seleccionar un país.");
+
             if (!ModelState.IsValid)
             {
                 model.Paises = await GetPaisesSelectList();
@@ -53,10 +48,11 @@ namespace ImportCostPro.Web.Controllers
                 {
                     Nombre = model.Nombre,
                     Rnc = model.Rnc,
-                    PaisId = model.PaisId,
+                    PaisId = model.Pais,
                     Direccion = model.Direccion,
                     Email = model.Email,
                     Telefono = model.Telefono,
+                    Contacto = model.Contacto,
                     Activo = model.Activo,
                     FechaCreacion = DateTime.Now,
                     FechaModificacion = DateTime.Now
@@ -74,7 +70,6 @@ namespace ImportCostPro.Web.Controllers
             }
         }
 
-        // GET: Importador/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id is null)
@@ -89,28 +84,30 @@ namespace ImportCostPro.Web.Controllers
                 Id = importador.Id,
                 Nombre = importador.Nombre,
                 Rnc = importador.Rnc,
-                PaisId = importador.PaisId,
+                Pais = importador.PaisId,
                 Direccion = importador.Direccion,
                 Email = importador.Email,
                 Telefono = importador.Telefono,
+                Contacto = importador.Contacto,
                 Activo = importador.Activo,
-                Paises = await GetPaisesSelectList()
+                Paises = await GetPaisesSelectList(importador.PaisId) 
             };
 
             return View(viewModel);
         }
 
-        // POST: Importador/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ImportadorFormViewModel model)
         {
             if (id != model.Id)
                 return NotFound();
 
+            if (model.Pais <= 0)
+                ModelState.AddModelError("Pais", "Debe seleccionar un país.");
+
             if (!ModelState.IsValid)
             {
-                model.Paises = await GetPaisesSelectList();
+                model.Paises = await GetPaisesSelectList(model.Pais);
                 return View(model);
             }
 
@@ -124,10 +121,11 @@ namespace ImportCostPro.Web.Controllers
                     Id = model.Id,
                     Nombre = model.Nombre,
                     Rnc = model.Rnc,
-                    PaisId = model.PaisId,
+                    PaisId = model.Pais,
                     Direccion = model.Direccion,
                     Email = model.Email,
                     Telefono = model.Telefono,
+                    Contacto = model.Contacto,
                     Activo = model.Activo,
                     FechaCreacion = importadorActual.FechaCreacion,
                     FechaModificacion = DateTime.Now
@@ -140,12 +138,11 @@ namespace ImportCostPro.Web.Controllers
             catch (Exception ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
-                model.Paises = await GetPaisesSelectList();
+                model.Paises = await GetPaisesSelectList(model.Pais); 
                 return View(model);
             }
         }
 
-        // GET: Importador/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id is null)
@@ -166,19 +163,18 @@ namespace ImportCostPro.Web.Controllers
                 Id = importador.Id,
                 Nombre = importador.Nombre,
                 Rnc = importador.Rnc,
-                PaisId = importador.PaisId,
+                Pais = importador.PaisId,
                 Direccion = importador.Direccion,
                 Email = importador.Email,
                 Telefono = importador.Telefono,
+                Contacto = importador.Contacto,
                 Activo = importador.Activo
             };
 
             return View(viewModel);
         }
 
-        // POST: Importador/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
@@ -194,9 +190,20 @@ namespace ImportCostPro.Web.Controllers
             }
         }
 
-        private async Task<List<SelectListItem>> GetPaisesSelectList()
+        private async Task<List<SelectListItem>> GetPaisesSelectList(int paisActualId = 0)
         {
-            var paises = await paisService.GetActivosAsync();
+            var paises = (await paisService.GetActivosAsync()).ToList();
+
+            if (paisActualId > 0 && !paises.Any(p => p.Id == paisActualId))
+            {
+                var paisInactivo = await paisService.GetByIdAsync(paisActualId);
+                if (paisInactivo != null)
+                {
+                    paisInactivo.Nombre = $"{paisInactivo.Nombre} (Inactivo)";
+                    paises = paises.Append(paisInactivo).ToList();
+                }
+            }
+
             return paises.Select(p => new SelectListItem
             {
                 Value = p.Id.ToString(),
@@ -204,7 +211,6 @@ namespace ImportCostPro.Web.Controllers
             }).ToList();
         }
 
-      
         private static List<ImportadorIndexViewModel> MapToIndexViewModel(IEnumerable<ImportadorDto> importadores)
         {
             return importadores.Select(i => new ImportadorIndexViewModel
@@ -212,10 +218,11 @@ namespace ImportCostPro.Web.Controllers
                 Id = i.Id,
                 Nombre = i.Nombre,
                 Rnc = i.Rnc,
-                NombrePais = i.NombrePais, 
+                NombrePais = i.NombrePais,
+                Email = i.Email,
                 Telefono = i.Telefono,
                 Activo = i.Activo,
-                TieneOrdenes = i.TieneOrdenes, 
+                TieneOrdenes = i.TieneOrdenes,
                 FechaCreacion = i.FechaCreacion
             }).ToList();
         }

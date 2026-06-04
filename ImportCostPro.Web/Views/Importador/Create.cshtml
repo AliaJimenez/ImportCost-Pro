@@ -40,6 +40,13 @@
                     </div>
                 </div>
 
+                <div class="mb-3">
+                    <label asp-for="Pais" class="icp-field-label">País</label>
+                    <select asp-for="Pais" asp-items="Model.Paises" class="form-select">
+                        <option value="">-- Seleccione un País --</option>
+                    </select>
+                    <span asp-validation-for="Pais" class="text-danger fs-xs"></span>
+                </div>
                 <span class="icp-form-section-label">Contacto</span>
 
                 <div class="row g-3 mb-3">
