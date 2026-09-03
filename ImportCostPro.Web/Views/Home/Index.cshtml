@@ -1,5 +1,14 @@
+@using ImportCostPro.Data.Contexts
+@inject ImportCostDbContext _context
 @{
     ViewData["Title"] = "Dashboard";
+
+    var totalPaises = _context.Paises.Count();
+    var totalMonedas = _context.Monedas.Count();
+    var totalProveedores = _context.Proveedores.Count();
+    var totalImportadores = _context.Importadores.Count();
+    var totalProductos = _context.Productos.Count();
+    var totalCategorias = _context.CategoriasArancelarias.Count();
 }
 
 <!-- ── Encabezado ──────────────────────────────────────────── -->
@@ -20,6 +29,7 @@
 
 <!-- ── KPI Metrics ─────────────────────────────────────────── -->
 <div class="row g-3 mb-4">
+
     <div class="col-sm-6 col-lg-4">
         <a asp-controller="Pais" asp-action="Index" class="text-decoration-none d-block">
             <div class="icp-metric-card" style="--metric-accent: var(--accent-cyan);">
@@ -29,11 +39,12 @@
                         <i class="bi bi-globe-americas" style="color: var(--accent-cyan);"></i>
                     </div>
                 </div>
-                <div class="icp-metric-value" style="color: var(--accent-cyan);">—</div>
+                <div class="icp-metric-value counter" data-target="@totalPaises" style="color: var(--accent-cyan);">0</div>
                 <div class="icp-metric-desc">Orígenes geográficos activos</div>
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-lg-4">
         <a asp-controller="Moneda" asp-action="Index" class="text-decoration-none d-block">
             <div class="icp-metric-card" style="--metric-accent: var(--accent-orange);">
@@ -43,11 +54,12 @@
                         <i class="bi bi-currency-exchange" style="color: var(--accent-orange);"></i>
                     </div>
                 </div>
-                <div class="icp-metric-value" style="color: var(--accent-orange);">—</div>
+                <div class="icp-metric-value counter" data-target="@totalMonedas" style="color: var(--accent-orange);">0</div>
                 <div class="icp-metric-desc">Divisas disponibles en el sistema</div>
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-lg-4">
         <a asp-controller="Proveedor" asp-action="Index" class="text-decoration-none d-block">
             <div class="icp-metric-card" style="--metric-accent: var(--accent-purple);">
@@ -57,11 +69,12 @@
                         <i class="bi bi-truck" style="color: var(--accent-purple);"></i>
                     </div>
                 </div>
-                <div class="icp-metric-value" style="color: var(--accent-purple);">—</div>
+                <div class="icp-metric-value counter" data-target="@totalProveedores" style="color: var(--accent-purple);">0</div>
                 <div class="icp-metric-desc">Suplidores internacionales</div>
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-lg-4">
         <a asp-controller="Importador" asp-action="Index" class="text-decoration-none d-block">
             <div class="icp-metric-card" style="--metric-accent: var(--accent-green);">
@@ -71,11 +84,12 @@
                         <i class="bi bi-person-badge" style="color: var(--accent-green);"></i>
                     </div>
                 </div>
-                <div class="icp-metric-value" style="color: var(--accent-green);">—</div>
+                <div class="icp-metric-value counter" data-target="@totalImportadores" style="color: var(--accent-green);">0</div>
                 <div class="icp-metric-desc">Empresas importadoras locales</div>
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-lg-4">
         <a asp-controller="Productos" asp-action="Index" class="text-decoration-none d-block">
             <div class="icp-metric-card" style="--metric-accent: var(--accent-red);">
@@ -85,11 +99,12 @@
                         <i class="bi bi-tags" style="color: var(--accent-red);"></i>
                     </div>
                 </div>
-                <div class="icp-metric-value" style="color: var(--accent-red);">—</div>
+                <div class="icp-metric-value counter" data-target="@totalProductos" style="color: var(--accent-red);">0</div>
                 <div class="icp-metric-desc">Artículos en catálogo</div>
             </div>
         </a>
     </div>
+
     <div class="col-sm-6 col-lg-4">
         <a asp-controller="CategoriasArancelarias" asp-action="Index" class="text-decoration-none d-block">
             <div class="icp-metric-card" style="--metric-accent: var(--accent-blue);">
@@ -99,13 +114,13 @@
                         <i class="bi bi-percent" style="color: var(--accent-blue);"></i>
                     </div>
                 </div>
-                <div class="icp-metric-value" style="color: var(--accent-blue);">—</div>
+                <div class="icp-metric-value counter" data-target="@totalCategorias" style="color: var(--accent-blue);">0</div>
                 <div class="icp-metric-desc">Grupos tributarios configurados</div>
             </div>
         </a>
     </div>
-</div>
 
+</div>
 <!-- ── Accesos Rápidos ─────────────────────────────────────── -->
 <div class="icp-card">
     <div class="d-flex align-items-center justify-content-between mb-3">
@@ -129,3 +144,31 @@
         </a>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const counters = document.querySelectorAll('.counter');
+
+            const speed = 50;
+
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const count = +counter.innerText;
+
+                    const inc = target / speed;
+
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count + inc);
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+
+                updateCount();
+            });
+        });
+    </script>
+}

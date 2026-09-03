@@ -54,8 +54,10 @@
                     </div>
                     <div class="col-md-6">
                         <label asp-for="PaisOrigenId" class="icp-field-label"></label>
-                        <select asp-for="PaisOrigenId" class="form-select" disabled>
-                            <option value="">-- Disponible pronto --</option>
+                        <select asp-for="PaisOrigenId"
+                                asp-items="Model.PaisesDisponibles"
+                            class="form-select">
+                            <option value="">-- Seleccione un país --</option>
                         </select>
                         <span asp-validation-for="PaisOrigenId" class="text-danger fs-xs"></span>
                     </div>

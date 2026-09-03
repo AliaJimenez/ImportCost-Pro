@@ -2,23 +2,16 @@
 using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Data.Contexts;
 using ImportCostPro.Data.Entities;
-using System;
 using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Core.Services
 {
-    public class PaisService : IPaisService
+
+    public class PaisService(ImportCostDbContext context) : IPaisService
     {
-        private readonly ImportCostDbContext _context;
-
-        public PaisService(ImportCostDbContext context)
-        {
-            _context = context;
-        }
-
         public async Task<IEnumerable<PaisDto>> GetAllAsync()
         {
-            var paises = await _context.Paises
+            var paises = await context.Paises
                 .OrderBy(p => p.Nombre)
                 .ToListAsync();
             return MapToDto(paises);
@@ -26,17 +19,19 @@ namespace ImportCostPro.Core.Services
 
         public async Task<IEnumerable<PaisDto>> GetActivosAsync()
         {
-            var paises = await _context.Paises
+            var paises = await context.Paises
                 .Where(p => p.Activo)
                 .OrderBy(p => p.Nombre)
                 .ToListAsync();
             return MapToDto(paises);
         }
 
-        public async Task<PaisDto> GetByIdAsync(int id)
+       
+        public async Task<PaisDto?> GetByIdAsync(int id)
         {
-            var pais = await _context.Paises.FindAsync(id);
-            return pais == null ? null : MapToDto(pais);
+            var pais = await context.Paises.FindAsync(id);
+        
+            return pais is null ? null : MapToDto(pais);
         }
 
         public async Task<PaisDto> CreateAsync(PaisDto paisDto)
@@ -47,53 +42,52 @@ namespace ImportCostPro.Core.Services
             var pais = new Pais
             {
                 Nombre = paisDto.Nombre,
-                CodigoISO = paisDto.CodigoISO?.ToUpper()!,
+                CodigoISO = paisDto.CodigoISO.ToUpper(),
                 Activo = paisDto.Activo,
                 FechaCreacion = DateTime.Now,
                 FechaModificacion = DateTime.Now
             };
 
-            _context.Paises.Add(pais);
-            await _context.SaveChangesAsync();
+            context.Paises.Add(pais);
+            await context.SaveChangesAsync();
             return MapToDto(pais);
         }
 
         public async Task<PaisDto> UpdateAsync(PaisDto paisDto)
         {
-            var pais = await _context.Paises.FindAsync(paisDto.Id);
-            if (pais == null)
-                throw new Exception("País no encontrado");
+            var pais = await context.Paises.FindAsync(paisDto.Id)
+                ?? throw new Exception("País no encontrado");
 
             if (await ExistsByCodigoISOAsync(paisDto.CodigoISO, paisDto.Id))
                 throw new Exception("El código ISO ya existe");
 
             pais.Nombre = paisDto.Nombre;
-            pais.CodigoISO = paisDto.CodigoISO?.ToUpper()!;
+            pais.CodigoISO = paisDto.CodigoISO.ToUpper();
             pais.Activo = paisDto.Activo;
             pais.FechaModificacion = DateTime.Now;
 
-            _context.Paises.Update(pais);
-            await _context.SaveChangesAsync();
+            context.Paises.Update(pais);
+            await context.SaveChangesAsync();
             return MapToDto(pais);
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var pais = await _context.Paises.FindAsync(id);
-            if (pais == null)
+            var pais = await context.Paises.FindAsync(id);
+            if (pais is null)
                 return false;
 
-            _context.Paises.Remove(pais);
-            await _context.SaveChangesAsync();
+            context.Paises.Remove(pais);
+            await context.SaveChangesAsync();
             return true;
         }
 
         public async Task<bool> ExistsByCodigoISOAsync(string codigoISO, int? excludeId = null)
         {
-            var codigoUpperCase = codigoISO?.ToUpper();  
+            var codigoUpperCase = codigoISO.ToUpper();
 
-            var query = _context.Paises
-                .Where(p => p.CodigoISO == codigoUpperCase); 
+            var query = context.Paises
+                .Where(p => p.CodigoISO == codigoUpperCase);
 
             if (excludeId.HasValue)
                 query = query.Where(p => p.Id != excludeId);
@@ -103,10 +97,10 @@ namespace ImportCostPro.Core.Services
 
         public async Task<bool> CanDeleteAsync(int paisId)
         {
-            bool enProveedores = await _context.Proveedores
+            bool enProveedores = await context.Proveedores
                 .AnyAsync(p => p.PaisOrigenId == paisId);
 
-            bool enProductos = await _context.Productos
+            bool enProductos = await context.Productos
                 .AnyAsync(p => p.PaisOrigenId == paisId);
 
             return !enProveedores && !enProductos;
@@ -114,16 +108,17 @@ namespace ImportCostPro.Core.Services
 
         public async Task<string> GetDeleteErrorMessageAsync(int paisId)
         {
-            if (await _context.Proveedores.AnyAsync(p => p.PaisOrigenId == paisId))
+            if (await context.Proveedores.AnyAsync(p => p.PaisOrigenId == paisId))
                 return "Este país está asignado a proveedores.";
 
-            if (await _context.Productos.AnyAsync(p => p.PaisOrigenId == paisId))
+            if (await context.Productos.AnyAsync(p => p.PaisOrigenId == paisId))
                 return "Este país está asignado a productos.";
 
             return "No se puede eliminar este país.";
         }
 
-        private IEnumerable<PaisDto> MapToDto(IEnumerable<Pais> paises)
+ 
+        private static List<PaisDto> MapToDto(IEnumerable<Pais> paises)
         {
             return paises.Select(p => new PaisDto
             {
@@ -133,10 +128,11 @@ namespace ImportCostPro.Core.Services
                 Activo = p.Activo,
                 FechaCreacion = p.FechaCreacion,
                 FechaModificacion = p.FechaModificacion
-            });
+            }).ToList();
         }
 
-        private PaisDto MapToDto(Pais pais)
+      
+        private static PaisDto MapToDto(Pais pais)
         {
             return new PaisDto
             {

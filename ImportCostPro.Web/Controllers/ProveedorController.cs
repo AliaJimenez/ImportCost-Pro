@@ -1,49 +1,45 @@
 ﻿using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Core.ViewModels.Proveedor;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ImportCostPro.Web.Controllers
 {
-    public class ProveedorController : Controller
+    public class ProveedorController(
+        IProveedorService proveedorService,
+        IPaisService paisService,
+        IMonedaService monedaService) : Controller
     {
-        private readonly IProveedorService _proveedorService;
-        private readonly IPaisService _paisService;
-        private readonly IMonedaService _monedaService;
-
-        public ProveedorController(IProveedorService proveedorService, IPaisService paisService, IMonedaService monedaService)
-        {
-            _proveedorService = proveedorService;
-            _paisService = paisService;
-            _monedaService = monedaService;
-        }
-
-        // GET: Proveedor
         public async Task<IActionResult> Index()
         {
-            var proveedores = await _proveedorService.GetAllAsync();
+            var proveedores = await proveedorService.GetAllAsync();
             var viewModel = MapToIndexViewModel(proveedores);
             return View(viewModel);
         }
 
-        // GET: Proveedor/Create
         public async Task<IActionResult> Create()
         {
             var model = new ProveedorFormViewModel
             {
+                Nombre = string.Empty,
+                PaisOrigenId = 0,
+                MonedaPrincipalId = 0,
                 Paises = await GetPaisesSelectList(),
                 Monedas = await GetMonedasSelectList()
             };
             return View(model);
         }
 
-        // POST: Proveedor/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProveedorFormViewModel model)
         {
+            if (model.PaisOrigenId <= 0)
+                ModelState.AddModelError("PaisOrigenId", "Debe seleccionar un país.");
+
+            if (model.MonedaPrincipalId <= 0)
+                ModelState.AddModelError("MonedaPrincipalId", "Debe seleccionar una moneda.");
+
             if (!ModelState.IsValid)
             {
                 model.Paises = await GetPaisesSelectList();
@@ -53,47 +49,49 @@ namespace ImportCostPro.Web.Controllers
 
             try
             {
-                var paisDto = await _paisService.GetByIdAsync(model.PaisOrigenId);
-                var monedaDto = await _monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
+                var paisDto = await paisService.GetByIdAsync(model.PaisOrigenId);
+                var monedaDto = await monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
 
                 var proveedorDto = new ProveedorDto
                 {
                     Nombre = model.Nombre,
                     PaisOrigenId = model.PaisOrigenId,
-                    NombrePais = paisDto?.Nombre, 
+                    NombrePais = paisDto?.Nombre,
                     MonedaPrincipalId = model.MonedaPrincipalId,
-                    NombreMoneda = monedaDto?.Nombre, 
+                    NombreMoneda = monedaDto?.Nombre,
                     Contacto = model.Contacto,
                     Email = model.Email,
                     Telefono = model.Telefono,
                     Direccion = model.Direccion,
-                    Activo = model.Activo
+                    Activo = model.Activo,
+                    TieneOrdenes = false,
+                    FechaCreacion = DateTime.Now,
+                    FechaModificacion = DateTime.Now
                 };
 
-                await _proveedorService.CreateAsync(proveedorDto);
+                await proveedorService.CreateAsync(proveedorDto);
                 TempData["Success"] = "Proveedor creado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
                 model.Paises = await GetPaisesSelectList();
                 model.Monedas = await GetMonedasSelectList();
                 return View(model);
             }
         }
 
-        // GET: Proveedor/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            if (id is null)
                 return NotFound();
 
-            var proveedor = await _proveedorService.GetByIdAsync(id.Value);
-            if (proveedor == null)
+            var proveedor = await proveedorService.GetByIdAsync(id.Value);
+            if (proveedor is null)
                 return NotFound();
 
-            bool tieneOrdenes = await _proveedorService.HasOrdersAsync(id.Value);
+            bool tieneOrdenes = await proveedorService.HasOrdersAsync(id.Value);
 
             var viewModel = new ProveedorEditViewModel
             {
@@ -101,7 +99,7 @@ namespace ImportCostPro.Web.Controllers
                 Nombre = proveedor.Nombre,
                 PaisOrigenId = proveedor.PaisOrigenId,
                 MonedaPrincipalId = proveedor.MonedaPrincipalId,
-                Contacto = proveedor.Contacto,  // ✅ AGREGAR
+                Contacto = proveedor.Contacto,
                 Email = proveedor.Email,
                 Telefono = proveedor.Telefono,
                 Direccion = proveedor.Direccion,
@@ -109,73 +107,83 @@ namespace ImportCostPro.Web.Controllers
                 TieneOrdenes = tieneOrdenes,
                 NombrePais = proveedor.NombrePais,
                 NombreMoneda = proveedor.NombreMoneda,
-                Paises = await GetPaisesSelectList(),  // ✅ AGREGAR
-                Monedas = await GetMonedasSelectList()  // ✅ AGREGAR
+                Paises = await GetPaisesSelectList(proveedor.PaisOrigenId),
+                Monedas = await GetMonedasSelectList(proveedor.MonedaPrincipalId)
             };
 
             return View(viewModel);
         }
 
-        // POST: Proveedor/Edit/5
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ProveedorEditViewModel model)
         {
             if (id != model.Id)
                 return NotFound();
 
+            if (model.PaisOrigenId <= 0)
+                ModelState.AddModelError("PaisOrigenId", "Debe seleccionar un país.");
+
+            if (model.MonedaPrincipalId <= 0)
+                ModelState.AddModelError("MonedaPrincipalId", "Debe seleccionar una moneda.");
+
             if (!ModelState.IsValid)
             {
-                model.Paises = await GetPaisesSelectList();
-                model.Monedas = await GetMonedasSelectList();
+                model.Paises = await GetPaisesSelectList(model.PaisOrigenId);
+                model.Monedas = await GetMonedasSelectList(model.MonedaPrincipalId);
                 return View(model);
             }
 
             try
             {
-                var paisDto = await _paisService.GetByIdAsync(model.PaisOrigenId);
-                var monedaDto = await _monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
+                var paisDto = await paisService.GetByIdAsync(model.PaisOrigenId);
+                var monedaDto = await monedaService.ObtenerPorIdAsync(model.MonedaPrincipalId);
+
+                var proveedorActual = await proveedorService.GetByIdAsync(id)
+                    ?? throw new Exception("Proveedor no encontrado");
 
                 var proveedorDto = new ProveedorDto
                 {
                     Id = model.Id,
                     Nombre = model.Nombre,
                     PaisOrigenId = model.PaisOrigenId,
-                    NombrePais = paisDto?.Nombre,  
+                    NombrePais = paisDto?.Nombre,
                     MonedaPrincipalId = model.MonedaPrincipalId,
-                    NombreMoneda = monedaDto?.Nombre, 
+                    NombreMoneda = monedaDto?.Nombre,
                     Contacto = model.Contacto,
                     Email = model.Email,
                     Telefono = model.Telefono,
                     Direccion = model.Direccion,
-                    Activo = model.Activo
+                    Activo = model.Activo,
+                    TieneOrdenes = proveedorActual.TieneOrdenes,
+                    FechaCreacion = proveedorActual.FechaCreacion,
+                    FechaModificacion = DateTime.Now
                 };
 
-                await _proveedorService.UpdateAsync(proveedorDto);
+                await proveedorService.UpdateAsync(proveedorDto);
                 TempData["Success"] = "Proveedor actualizado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
-                model.Paises = await GetPaisesSelectList();
-                model.Monedas = await GetMonedasSelectList();
+                ModelState.AddModelError(string.Empty, ex.Message);
+                model.Paises = await GetPaisesSelectList(model.PaisOrigenId);
+                model.Monedas = await GetMonedasSelectList(model.MonedaPrincipalId);
                 return View(model);
             }
         }
-        // GET: Proveedor/Delete/5
+
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            if (id is null)
                 return NotFound();
 
-            var proveedor = await _proveedorService.GetByIdAsync(id.Value);
-            if (proveedor == null)
+            var proveedor = await proveedorService.GetByIdAsync(id.Value);
+            if (proveedor is null)
                 return NotFound();
 
-            if (!await _proveedorService.CanDeleteAsync(id.Value))
+            if (!await proveedorService.CanDeleteAsync(id.Value))
             {
-                TempData["Error"] = await _proveedorService.GetDeleteErrorMessageAsync(id.Value);
+                TempData["Error"] = await proveedorService.GetDeleteErrorMessageAsync(id.Value);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -195,14 +203,12 @@ namespace ImportCostPro.Web.Controllers
             return View(viewModel);
         }
 
-        // POST: Proveedor/Delete/5
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
-                await _proveedorService.DeleteAsync(id);
+                await proveedorService.DeleteAsync(id);
                 TempData["Success"] = "Proveedor eliminado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
@@ -212,20 +218,40 @@ namespace ImportCostPro.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
-
-        private async Task<List<SelectListItem>> GetPaisesSelectList()
+        private async Task<List<SelectListItem>> GetPaisesSelectList(int paisActualId = 0)
         {
-            var paises = await _paisService.GetActivosAsync();
+            var paises = (await paisService.GetActivosAsync()).ToList();
+
+            if (paisActualId > 0 && !paises.Any(p => p.Id == paisActualId))
+            {
+                var paisInactivo = await paisService.GetByIdAsync(paisActualId);
+                if (paisInactivo != null)
+                {
+                    paisInactivo.Nombre = $"{paisInactivo.Nombre} (Inactivo)";
+                    paises = paises.Append(paisInactivo).ToList();
+                }
+            }
+
             return paises.Select(p => new SelectListItem
             {
                 Value = p.Id.ToString(),
                 Text = p.Nombre
             }).ToList();
         }
-
-        private async Task<List<SelectListItem>> GetMonedasSelectList()
+        private async Task<List<SelectListItem>> GetMonedasSelectList(int monedaActualId = 0)
         {
-            var monedas = await _monedaService.ObtenerActivasAsync();
+            var monedas = (await monedaService.ObtenerActivasAsync()).ToList();
+
+            if (monedaActualId > 0 && !monedas.Any(m => m.Id == monedaActualId))
+            {
+                var monedaInactiva = await monedaService.ObtenerPorIdAsync(monedaActualId);
+                if (monedaInactiva != null)
+                {
+                    monedaInactiva.Nombre = $"{monedaInactiva.Nombre} (Inactivo)";
+                    monedas = monedas.Append(monedaInactiva).ToList();
+                }
+            }
+
             return monedas.Select(m => new SelectListItem
             {
                 Value = m.Id.ToString(),
@@ -233,7 +259,7 @@ namespace ImportCostPro.Web.Controllers
             }).ToList();
         }
 
-        private IEnumerable<ProveedorIndexViewModel> MapToIndexViewModel(IEnumerable<ProveedorDto> proveedores)
+        private static List<ProveedorIndexViewModel> MapToIndexViewModel(IEnumerable<ProveedorDto> proveedores)
         {
             return proveedores.Select(p => new ProveedorIndexViewModel
             {
@@ -245,7 +271,7 @@ namespace ImportCostPro.Web.Controllers
                 Activo = p.Activo,
                 TieneOrdenes = p.TieneOrdenes,
                 FechaCreacion = p.FechaCreacion
-            });
+            }).ToList();
         }
     }
 }

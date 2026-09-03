@@ -23,7 +23,6 @@ namespace ImportCostPro.Web.Controllers
             return View(new CategoriaArancelariaViewModel());
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CategoriaArancelariaViewModel viewModel)
         {
             
@@ -75,7 +74,6 @@ namespace ImportCostPro.Web.Controllers
             return View(viewModel);
         }
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             CategoriaArancelariaViewModel viewModel)
         {
@@ -113,11 +111,23 @@ namespace ImportCostPro.Web.Controllers
             if (dto == null)
                 return NotFound();
 
-            return View(dto);
+            var viewModel = new CategoriaArancelariaViewModel
+            {
+                Id = dto.Id,
+                CodigoArancelario = dto.CodigoArancelario,
+                Nombre = dto.Nombre,
+                PorcentajeArancel = dto.PorcentajeArancel,
+                AplicaItbis = dto.AplicaItbis,
+                AplicaImpuestoSelectivo = dto.AplicaImpuestoSelectivo,
+                PorcentajeImpuestoSelectivo = dto.PorcentajeImpuestoSelectivo,
+                Activo = dto.Activo,
+                TieneProductosAsociados = dto.TieneProductosAsociados
+            };
+
+            return View(viewModel);
         }
 
         [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var (exito, mensaje) = await _service.EliminarAsync(id);

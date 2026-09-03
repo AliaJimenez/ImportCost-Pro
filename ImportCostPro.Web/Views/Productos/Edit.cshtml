@@ -65,8 +65,10 @@
                     </div>
                     <div class="col-md-6">
                         <label asp-for="PaisOrigenId" class="icp-field-label"></label>
-                        <select asp-for="PaisOrigenId" class="form-select" disabled>
-                            <option value="">-- Disponible pronto --</option>
+                        <select asp-for="PaisOrigenId"
+                            asp-items="Model.PaisesDisponibles"
+                                class="form-select" disabled="@(Model.TieneOrdenesAsociadas ? "disabled" : null)">
+                            <option value="">-- Seleccione un país --</option>
                         </select>
                         <input type="hidden" asp-for="PaisOrigenId" />
                     </div>

@@ -23,7 +23,6 @@ namespace ImportCostPro.Web.Controllers
 
         public async Task<IActionResult> Index(int? filtroOrdenId)
         {
-            // Similar a gastos, mostramos según orden
             var todosLosProductos = new List<OrdenProductoDto>();
             if (filtroOrdenId.HasValue)
             {
@@ -124,7 +123,7 @@ namespace ImportCostPro.Web.Controllers
 
         private async Task CargarProductosCat(int? productoId)
         {
-            var productos = await _catalogoProductoService.ObtenerTodosAsync();
+            var productos = await _catalogoProductoService.ObtenerProductosActivosAsync();
             ViewBag.ProductosCat = new SelectList(productos, "Id", "Nombre", productoId);
         }
     }

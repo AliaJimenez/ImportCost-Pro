@@ -2,11 +2,6 @@
 using ImportCostPro.Core.Interfaces;
 using ImportCostPro.Data.Contexts;
 using ImportCostPro.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Core.Services
@@ -43,7 +38,7 @@ namespace ImportCostPro.Core.Services
             return await MapToDtoAsync(proveedores);
         }
 
-        public async Task<ProveedorDto> GetByIdAsync(int id)
+        public async Task<ProveedorDto?> GetByIdAsync(int id)  
         {
             var proveedor = await _context.Proveedores
                 .Include(p => p.PaisOrigen)
@@ -148,12 +143,10 @@ namespace ImportCostPro.Core.Services
         private async Task<IEnumerable<ProveedorDto>> MapToDtoAsync(IEnumerable<Proveedor> proveedores)
         {
             var result = new List<ProveedorDto>();
-
             foreach (var p in proveedores)
             {
                 result.Add(await MapToDtoAsync(p));
             }
-
             return result;
         }
 

@@ -1,4 +1,4 @@
-using ImportCostPro.Core.Dtos;
+﻿using ImportCostPro.Core.Dtos;
 using ImportCostPro.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,17 +25,12 @@ namespace ImportCostPro.Web.Controllers
         {
             var ordenesAbiertas = await _gastoService.ObtenerOrdenesAbiertasAsync();
             ViewBag.Ordenes = new SelectList(ordenesAbiertas, "Id", "NumeroOrden", filtroOrdenId);
-            
+            ViewBag.FiltroOrdenId = filtroOrdenId; 
+
             var todosLosGastos = new List<OrdenGastoDto>();
-            
             if (filtroOrdenId.HasValue)
-            {
                 todosLosGastos = await _gastoService.ObtenerPorOrdenAsync(filtroOrdenId.Value);
-            }
-            // Para simplificar, si no hay filtro, podríamos traer todos, 
-            // pero IOrdenGastoService solo tiene ObtenerPorOrdenAsync en la interfaz. 
-            // Así que si es nulo devolvemos vacío y obligamos a seleccionar.
-            
+
             return View(todosLosGastos);
         }
 

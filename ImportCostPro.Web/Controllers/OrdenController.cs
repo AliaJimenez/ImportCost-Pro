@@ -6,48 +6,30 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ImportCostPro.Web.Controllers
 {
-    public class OrdenController : Controller
+    public class OrdenController(
+        IOrdenImportacionService ordenService,
+        IImportadorService importadorService,
+        IProveedorService proveedorService,
+        IPaisService paisService,
+        IMonedaService monedaService,
+        IOrdenGastoService gastoService,
+        IOrdenProductoService productoService) : Controller
     {
-        private readonly IOrdenImportacionService _ordenService;
-        private readonly IImportadorService _importadorService;
-        private readonly IProveedorService _proveedorService;
-        private readonly IPaisService _paisService;
-        private readonly IMonedaService _monedaService;
-        private readonly IOrdenGastoService _gastoService;
-        private readonly IOrdenProductoService _productoService;
-
-        public OrdenController(
-            IOrdenImportacionService ordenService,
-            IImportadorService importadorService,
-            IProveedorService proveedorService,
-            IPaisService paisService,
-            IMonedaService monedaService,
-            IOrdenGastoService gastoService,
-            IOrdenProductoService productoService)
-        {
-            _ordenService = ordenService;
-            _importadorService = importadorService;
-            _proveedorService = proveedorService;
-            _paisService = paisService;
-            _monedaService = monedaService;
-            _gastoService = gastoService;
-            _productoService = productoService;
-        }
-
         public async Task<IActionResult> Index()
         {
-            var ordenes = await _ordenService.GetAllAsync();
+            var ordenes = await ordenService.GetAllAsync();
             var vm = ordenes.Select(o => new OrdenIndexViewModel
             {
                 Id = o.Id,
                 NumeroOrden = o.NumeroOrden,
-                NombreImportador = o.ImportadorId.ToString(), // Se necesitaría un join o traer el nombre
-                NombreProveedor = o.ProveedorId.ToString(),
-                NombrePais = o.PaisOrigenId.ToString(),
-                NombreMoneda = o.MonedaId.ToString(),
+                NombreImportador = o.NombreImportador ?? "N/A",
+                NombreProveedor = o.NombreProveedor ?? "N/A",
+                NombrePais = o.NombrePais ?? "N/A",
+                NombreMoneda = o.NombreMoneda ?? "N/A",
                 Estado = o.Estado,
-                FechaCreacion = o.FechaCreacion,
-                Activo = o.Activo
+                PrecioSugerido = o.PrecioSugerido,
+                Activo = o.Activo,
+                FechaCreacion = o.FechaCreacion
             }).ToList();
 
             return View(vm);
@@ -55,26 +37,33 @@ namespace ImportCostPro.Web.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var orden = await _ordenService.GetByIdAsync(id);
-            if (orden == null) return NotFound();
+            var orden = await ordenService.GetByIdAsync(id);
+            if (orden is null) return NotFound();
 
-            var productos = await _productoService.ObtenerPorOrdenAsync(id);
-            var gastos = await _gastoService.ObtenerPorOrdenAsync(id);
+            ViewBag.Productos = await productoService.ObtenerPorOrdenAsync(id) ?? [];
+            ViewBag.Gastos = await gastoService.ObtenerPorOrdenAsync(id) ?? [];
 
-            ViewBag.Productos = productos ?? new List<OrdenProductoDto>();
-            ViewBag.Gastos = gastos ?? new List<OrdenGastoDto>();
-            
             return View(orden);
         }
 
         public async Task<IActionResult> Create()
         {
-            var vm = new OrdenFormViewModel();
+            var vm = new OrdenFormViewModel
+            {
+                NumeroOrden = string.Empty,
+                ImportadorId = 0,         
+                ProveedorId = 0,          
+                PaisOrigenId = 0,         
+                MonedaId = 0,            
+                ModalidadTransporte = string.Empty, 
+                FechaOrden = DateTime.Now
+            };
             await CargarListas(vm);
             return View(vm);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(OrdenFormViewModel model)
         {
             if (!ModelState.IsValid)
@@ -90,27 +79,34 @@ namespace ImportCostPro.Web.Controllers
                 ProveedorId = model.ProveedorId,
                 PaisOrigenId = model.PaisOrigenId,
                 MonedaId = model.MonedaId,
-                Estado = "Abierta"
+                FechaOrden = model.FechaOrden,
+                ModalidadTransporte = model.ModalidadTransporte,
+                Estado = "Abierta",
+                Activo = model.Activo,
+                FechaCreacion = DateTime.Now,
+                FechaModificacion = DateTime.Now
             };
 
-            await _ordenService.CreateAsync(dto);
+            await ordenService.CreateAsync(dto);
             TempData["Success"] = "Orden creada exitosamente.";
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            var orden = await _ordenService.GetByIdAsync(id);
-            if (orden == null) return NotFound();
+            var orden = await ordenService.GetByIdAsync(id);
+            if (orden is null) return NotFound();
 
-            var vm = new OrdenFormViewModel
+            var vm = new OrdenEditViewModel
             {
                 Id = orden.Id,
                 NumeroOrden = orden.NumeroOrden,
                 ImportadorId = orden.ImportadorId,
                 ProveedorId = orden.ProveedorId,
                 PaisOrigenId = orden.PaisOrigenId,
-                MonedaId = orden.MonedaId
+                MonedaId = orden.MonedaId,
+                FechaOrden = orden.FechaOrden,
+                ModalidadTransporte = orden.ModalidadTransporte
             };
 
             await CargarListas(vm);
@@ -119,14 +115,13 @@ namespace ImportCostPro.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(OrdenFormViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(OrdenEditViewModel model)
         {
-            var orden = await _ordenService.GetByIdAsync(model.Id);
-            if (orden == null) return NotFound();
-            
-            ViewBag.EstadoOrden = orden.Estado;
+            var ordenActual = await ordenService.GetByIdAsync(model.Id);
+            if (ordenActual is null) return NotFound();
 
-            if (orden.Estado != "Abierta")
+            if (ordenActual.Estado != "Abierta")
             {
                 TempData["Error"] = "Solo las órdenes abiertas pueden ser editadas.";
                 return RedirectToAction(nameof(Index));
@@ -138,52 +133,41 @@ namespace ImportCostPro.Web.Controllers
                 return View(model);
             }
 
-            orden.NumeroOrden = model.NumeroOrden;
-            orden.ImportadorId = model.ImportadorId;
-            orden.ProveedorId = model.ProveedorId;
-            orden.PaisOrigenId = model.PaisOrigenId;
-            orden.MonedaId = model.MonedaId;
-
-            await _ordenService.UpdateAsync(orden);
-            TempData["Success"] = "Orden actualizada exitosamente.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> Delete(int id)
-        {
-            var orden = await _ordenService.GetByIdAsync(id);
-            if (orden == null) return NotFound();
-            return View(orden);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var orden = await _ordenService.GetByIdAsync(id);
-            if (orden == null) return NotFound();
-
-            if (orden.Estado != "Abierta")
+            var dto = new OrdenImportacionDto
             {
-                TempData["Error"] = "No se puede eliminar una orden que ya fue calculada o cerrada.";
-                return RedirectToAction(nameof(Index));
-            }
+                Id = model.Id,
+                NumeroOrden = model.NumeroOrden,
+                ImportadorId = model.ImportadorId,
+                ProveedorId = model.ProveedorId,
+                PaisOrigenId = model.PaisOrigenId,
+                MonedaId = model.MonedaId,
+                FechaOrden = model.FechaOrden,
+                ModalidadTransporte = model.ModalidadTransporte,
+                Estado = ordenActual.Estado,
+                Activo = model.Activo,
+                FechaCreacion = ordenActual.FechaCreacion,
+                FechaModificacion = DateTime.Now
+            };
 
-            await _ordenService.DeleteAsync(id);
-            TempData["Success"] = "Orden eliminada exitosamente.";
+            await ordenService.UpdateAsync(dto);
+            TempData["Success"] = "Orden actualizada exitosamente.";
             return RedirectToAction(nameof(Index));
         }
 
         private async Task CargarListas(OrdenFormViewModel vm)
         {
-            var importadores = await _importadorService.GetAllAsync();
-            var proveedores = await _proveedorService.GetAllAsync();
-            var paises = await _paisService.GetAllAsync();
-            var monedas = await _monedaService.ObtenerTodasAsync();
+            var importadores = await importadorService.GetActivosAsync();
+            var proveedores = await proveedorService.GetActivosAsync();
+            var paises = await paisService.GetActivosAsync();
+            var monedas = await monedaService.ObtenerActivasAsync();
 
             vm.Importadores = importadores.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Nombre }).ToList();
             vm.Proveedores = proveedores.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Nombre }).ToList();
             vm.Paises = paises.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Nombre }).ToList();
             vm.Monedas = monedas.Select(x => new SelectListItem { Value = x.Id.ToString(), Text = x.Nombre }).ToList();
+            vm.Modalidades = new List<SelectListItem> {
+                new("Marítimo", "Marítimo"), new("Aéreo", "Aéreo"), new("Terrestre", "Terrestre")
+            };
         }
     }
 }
