@@ -1,0 +1,10 @@
+# SQL Server para desarrollo en macOS/Linux (en Windows puedes usar tu instancia local)
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: importcost_sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "ImportCost_Dev123!"
+    ports:
+      - "1433:1433"

@@ -27,6 +27,12 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+// Crea/actualiza la base de datos automáticamente al iniciar (aplica las migraciones pendientes)
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<ImportCostDbContext>().Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
